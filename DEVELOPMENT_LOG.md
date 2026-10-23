@@ -217,6 +217,15 @@ This document tracks all features, user requests, architectural decisions, and i
     - Streamlined the "How to board right now" card, "Notify Me" input (`h-9`), and dismiss button (`h-10`).
   - Validated with `npm run build` (0 errors).
 
+### Step 15: GitHub Version Control Setup & Remote Repository Push
+- **User Request**: *"https://github.com/RanvirSahib/AnyStop.git push into github"*
+- **Implementation**:
+  - Configured project `.gitignore` excluding `node_modules/`, `dist/`, `.tsbuildinfo`, `.vite/`, and environment secrets.
+  - Initialized Git repository on `main` branch.
+  - Linked remote origin to `https://github.com/RanvirSahib/AnyStop.git`.
+  - Staged and committed all core application files, design systems, assets, and documentation.
+  - Pushed to `origin/main` successfully.
+
 ---
 
 ## 🗂️ Key Files Reference
