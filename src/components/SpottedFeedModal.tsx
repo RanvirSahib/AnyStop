@@ -77,22 +77,24 @@ export const SpottedFeedModal: React.FC<SpottedFeedModalProps> = ({
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="p-4 sm:p-5 border-b border-[#EBDDD0] dark:border-[#342E5A] flex items-center justify-between bg-gradient-to-r from-[#FFF5EC] to-[#FFF0E0] dark:from-[#171330] dark:to-[#1E193C]">
-          <div className="flex items-center gap-3">
-            <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-[#0B8F82] to-[#12B3A4] text-white flex items-center justify-center shadow-md shadow-[#0B8F82]/25 shrink-0">
+        <div className="p-3.5 sm:p-5 border-b border-[#EBDDD0] dark:border-[#342E5A] flex items-center justify-between gap-2.5 bg-gradient-to-r from-[#FFF5EC] to-[#FFF0E0] dark:from-[#171330] dark:to-[#1E193C]">
+          <div className="flex items-center gap-2.5 sm:gap-3 min-w-0 flex-1">
+            <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-2xl bg-gradient-to-tr from-[#0B8F82] to-[#12B3A4] text-white flex items-center justify-center shadow-md shadow-[#0B8F82]/25 shrink-0">
               <Radio className="w-5 h-5 animate-pulse" />
             </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <h3 className="font-display font-extrabold text-lg sm:text-xl text-[#231F3D] dark:text-[#F6F1FF] tracking-tight">
-                  Live Spotted at Stop
+            <div className="min-w-0 flex-1">
+              <div className="flex items-center gap-1.5 sm:gap-2">
+                <h3 className="font-display font-extrabold text-base sm:text-xl text-[#231F3D] dark:text-[#F6F1FF] tracking-tight truncate">
+                  <span className="sm:hidden">Live Spotted</span>
+                  <span className="hidden sm:inline">Live Spotted at Stop</span>
                 </h3>
-                <span className="inline-flex items-center gap-1 text-[11px] font-bold px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border border-emerald-500/25">
+                <span className="inline-flex items-center gap-1 text-[10.5px] sm:text-[11px] font-bold px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border border-emerald-500/25 shrink-0 whitespace-nowrap">
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                  Live Crowd Feed
+                  <span className="sm:hidden">Live Feed</span>
+                  <span className="hidden sm:inline">Live Crowd Feed</span>
                 </span>
               </div>
-              <p className="text-xs text-[#6B6585] dark:text-[#A9A2C8] mt-0.5">
+              <p className="text-[11px] sm:text-xs text-[#6B6585] dark:text-[#A9A2C8] mt-0.5 truncate sm:whitespace-normal">
                 Real-time bus sightings shared by waiting commuters
               </p>
             </div>
@@ -100,25 +102,26 @@ export const SpottedFeedModal: React.FC<SpottedFeedModalProps> = ({
           <button
             onClick={onClose}
             aria-label="Close modal"
-            className="w-9 h-9 rounded-full bg-white/80 dark:bg-[#2A2352] text-[#6B6585] dark:text-[#A9A2C8] hover:text-[#231F3D] dark:hover:text-white hover:bg-white shadow-sm flex items-center justify-center transition-all active:scale-95 shrink-0"
+            className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-white/80 dark:bg-[#2A2352] text-[#6B6585] dark:text-[#A9A2C8] hover:text-[#231F3D] dark:hover:text-white hover:bg-white shadow-sm flex items-center justify-center transition-all active:scale-95 shrink-0 ml-1"
           >
-            <X className="w-5 h-5" />
+            <X className="w-4 h-4 sm:w-5 sm:h-5" />
           </button>
         </div>
 
         {/* Stop Rush Live Meter */}
-        <div className="px-4 sm:px-5 py-2.5 bg-gradient-to-r from-[#FFF4DF] to-[#FFF8EC] dark:from-[#2B2313] dark:to-[#221B32] border-b border-[#EBDDD0] dark:border-[#342E5A] flex items-center justify-between text-xs">
-          <div className="flex items-center gap-2">
-            <div className="w-6 h-6 rounded-lg bg-[#FFB020]/20 flex items-center justify-center text-[#8A5A00] dark:text-[#FFB020]">
+        <div className="px-3.5 sm:px-5 py-2 sm:py-2.5 bg-gradient-to-r from-[#FFF4DF] to-[#FFF8EC] dark:from-[#2B2313] dark:to-[#221B32] border-b border-[#EBDDD0] dark:border-[#342E5A] flex items-center justify-between gap-2 text-xs">
+          <div className="flex items-center gap-1.5 sm:gap-2 min-w-0 flex-1">
+            <div className="w-5 h-5 sm:w-6 sm:h-6 rounded-lg bg-[#FFB020]/20 flex items-center justify-center text-[#8A5A00] dark:text-[#FFB020] shrink-0">
               <Users className="w-3.5 h-3.5" />
             </div>
-            <span className="font-bold text-[#231F3D] dark:text-[#F6F1FF]">
+            <span className="font-bold text-[#231F3D] dark:text-[#F6F1FF] truncate text-[11.5px] sm:text-xs">
               {currentStop || 'Corridor Stop'}
             </span>
           </div>
-          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#FFB020] text-[#7A4E00] font-bold text-xs shadow-sm">
+          <span className="inline-flex items-center gap-1 sm:gap-1.5 px-2.5 sm:px-3 py-0.5 sm:py-1 rounded-full bg-[#FFB020] text-[#7A4E00] font-bold text-[11px] sm:text-xs shadow-sm shrink-0 whitespace-nowrap">
             <Zap className="w-3 h-3 fill-current" />
-            Moderate Rush (15–20 waiting)
+            <span className="sm:hidden">Moderate Rush</span>
+            <span className="hidden sm:inline">Moderate Rush (15–20 waiting)</span>
           </span>
         </div>
 
@@ -325,7 +328,10 @@ export const SpottedFeedModal: React.FC<SpottedFeedModalProps> = ({
               <div className="w-6 h-6 rounded-full bg-[#FF5A4E] text-white flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform">
                 <Plus className="w-4 h-4 stroke-[3]" />
               </div>
-              <span>Spotted a Bus? Share Live Sighting with Commuters</span>
+              <span className="truncate">
+                <span className="sm:hidden">Spotted a Bus? Share Sighting</span>
+                <span className="hidden sm:inline">Spotted a Bus? Share Live Sighting with Commuters</span>
+              </span>
             </button>
           )}
 

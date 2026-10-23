@@ -54,19 +54,19 @@ export const InquiryDirectoryModal: React.FC<InquiryDirectoryModalProps> = ({
       }
       if (selectedCategory === 'majha') {
         const text = `${c.title} ${c.location} ${c.notes}`.toLowerCase();
-        if (!text.includes('amritsar') && !text.includes('pathankot') && !text.includes('gurdaspur') && !text.includes('tarn taran') && !text.includes('beas')) {
+        if (!text.includes('majha') && !text.includes('amritsar') && !text.includes('pathankot') && !text.includes('gurdaspur') && !text.includes('tarn taran') && !text.includes('batala') && !text.includes('beas')) {
           return false;
         }
       }
       if (selectedCategory === 'doaba') {
         const text = `${c.title} ${c.location} ${c.notes}`.toLowerCase();
-        if (!text.includes('jalandhar') && !text.includes('hoshiarpur') && !text.includes('phagwara') && !text.includes('kapurthala') && !text.includes('nawanshahr')) {
+        if (!text.includes('doaba') && !text.includes('jalandhar') && !text.includes('hoshiarpur') && !text.includes('phagwara') && !text.includes('kapurthala') && !text.includes('nawanshahr') && !text.includes('sbs nagar')) {
           return false;
         }
       }
       if (selectedCategory === 'malwa') {
         const text = `${c.title} ${c.location} ${c.notes}`.toLowerCase();
-        if (!text.includes('ludhiana') && !text.includes('patiala') && !text.includes('bathinda') && !text.includes('moga') && !text.includes('firozpur') && !text.includes('faridkot') && !text.includes('chandigarh') && !text.includes('kharar') && !text.includes('morinda') && !text.includes('ropar')) {
+        if (!text.includes('malwa') && !text.includes('ludhiana') && !text.includes('patiala') && !text.includes('bathinda') && !text.includes('moga') && !text.includes('firozpur') && !text.includes('faridkot') && !text.includes('chandigarh') && !text.includes('kharar') && !text.includes('morinda') && !text.includes('ropar') && !text.includes('sangrur') && !text.includes('barnala') && !text.includes('mansa') && !text.includes('muktsar') && !text.includes('fazilka') && !text.includes('fatehgarh') && !text.includes('malerkotla')) {
           return false;
         }
       }
@@ -128,20 +128,21 @@ export const InquiryDirectoryModal: React.FC<InquiryDirectoryModalProps> = ({
         {/* Live Search & Filter Bar */}
         <div className="p-3.5 sm:p-4 bg-white dark:bg-[#1E193C] border-b border-[#EBDDD0] dark:border-[#342E5A] space-y-3">
           {/* Search Input Box */}
-          <div className="relative flex items-center">
-            <Search className="w-4 h-4 text-[#8A84A4] absolute left-3.5 pointer-events-none" />
+          <div className="inquiry-search-wrapper">
+            <Search className="inquiry-search-icon" />
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search by bus stand, city, depot, or phone number..."
-              className="w-full pl-10 pr-9 py-2.5 rounded-xl bg-[#F6EFE8] dark:bg-[#15122B] text-sm text-[#231F3D] dark:text-[#F6F1FF] placeholder-[#8A84A4] border border-[#E4D5C7] dark:border-[#362E5E] focus:outline-none focus:border-[#0B8F82] dark:focus:border-[#4DE0CF] focus:ring-2 focus:ring-[#0B8F82]/20 transition-all"
+              className="inquiry-search-input"
             />
             {searchQuery && (
               <button
                 onClick={() => setSearchQuery('')}
-                className="absolute right-3 w-5 h-5 rounded-full bg-[#DFD2C4] dark:bg-[#342E5A] text-[#6B6585] dark:text-[#A9A2C8] flex items-center justify-center hover:text-[#231F3D] dark:hover:text-white"
+                className="absolute right-3 w-6 h-6 rounded-full bg-[#DFD2C4] dark:bg-[#342E5A] text-[#6B6585] dark:text-[#A9A2C8] flex items-center justify-center hover:text-[#231F3D] dark:hover:text-white transition-all active:scale-95"
                 title="Clear search"
+                aria-label="Clear search"
               >
                 <X className="w-3.5 h-3.5" />
               </button>

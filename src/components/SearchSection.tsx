@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
+import { ArrowLeftRight } from 'lucide-react';
 import { TimeFilter, TypeFilter, OwnerFilter } from '../types/transit';
 import { POPULAR_TRIPS, TIMES, TYPES, OWNERS } from '../data/transitData';
+import { StopSelectMenu } from './StopSelectMenu';
 
 interface SearchSectionProps {
   from: string;
@@ -60,50 +62,37 @@ export const SearchSection: React.FC<SearchSectionProps> = ({
   return (
     <section className="search" aria-label="Find a bus">
       <div className="fields">
-        <div>
-          <label htmlFor="from">From</label>
-          <input
-            type="text"
-            id="from"
-            list="stoplist"
-            autoComplete="off"
-            placeholder="Search any stop in Punjab (e.g. Amritsar, Jalandhar, Patiala)"
-            value={from}
-            onChange={(e) => onChangeFrom(e.target.value)}
-            onFocus={(e) => e.target.select()}
-          />
-        </div>
+        <StopSelectMenu
+          id="from"
+          label="SOURCE"
+          value={from}
+          stops={stops}
+          placeholder="Ex: Chandigarh, Ludhiana..."
+          otherValue={to}
+          onChange={onChangeFrom}
+        />
 
         <button
           className={`swap ${isSpinning ? 'spin' : ''}`}
           id="swap"
-          aria-label="Swap from and to"
+          aria-label="Swap source and destination"
           type="button"
           onClick={handleSwapClick}
+          title="Swap source and destination"
         >
-          ⇅
+          <ArrowLeftRight className="w-4 h-4 sm:w-5 sm:h-5" />
         </button>
 
-        <div>
-          <label htmlFor="to">To</label>
-          <input
-            type="text"
-            id="to"
-            list="stoplist"
-            autoComplete="off"
-            placeholder="Search destination in Punjab (e.g. Bathinda, Ludhiana, Moga)"
-            value={to}
-            onChange={(e) => onChangeTo(e.target.value)}
-            onFocus={(e) => e.target.select()}
-          />
-        </div>
+        <StopSelectMenu
+          id="to"
+          label="DESTINATION"
+          value={to}
+          stops={stops}
+          placeholder="Ex: Amritsar, Jalandhar..."
+          otherValue={from}
+          onChange={onChangeTo}
+        />
       </div>
-
-      <datalist id="stoplist">
-        {stops.map((stop) => (
-          <option key={stop} value={stop} />
-        ))}
-      </datalist>
 
       {errorMessage && (
         <div className="err" id="err" role="alert">

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Radio } from 'lucide-react';
 import { FilterState, SpottedReport, ComputedTrip } from './types/transit';
 import { STOPS, BUS_SERVICES, INQUIRY_CONTACTS, INITIAL_SPOTTED_REPORTS } from './data/transitData';
 import { getMatchingTrips, getCurrentMinutes } from './utils/transitEngine';
@@ -86,12 +87,48 @@ export const App: React.FC = () => {
     ? getMatchingTrips(BUS_SERVICES, filters, currentMinutes)
     : [];
 
+  // Animated Theme toggle using View Transitions API when supported
+  const handleToggleDarkMode = (e?: React.MouseEvent<HTMLButtonElement>) => {
+    // Fallback if startViewTransition is unsupported
+    if (!('startViewTransition' in document)) {
+      setDarkMode(prev => !prev);
+      return;
+    }
+
+    const x = e?.clientX ?? (window.innerWidth - 30);
+    const y = e?.clientY ?? 30;
+    const endRadius = Math.hypot(
+      Math.max(x, window.innerWidth - x),
+      Math.max(y, window.innerHeight - y)
+    );
+
+    const transition = document.startViewTransition(() => {
+      setDarkMode(prev => !prev);
+    });
+
+    transition.ready.then(() => {
+      document.documentElement.animate(
+        {
+          clipPath: [
+            `circle(0px at ${x}px ${y}px)`,
+            `circle(${endRadius}px at ${x}px ${y}px)`
+          ]
+        },
+        {
+          duration: 500,
+          easing: 'cubic-bezier(0.4, 0, 0.2, 1)',
+          pseudoElement: '::view-transition-new(root)'
+        }
+      );
+    });
+  };
+
   return (
     <>
       {/* Hero Header */}
       <Header
         darkMode={darkMode}
-        onToggleDarkMode={() => setDarkMode(prev => !prev)}
+        onToggleDarkMode={handleToggleDarkMode}
         onOpenInquiries={() => setIsInquiryOpen(true)}
         onOpenSpottedFeed={() => setIsSpottedOpen(true)}
         spottedCount={spottedReports.length}
@@ -116,6 +153,35 @@ export const App: React.FC = () => {
           onChangeOwnerFilter={(ownerFilter) => setFilters(prev => ({ ...prev, ownerFilter, openCardKey: null }))}
         />
 
+        {/* Community Spotted Prompt Banner */}
+        <aside className="spotted-callout-banner" aria-label="Spotted bus community tip">
+          <div className="flex items-start sm:items-center gap-2.5 sm:gap-3 flex-1 min-w-0">
+            <div className="spotted-callout-beacon shrink-0">
+              <Radio className="w-4 h-4 text-[var(--teal)] animate-pulse" />
+            </div>
+            <p className="spotted-callout-text">
+              If you want to share a spotted bus, you can kindly share it by clicking on{' '}
+              <button
+                type="button"
+                onClick={() => setIsSpottedOpen(true)}
+                className="spotted-callout-inline-pill"
+                title="Open Spotted Bus Feed & Report"
+              >
+                <Radio className="w-3 h-3 text-[var(--teal)]" />
+                <span>Spotted</span>
+              </button>{' '}
+              in the top bar.
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={() => setIsSpottedOpen(true)}
+            className="spotted-callout-action-btn"
+          >
+            Share Bus
+          </button>
+        </aside>
+
         {/* Results Header */}
         <div className="head">
           <h2 id="title">
@@ -133,6 +199,17 @@ export const App: React.FC = () => {
               <b>Choose where you're starting and going.</b>
               <br />
               Type a stop or tap a popular trip.
+              <p className="mt-3 text-xs text-[var(--muted)] flex items-center justify-center gap-1.5 flex-wrap">
+                <span>Waiting at a stop? If you want to share a spotted bus, you can kindly share it through clicking on</span>
+                <button
+                  type="button"
+                  onClick={() => setIsSpottedOpen(true)}
+                  className="font-bold text-[var(--teal)] underline hover:opacity-80 inline-flex items-center gap-1 cursor-pointer"
+                >
+                  <Radio className="w-3 h-3" />
+                  Spotted
+                </button>
+              </p>
             </div>
           ) : trips.length > 0 ? (
             trips.map((trip, idx) => {

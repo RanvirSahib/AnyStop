@@ -15,15 +15,21 @@ export const AnyStopLogo: React.FC<AnyStopLogoProps> = ({
   variant = 'navbar',
   className = '',
   height,
-  showSparkle = true,
+  showSparkle = false,
   animated = true,
   onClick
 }) => {
+  const rawId = React.useId();
+  const id = rawId.replace(/[^a-zA-Z0-9_-]/g, '');
+  const pinGradId = `pinGrad-${id}`;
+  const roadGradId = `roadGrad-${id}`;
+
   // Option 2: Compact Navbar (Horizontal)
   if (variant === 'navbar') {
+    const svgHeight = height ? (typeof height === 'number' ? `${height}px` : height) : undefined;
     return (
       <div
-        className={`inline-flex items-center gap-2.5 select-none transition-transform duration-200 ${
+        className={`inline-flex items-center select-none transition-transform duration-200 ${
           onClick ? 'cursor-pointer hover:scale-[1.02] active:scale-[0.98]' : ''
         } ${className}`}
         onClick={onClick}
@@ -31,27 +37,24 @@ export const AnyStopLogo: React.FC<AnyStopLogoProps> = ({
         aria-label="AnyStop Logo"
       >
         <svg
-          viewBox="0 0 320 80"
-          className="w-auto"
-          style={{ height: height || '42px', overflow: 'visible' }}
+          viewBox="0 0 248 72"
+          className={`w-auto ${svgHeight ? '' : 'h-[28px] sm:h-[38px]'}`}
+          style={svgHeight ? { height: svgHeight } : undefined}
           fill="none"
         >
           <defs>
-            <linearGradient id="navPinGrad" x1="0%" y1="0%" x2="0%" y2="100%">
-              <stop offset="0%" stop-color="#FF6B5E" />
-              <stop offset="100%" stop-color="#FF4B3E" />
+            <linearGradient id={pinGradId} x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stopColor="#FF6B5E" />
+              <stop offset="100%" stopColor="#FF4B3E" />
             </linearGradient>
-            <linearGradient id="navRoadGrad" x1="0%" y1="0%" x2="0%" y2="100%">
-              <stop offset="0%" stop-color="#FFB326" />
-              <stop offset="100%" stop-color="#FF981A" />
+            <linearGradient id={roadGradId} x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stopColor="#FFB326" />
+              <stop offset="100%" stopColor="#FF981A" />
             </linearGradient>
-            <filter id="navShadow" x="-20%" y="-20%" width="140%" height="140%">
-              <feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#000000" flood-opacity="0.25" />
-            </filter>
           </defs>
 
-          {/* Left Icon Mark */}
-          <g transform="translate(10, 4)" filter="url(#navShadow)" className={animated ? 'anystop-logo-mark' : ''}>
+          {/* Left Icon Mark: Location Pin + Bus Silhouette + Road 'A' + Waves */}
+          <g transform="translate(4, 2)" className={animated ? 'anystop-logo-mark' : ''}>
             {/* Left Signal Waves */}
             <path
               d="M 23 23 A 28 28 0 0 0 23 51"
@@ -89,7 +92,7 @@ export const AnyStopLogo: React.FC<AnyStopLogoProps> = ({
             {/* Location Pin */}
             <path
               d="M 48 64 C 41 53 28 41 28 26 A 20 20 0 1 1 68 26 C 68 41 55 53 48 64 Z"
-              fill="url(#navPinGrad)"
+              fill={`url(#${pinGradId})`}
             />
 
             {/* Bus Silhouette */}
@@ -102,7 +105,7 @@ export const AnyStopLogo: React.FC<AnyStopLogoProps> = ({
             {/* Road 'A' */}
             <path
               d="M 44.5 37 L 51.5 37 L 59 66 L 52.5 66 L 50 56 L 46 56 L 43.5 66 L 37 66 Z"
-              fill="url(#navRoadGrad)"
+              fill={`url(#${roadGradId})`}
             />
             <polygon points="48,41 45.2,50.5 50.8,50.5" fill="#1F1A3F" />
             <polygon points="48,56 46,66 50,66" fill="#1F1A3F" />
@@ -113,30 +116,20 @@ export const AnyStopLogo: React.FC<AnyStopLogoProps> = ({
             <line x1="48" y1="58" x2="48" y2="64" stroke="#FFFFFF" strokeWidth="1.6" strokeLinecap="round" />
           </g>
 
-          {/* Typography: "AnyStop" */}
+          {/* Typography: "AnyStop" without sparkle star */}
           <g
             fontFamily="'Bricolage Grotesque', 'Figtree', sans-serif"
             fontWeight="800"
             fontSize="38"
             letterSpacing="-0.5"
           >
-            <text x="96" y="52" fill="#FFA726">
+            <text x="88" y="51" fill="#FFA726">
               Any
             </text>
-            <text x="174" y="52" fill="#FFFFFF">
+            <text x="162" y="51" fill="#FFFFFF">
               Stop
             </text>
           </g>
-
-          {/* Sparkle Star */}
-          {showSparkle && (
-            <path
-              d="M 276 26 Q 276 32 282 32 Q 276 32 276 38 Q 276 32 270 32 Q 276 32 276 26 Z"
-              fill="#A29DBE"
-              opacity="0.85"
-              className={animated ? 'anystop-sparkle' : ''}
-            />
-          )}
         </svg>
       </div>
     );

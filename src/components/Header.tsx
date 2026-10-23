@@ -1,10 +1,10 @@
 import React from 'react';
-import { Radio, PhoneCall } from 'lucide-react';
+import { Radio, PhoneCall, Sun, Moon } from 'lucide-react';
 import { AnyStopLogo } from './AnyStopLogo';
 
 interface HeaderProps {
   darkMode: boolean;
-  onToggleDarkMode: () => void;
+  onToggleDarkMode: (e: React.MouseEvent<HTMLButtonElement>) => void;
   onOpenInquiries: () => void;
   onOpenSpottedFeed: () => void;
   spottedCount: number;
@@ -21,44 +21,39 @@ export const Header: React.FC<HeaderProps> = ({
     <header className="hero">
       <div className="wrap">
         <div className="top">
-          <div className="logo shrink-0" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
-            <div className="block sm:hidden">
-              <AnyStopLogo variant="navbar" height="34px" animated={true} />
-            </div>
-            <div className="hidden sm:block">
-              <AnyStopLogo variant="navbar" height="42px" animated={true} />
-            </div>
+          <div className="logo shrink-0 cursor-pointer" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
+            <AnyStopLogo variant="navbar" animated={true} />
           </div>
 
-          <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
+          <div className="flex items-center gap-1 sm:gap-2 shrink-0">
             {/* Inquiry button */}
             <button
               onClick={onOpenInquiries}
-              className="tbtn"
+              className="tbtn shrink-0"
               title="Official Depot Inquiry Directory"
               aria-label="Official Depot Inquiries"
             >
-              <PhoneCall style={{ width: '15px', height: '15px', color: 'var(--sun)' }} />
+              <PhoneCall style={{ width: '14px', height: '14px', color: 'var(--sun)' }} />
               <span className="hidden md:inline">Inquiries</span>
             </button>
 
             {/* Spotted button */}
             <button
               onClick={onOpenSpottedFeed}
-              className="tbtn"
+              className="tbtn shrink-0"
               title="Live Spotted Feed"
               aria-label="Live Spotted Feed"
             >
-              <Radio style={{ width: '15px', height: '15px', color: 'var(--teal)' }} />
-              <span className="hidden sm:inline">Spotted</span>
+              <Radio style={{ width: '13.5px', height: '13.5px', color: 'var(--teal)' }} />
+              <span className="text-[11.5px] sm:text-sm font-semibold">Spotted</span>
               {spottedCount > 0 && (
                 <span
                   style={{
                     background: 'var(--coral)',
                     color: '#fff',
                     borderRadius: '99px',
-                    padding: '1px 6px',
-                    fontSize: '11px',
+                    padding: '0 5px',
+                    fontSize: '10px',
                     fontWeight: 700,
                     lineHeight: '14px'
                   }}
@@ -71,13 +66,22 @@ export const Header: React.FC<HeaderProps> = ({
             {/* Theme toggle */}
             <button
               onClick={onToggleDarkMode}
-              className="tbtn"
+              className="tbtn shrink-0 theme-toggle-btn"
               id="theme"
               aria-label="Switch light and dark theme"
-              title="Toggle light and dark theme"
+              title={darkMode ? "Switch to Day theme" : "Switch to Night theme"}
             >
-              <span className="hidden sm:inline">Theme </span>
-              <span>{darkMode ? '🌙' : '☀️'}</span>
+              <span className="hidden sm:inline text-xs font-semibold">Theme</span>
+              <span
+                key={darkMode ? 'dark' : 'light'}
+                className="theme-icon-container"
+              >
+                {darkMode ? (
+                  <Moon className="w-3.5 h-3.5 text-indigo-200 fill-indigo-200/50 theme-icon" />
+                ) : (
+                  <Sun className="w-3.5 h-3.5 text-amber-300 fill-amber-300/60 theme-icon" />
+                )}
+              </span>
             </button>
           </div>
         </div>
