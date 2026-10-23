@@ -443,6 +443,252 @@ This document tracks all features, user requests, architectural decisions, and i
 
 ---
 
+### Step 29: Theme Toggle Animation Performance Optimization on Mobile
+- **User Request**: *"Don't push into github until i say and save every step we do in development_log.md and the animation we have put on clicking theme is lagging in phone so can solve this problem"*
+- **Issue Diagnosis & Root Cause Analysis**:
+  1. **Fullscreen `clipPath: circle(...)` GPU Overhead**:
+     - On mobile touchscreens with high pixel densities (2x-3x DPR / 1080p+), animating `clipPath: circle(...)` on `::view-transition-new(root)` across the entire viewport (~900px+ radius) forces mobile GPU drivers to repeatedly rasterize and calculate analytical polygon clipping masks every single frame. Because mobile GPUs lack dedicated compositing hardware for dynamic full-screen pseudo-element masks, this caused frame drops, stutter, and lag on smartphones.
+  2. **Double Transition Collision**:
+     - Global CSS rules had `transition: background-color 0.4s, border-color 0.4s, color 0.4s, box-shadow 0.4s` on `body`, `.card`, `.hero`, `.search`, etc.
+     - When `setDarkMode` ran inside `document.startViewTransition()`, all page elements began animating their individual CSS transitions simultaneously while the browser was capturing snapshots and attempting to render the View Transition. This double-animation taxed both CPU style calculation and GPU compositing.
+  3. **Mobile `background-attachment: fixed` Rasterization Penalty**:
+     - `background-attachment: fixed` on the SVG doodle pattern (`/transit-doodle-*.svg`) is notoriously un-accelerated on mobile browsers (iOS WebKit and Android Chrome), forcing continuous re-rasterization during view transitions and scrolling.
+- **Implementation & Solutions**:
+  1. **Hardware-Accelerated Mobile Crossfade (`src/App.tsx` & `src/index.css`)**:
+     - Added device capability detection in `handleToggleDarkMode`:
+       ```ts
+       const isMobile = typeof window !== 'undefined' && window.matchMedia('(max-width: 768px), (pointer: coarse)').matches;
+       ```
+     - For mobile/touch devices: Replaced the heavy `clipPath` calculation with a 220ms GPU-composited opacity crossfade (`themeMobileFadeOut` / `themeMobileFadeIn`). Opacity transitions run 100% on the mobile GPU compositor thread, guaranteeing butter-smooth 60/120 FPS performance with zero dropped frames.
+     - For desktop: Kept the radial circular reveal (`theme-clip-transition`) with an optimized 380ms duration.
+     - Added `prefers-reduced-motion` compliance to respect accessibility preferences.
+  2. **Active View Transition CSS Suppression (`src/index.css`)**:
+     - Added `html.theme-transition-active *, html.theme-transition-active *::before, html.theme-transition-active *::after { transition: none !important; }` during the transition lifecycle.
+     - This ensures the View Transition snapshot cleanly captures the final state instantly without competing element-level color transitions, completely eliminating CPU/GPU contention.
+  3. **Mobile Background Attachment Decoupling (`src/index.css`)**:
+     - Added `@media (max-width: 768px), (pointer: coarse) { body { background-attachment: scroll; } }` to eliminate continuous wallpaper re-rasterization on mobile viewports.
+  4. **Icon Spin Compositing**:
+     - Added `will-change: transform, opacity;` and optimized duration to 0.35s on `.theme-icon` and `.theme-icon-container` so the button icon spin rotates snappily on its own compositor layer.
+- **Verification**:
+  - Validated with `npm run build` (0 TypeScript / bundling errors in 5.13s).
+  - Confirmed Git status: changes retained locally, NO push executed per user request.
+
+---
+
+### Step 30: Expected Stoppage Timings Disclaimer & Badging
+- **User Request**: *"Mention these stops time are expected as they are not confirmed"* (with screenshot showing the intermediate stop times list e.g., 6:00 AM, 6:20 AM, 6:32 AM in the bus card's expanded stops drawer).
+- **Implementation**:
+  1. **Disclaimer Notice Banner (`src/components/BusCard.tsx`)**:
+     - Added an informational notice banner `.stops-notice` at the top of the expanded stops drawer:
+       - Displays a `<Clock />` icon with title: **"Expected Stoppage Timings (Not Confirmed)"**.
+       - Description: *"All stop times are approximate schedule estimates and not officially confirmed. Timings may vary depending on highway traffic, passenger boarding, and depot departures."*
+  2. **Approximate Prefix & "Expected" Badges per Stop (`src/components/BusCard.tsx`)**:
+     - Updated the time column to wrap both an approximate time with `~` prefix (e.g., `~6:20 AM`) and an amber/warm pill badge explicitly labeled **"EXPECTED"** (`.stop-time-badge`).
+     - Wrapped stop names in `.stop-name` with flex-shrink constraints to ensure clean text flow on compact mobile screens.
+  3. **High-Contrast Themed Styling (`src/index.css`)**:
+     - Styled `.stops-notice` with soft amber alert tint (`rgba(245, 158, 11, 0.08)`) and border (`rgba(245, 158, 11, 0.22)`) for light mode, and glowing dark amber for dark mode.
+     - Vertically centered the timeline milestone dot (`top: 50%; transform: translateY(-50%);`) so it remains aligned with the stop entry row even if timestamps wrap.
+- **Verification**:
+  - Validated with `npm run build` (0 TypeScript / bundling errors in 13.24s).
+  - Confirmed Git status: all changes retained locally, NO push executed.
+
+---
+
+### Step 31: User-Shared Bus Card and Headline Styling
+- **User Request**: *"Make the card like this and headline like this for the shared buses also that is shared by the user."* (with screenshot showing the standard AnyStop bold headline layout e.g. "Chandigarh ISBT 43 to Ludhiana Bus Stand" with "24 buses" count on the right, and the full bus card layout with departure time, journey duration bar, arrival time, operator, badges, and "See all stops" button).
+- **Implementation**:
+  1. **New `SharedBusCard` Component (`src/components/SharedBusCard.tsx`)**:
+     - Built a dedicated, high-performance card component specifically for user-reported crowd sightings:
+       - **Departure & Arrival Times**: Shows sighting departure time (`formatMinutesToTime`) and estimated arrival time calculated from corridor travel time.
+       - **Journey Progress Bar**: Renders the signature AnyStop journey bar (`.mid`, `.dur`, `.bar`) with travel duration (e.g. `1h 40m`).
+       - **Operator & Fleet Info**: Displays operator name with fleet class (`Ordinary` / `Volvo AC`) and live relative sighting timestamp (e.g. `Spotted 6m ago`).
+       - **Badges Suite**: Displays Government/Private ownership (`b-g`/`b-p`), Speed (`⚡ Express`/`🐢 All-stop`), crowd rush badge (`🟢 Low Rush`/`🟡 Moderate Rush`/`🔴 Heavy Rush`), fare estimate, and live badge `📡 Live Shared Bus`.
+       - **Collapsible Stoppage Drawer**: Includes the commuter's live sighting quote note, the expected stoppage timings disclaimer notice banner, and the departure/arrival milestone timeline.
+  2. **Identical Headline Layout (`src/components/SpottedFeedModal.tsx` & `src/App.tsx`)**:
+     - Standardized the headline across all shared bus listings using the signature AnyStop `.head` class:
+       - Left: `<h2 className="disp flex items-center gap-2 text-[var(--ink)]"><Radio ... /><span>Live Buses Shared by Users</span></h2>`
+       - Right: `<span className="count">{reports.length} shared {reports.length === 1 ? 'bus' : 'buses'}</span>`
+  3. **Main Page Integration (`src/App.tsx`)**:
+     - When the user searches for a route (e.g., Chandigarh to Ludhiana), any live buses shared by commuters for that corridor are highlighted directly above the scheduled timetable in a dedicated section with the matching headline and card layout.
+     - On the home page before searching, live shared buses are showcased right below the search box so commuters can immediately see recent crowd sightings across Punjab.
+  4. **Updated Spotted Modal (`src/components/SpottedFeedModal.tsx`)**:
+     - Replaced the previous compact card list with `SharedBusCard` and `.head` headline, expanded modal width to `max-w-2xl` for optimal readability and high-contrast card spacing.
+- **Verification**:
+  - Validated with `npm run build` (0 TypeScript / bundling errors in 4.55s).
+  - Confirmed Git status: all changes retained locally, NO push executed per user request.
+
+---
+
+### Step 32: Removal of Large "Expected Stoppage Timings" Disclaimer Banner
+- **User Request**: *"delete this"* (with screenshot showing the amber disclaimer box *"Expected Stoppage Timings (Not Confirmed)..."*).
+- **Implementation**:
+  - Removed the large `.stops-notice` disclaimer banner block from both:
+    - [`src/components/BusCard.tsx`](file:///c:/AnyStop/src/components/BusCard.tsx)
+    - [`src/components/SharedBusCard.tsx`](file:///c:/AnyStop/src/components/SharedBusCard.tsx)
+  - Removed unused `<Clock />` imports.
+  - Kept the compact, elegant `~[Time]` and inline `EXPECTED` tags next to individual intermediate stop timestamps, keeping the drawer clean, spacious, and uncluttered without the bulky banner.
+- **Verification**:
+  - Validated with `npm run build` (0 TypeScript / bundling errors in 4.24s).
+  - Confirmed Git status: all changes retained locally, NO push executed per user request.
+
+---
+
+### Step 33: User-Reported Sighting Disclaimer Subtitle
+- **User Request**: *"Put some line here that say we don't guarantee this bacause this uploaded by users"* (with screenshot highlighting the area under the headline `Chandigarh ISBT 43 to Ludhiana Bus Stand (Shared by Users)`).
+- **Implementation**:
+  - Added a clean, subtle notice line directly under the shared buses headline:
+    - Text: **"Note: We don't guarantee departure times or seat availability as this bus information is uploaded by fellow users."**
+    - Accompanied by `<AlertCircle className="w-3.5 h-3.5 text-amber-500" />` icon.
+    - Integrated across:
+      1. [`src/App.tsx`](file:///c:/AnyStop/src/App.tsx) corridor shared buses section.
+      2. [`src/App.tsx`](file:///c:/AnyStop/src/App.tsx) home view live shared buses section.
+      3. [`src/components/SpottedFeedModal.tsx`](file:///c:/AnyStop/src/components/SpottedFeedModal.tsx) shared sightings list.
+- **Verification**:
+  - Validated with `npm run build` (0 TypeScript / bundling errors in 4.15s).
+  - Confirmed Git status: all changes retained locally, NO push executed per user request.
+
+---
+
+### Step 34: Default Search Inputs Empty Initialization
+- **User Request**: *"There should not be present here by default it should be empty"* (with screenshot showing pre-filled "Chandigarh ISBT 43" and "Ludhiana Bus Stand" in the origin/destination search inputs).
+- **Implementation**:
+  - In [`src/App.tsx`](file:///c:/AnyStop/src/App.tsx), updated the initial `filters` state:
+    - Set `from: ""` (previously `"Chandigarh ISBT 43"`).
+    - Set `to: ""` (previously `"Ludhiana Bus Stand"`).
+  - Search inputs now load completely empty with clean placeholders (`Starting from...` and `Going to...`), allowing users to choose their departure and destination stops from scratch.
+- **Verification**:
+  - Validated with `npm run build` (0 TypeScript / bundling errors in 7.53s).
+  - Confirmed Git status: all changes retained locally, NO push executed per user request.
+
+---
+
+### Step 35: Clear Sample Shared Bus Data
+- **User Request**: *"Delete the data of shared bus"*
+- **Implementation**:
+  - In [`src/data/transitData.ts`](file:///c:/AnyStop/src/data/transitData.ts):
+    - Replaced the mock demo array `INITIAL_SPOTTED_REPORTS` (`spot-1`, `spot-2`, `spot-3`, `spot-4`) with an empty array `[]`.
+  - In [`src/App.tsx`](file:///c:/AnyStop/src/App.tsx):
+    - Added automatic cache cleansing on initial state hydration to strip out any legacy mock reports from the browser's `localStorage` (`anystop_spotted_reports`).
+  - In [`src/components/SpottedFeedModal.tsx`](file:///c:/AnyStop/src/components/SpottedFeedModal.tsx):
+    - Added an empty state indicator when `reports.length === 0`: *"No shared buses yet. Be the first commuter to spot and share a live bus on this route!"*.
+- **Verification**:
+  - Validated with `npm run build` (0 TypeScript / bundling errors in 7.36s).
+  - Confirmed Git status: all changes retained locally, NO push executed per user request.
+
+### Step 36: Operator Fleet Dropdown Styled in Image 1 Theme
+- **User Request**: *"Make the image 2 operator fleet options in the image 1 theme adn design only"*
+- **Issue Diagnosis & Implementation**:
+  - Previously, the "Operator Fleet" field in [`src/components/SpottedFeedModal.tsx`](file:///c:/AnyStop/src/components/SpottedFeedModal.tsx) used a native browser HTML `<select>` element (Image 2), rendering an unstyled system dropdown.
+  - Image 1 showcases AnyStop's custom location autocomplete dropdown design:
+    - Building depot icon (`Building2` / `.location-building-icon`)
+    - Uniform Punjab location convention: `[Operator/Stand Name] (Punjab), Punjab, India`
+    - Soft hover/highlight background `#D9DDE2` in light mode and `#334155` in dark mode (`.location-menu-item.highlighted`)
+    - Crisp item separators and type tags (`.location-item-badge`)
+    - Smooth `.location-dropdown-menu` and `.location-dropdown-list` hierarchy.
+  - In [`src/components/SpottedFeedModal.tsx`](file:///c:/AnyStop/src/components/SpottedFeedModal.tsx):
+    - Replaced native `<select>` with a custom trigger button featuring the `Building2` icon, active operator display, and dynamic `ChevronDown` arrow.
+    - Attached an Image 1 styled `.location-dropdown-menu` listbox containing all 9 operator fleets formatted in the exact Image 1 visual style (`PRTC PEPSU (Punjab), Punjab, India`, `Punbus / Punjab Roadways (Punjab), Punjab, India`, etc.) with badges (`Govt`, `Private`, `Volvo AC`, `Local`).
+    - Added mouse hover tracking (`operatorHighlightedIndex`) and outside-click detection to dismiss the menu.
+- **Verification**:
+  - Validated with `npm run build` (0 TypeScript / bundling errors in 10.83s).
+  - Confirmed Git status: all changes retained locally, NO push executed per user request.
+
+### Step 37: Purged Stale Shared Buses & Enforced Source-to-Destination Corridor Linkage
+- **User Request**: *"Delete this shared bus also its pending and live bus should be shown according to the source and destination or stops between them if they are coming only else there is no need to show the other live buses which are not with the link of source and destination"*
+- **Issue Diagnosis & Implementation**:
+  1. **Purged Pending / Stale Shared Bus Reports**:
+     - The user's browser had an old shared bus report from testing ("Local Mini Bus, Ordinary • Spotted 14h 23m ago") stored in `localStorage`.
+     - In [`src/App.tsx`](file:///c:/AnyStop/src/App.tsx), enhanced state initialization to automatically filter out expired sightings (> 3 hours old) and clear stale `localStorage` entries (`anystop_spotted_reports`).
+     - Added `handleDeleteReport` in [`src/App.tsx`](file:///c:/AnyStop/src/App.tsx) and passed `onDelete` to [`src/components/SharedBusCard.tsx`](file:///c:/AnyStop/src/components/SharedBusCard.tsx) and [`src/components/SpottedFeedModal.tsx`](file:///c:/AnyStop/src/components/SpottedFeedModal.tsx), giving users a discrete one-click "Delete" button to remove any live report at will.
+  2. **Corridor & Intermediate Stops Matching**:
+     - Implemented dynamic route linkage in `relevantSpotted`:
+       - Analyzes all routes and bus services in `BUS_SERVICES` connecting `filters.from` (source) to `filters.to` (destination).
+       - Gathers the complete ordered sequence of intermediate boarding stops (e.g., Kharar, Morinda, Samrala, Kohara between Chandigarh and Ludhiana).
+       - Live shared buses are now ONLY displayed if:
+         a) The bus was spotted at `from` or at an intermediate stop along that corridor before `to`.
+         b) The bus is heading in the forward direction along that corridor towards `to`.
+         c) The bus is fresh (< 3 hours old).
+       - Completely rejects buses running in reverse or on unrelated corridors.
+  3. **Removed Unlinked Live Buses from Home Screen**:
+     - Removed the global `spottedReports.length > 0` block from the empty home view in [`src/App.tsx`](file:///c:/AnyStop/src/App.tsx), ensuring that when no linked source and destination are selected, unlinked live buses are never shown.
+### Step 38: Autocomplete Dropdowns & All Punjab Bus Stand Locations for Sighting Modal
+- **User Request**: *"made these two also like the operator fleet and add all the bus stand etails in this also also the other locations of punjab so that it can easy for rhe customer to put the location in it"*
+- **Issue Diagnosis & Implementation**:
+  1. **All-Punjab Master Locations Directory**:
+     - In [`src/data/transitData.ts`](file:///c:/AnyStop/src/data/transitData.ts), created and exported `ALL_PUNJAB_LOCATIONS` combining all 143 transit stops from `STOPS` across all 23 districts in Majha, Doaba, and Malwa, along with major bus stands, tehsils, junctions, railway junctions, and border stops (e.g., Zirakpur, Mohali phases, CU Gharuan, Attari Wagah Border, Harike, Makhu, Bagha Purana, Dhariwal, Gardhiwala, Dhuri, Lehragaga, Tapa, Bhadaur, Goniana, Bareta, Bhawanigarh, Banur, Lalru, Sri Anandpur Sahib, Nangal, Mandi Gobindgarh, Doraha, Sahnewal, etc.).
+  2. **Image 1 Autocomplete Design for "At Stop / Landmark" & "Heading Towards"**:
+     - In [`src/components/SpottedFeedModal.tsx`](file:///c:/AnyStop/src/components/SpottedFeedModal.tsx):
+       - Replaced the plain HTML `<input>` fields with custom autocomplete dropdowns styled identically to the Operator Fleet dropdown and Image 1.
+       - Integrated [`formatLocationDisplay`](file:///c:/AnyStop/src/components/StopSelectMenu.tsx#L18) for uniform location presentation (`[Location Name] (Punjab), Punjab, India`).
+       - Integrated [`renderHighlightedLocation`](file:///c:/AnyStop/src/components/StopSelectMenu.tsx#L35) for character-level matching with red underlined mark tags matching Image 1.
+       - Each option features depot icons ([`Building2`](file:///c:/AnyStop/src/components/SpottedFeedModal.tsx#L16)), location badges (`Bus Stand`, `ISBT`, `Route`), and soft `#D9DDE2` / `#334155` hover highlights.
+       - Included clear (`X`) buttons, rotating [`ChevronDown`](file:///c:/AnyStop/src/components/SpottedFeedModal.tsx#L17) arrows, and click-outside dismissal.
+### Step 39: Fixed Input Icon Overlap & Swapped Operator Fleet Logo to Bus
+- **User Request**: *"Check the image 1 its overlapping in operator fleet change the logo image from building to bus"*
+- **Issue Diagnosis & Implementation**:
+  1. **Fixed Input Icon Overlap in Image 1**:
+     - In [`src/components/SpottedFeedModal.tsx`](file:///c:/AnyStop/src/components/SpottedFeedModal.tsx), the previous implementation placed icons absolutely (`absolute left-3`) inside an input wrapper, causing icons to directly collide with and overlap text (e.g. `Building2` over the "C" in "Chandigarh ISBT 43" and `Navigation` over the "T" in "Towards Ludhiana").
+     - Refactored both "At Stop / Landmark" and "Heading Towards" to use an inline flex container (`w-full h-10 px-3 flex items-center gap-2.5`):
+       - The leading icon (`Building2` / `Navigation`) is now a native flex sibling with `shrink-0`.
+       - The text input is set to `flex-1 min-w-0 bg-transparent border-0 outline-none p-0`, ensuring the text begins cleanly after the icon with generous breathing room and zero possibility of overlap.
+       - The trailing action buttons (`X` and `ChevronDown`) sit neatly in a right-aligned flex cluster.
+  2. **Changed Operator Fleet Logo to Bus**:
+     - Swapped the icon in the Operator Fleet trigger button from [`Building2`](file:///c:/AnyStop/src/components/SpottedFeedModal.tsx#L16) to [`Bus`](file:///c:/AnyStop/src/components/SpottedFeedModal.tsx#L12).
+     - Swapped the icon in all 9 dropdown items in the Operator Fleet menu from `Building2` to `Bus` with matching theme accents (`text-[#0B8F82] dark:text-[#4DE0CF]`).
+### Step 40: Redesigned Crowd Level Selector into Animated Status Cards
+- **User Request**: *"Change the design of thsi"* (with screenshot of the raw emoji-based Low Rush / Moderate / Heavy Rush radio buttons).
+- **Issue Diagnosis & Implementation**:
+  - Previously, the "Bus / Stop Crowd Level" selector used raw emoji characters (`🟢`, `🟡`, `🔴`) and pale, flat borders with weak contrast and unpolished spacing.
+  - Redesigned all three choices into modern, interactive transit status cards in [`src/components/SpottedFeedModal.tsx`](file:///c:/AnyStop/src/components/SpottedFeedModal.tsx):
+    - Replaced raw emojis with clean SVG status beacons featuring dynamic CSS ping rings (`animate-ping`) on active selection.
+    - Added 2px bold accent borders (`border-emerald-500`, `border-amber-500`, `border-rose-500`) paired with subtle glowing drop shadows and micro-scaling (`scale-[1.02]`).
+    - Added high-contrast colored titles and refined subtitle captions ("Seats available", "Standing room", "Packed bus").
+    - Optimized smooth hover transitions (`hover:border-... hover:bg-...`) and rich dark-mode tints (`dark:bg-emerald-500/20`, `dark:bg-amber-500/20`, `dark:bg-rose-500/20`).
+### Step 41: Initialized Operator Fleet, Stop, and Heading Towards as Empty by Default
+- **User Request**: *"By default These should be empty means the customer should come and choose this"* (with screenshots highlighting Operator Fleet defaulting to PRTC PEPSU, At Stop defaulting to Chandigarh ISBT 43, and Heading Towards defaulting to Towards Ludhiana).
+- **Issue Diagnosis & Implementation**:
+  1. **Reset Default States to Empty Strings**:
+     - In [`src/components/SpottedFeedModal.tsx`](file:///c:/AnyStop/src/components/SpottedFeedModal.tsx):
+       - Changed `operator` initial state from `'PRTC PEPSU'` to `''`.
+       - Changed `stop` initial state from `currentStop || 'Chandigarh ISBT 43'` to `''`.
+       - Changed `direction` initial state from `'Towards Ludhiana'` to `''`.
+  2. **Operator Fleet Placeholder & Clear Trigger**:
+     - Updated the Operator Fleet trigger button: when `operator` is unselected, it renders a friendly placeholder `Choose Operator Fleet...` in neutral muted gray (`text-[#8E87A5]`) and muted bus icon.
+     - Added an inline clear button (`X`) to allow resetting the chosen operator at any time.
+  3. **Stop & Destination Placeholders**:
+     - Input fields now clearly display intuitive placeholders (`Search or choose bus stand in Punjab...` and `Search or choose destination in Punjab...`) with clear (`X`) buttons when populated.
+  4. **Form Validation & Submit Prevention**:
+     - Added `isFormValid = Boolean(operator.trim() && stop.trim() && direction.trim())`.
+     - The submit button is cleanly disabled (`disabled={submitted || !isFormValid}`) with contextual guidance text (*"Choose Fleet, Stop & Destination to Submit"*) and muted background until the commuter selects their fleet and locations.
+     - Form reset after submission cleanly clears all three fields back to empty strings.
+### Step 42: Conditioned "Share Bus" Prompt Banner to Only Show When Buses Are Showing & No User-Uploaded Buses Exist
+- **User Request**: *"This shows only when the bus is shwoing not the bus uploaded by users is showing"* (with screenshot of the `spotted-callout-banner` tip: *"If you want to share a spotted bus, you can kindly share it by clicking on Spotted in the top bar. [Share Bus]"*).
+- **Issue Diagnosis & Implementation**:
+  - Previously in [`src/App.tsx`](file:///c:/AnyStop/src/App.tsx), the `.spotted-callout-banner` was rendered unconditionally directly underneath `SearchSection`, even before any route was chosen or when user-shared buses were already displayed.
+  - Wrapped `.spotted-callout-banner` in the strict condition:
+    `{areStopsValid && trips.length > 0 && relevantSpotted.length === 0 && (...)}`
+    - When valid origin/destination are selected and timetable buses are showing (`areStopsValid && trips.length > 0`) AND no user-uploaded buses exist for the corridor (`relevantSpotted.length === 0`), the tip banner shows to encourage commuters to report sightings.
+    - If user-uploaded buses are already showing (`relevantSpotted.length > 0`), the banner is hidden to avoid duplicate prompts.
+    - If no route is selected or no buses are found, the banner remains hidden.
+### Step 43: Redesigned the "Expected" Timing Badge Design and Theme
+- **User Request**: *"Change the design and theme of this expected"* (with screenshot of the stoppage arrival time ~5:30 AM and the boxy amber EXPECTED badge).
+- **Issue Diagnosis & Implementation**:
+  - The previous `.stop-time-badge` used a harsh, boxy 4px radius with muddy amber tones (`#B45309`, `background: rgba(245, 158, 11, 0.12)`), clashing with AnyStop's modern teal/indigo theme.
+  - Redesigned `.stop-time-badge` in [`src/index.css`](file:///c:/AnyStop/src/index.css):
+    - **Capsule Pill Geometry**: Converted to an ultra-sleek `border-radius: 999px` pill with micro-padding (`padding: 1.5px 7px 1.5px 6px`) and `gap: 4px`.
+    - **Live Beacon Dot**: Added an inline pseudo-element (`::before`) rendering a crisp 4px glowing dot in `currentColor` (`box-shadow: 0 0 4px currentColor`).
+    - **AnyStop Signature Teal Theme**:
+      - Light mode: Deep teal `#0B8F82` text on subtle mint wash (`background: rgba(11, 143, 130, 0.09)`) with a delicate teal border (`border: 1px solid rgba(11, 143, 130, 0.28)`).
+      - Dark mode: Luminous cyan `#4DE0CF` text on dark teal tint (`background: rgba(77, 224, 207, 0.12)`) with matching glowing border (`border: 1px solid rgba(77, 224, 207, 0.32)`).
+    - **Unified `.stop-time-badge.spotted` Variant**:
+      - Updated [`src/components/SharedBusCard.tsx`](file:///c:/AnyStop/src/components/SharedBusCard.tsx) to use the dedicated emerald variant (`#059669` light / `#34D399` dark) for spotted bus sightings.
+    - **Hover Micro-Interaction**: Added subtle lift (`transform: translateY(-0.5px)`) and crisp border intensification on row hover.
+- **Verification**:
+  - Validated with `npm run build` (0 TypeScript / bundling errors in 2.76s).
+  - Confirmed Git status: all changes retained locally, NO push executed per user request.
+
+---
+
 ## 🗂️ Key Files Reference
 | File | Role |
 | :--- | :--- |

@@ -1,4 +1,4 @@
-import { BusService, InquiryContact } from '../types/transit';
+import { BusService, InquiryContact, SpottedReport } from '../types/transit';
 
 /**
  * All-Punjab transit routes across all 23 districts in Majha, Doaba, and Malwa regions
@@ -743,6 +743,63 @@ export const CLASS_RATES: Record<string, number> = {
 // All unique stops across all 23 districts of Punjab (alphabetically sorted)
 export const STOPS = Array.from(
   new Set(Object.values(ROUTES).flatMap((route) => route.map(([name]) => name)))
+).sort();
+
+// Comprehensive list of Punjab bus stands, stops, and regional transit landmarks across all 23 districts
+export const ALL_PUNJAB_LOCATIONS: string[] = Array.from(
+  new Set([
+    ...STOPS,
+    "Zirakpur Bus Stand",
+    "Mohali Phase 7 Bus Stand",
+    "Mohali Phase 8 Bus Stand",
+    "Mohali Phase 11 Bus Stand",
+    "Sector 43 ISBT Chandigarh",
+    "Sector 17 ISBT Chandigarh",
+    "CU Gharuan Gate 1",
+    "CU Gharuan Gate 2",
+    "Amritsar Golden Temple Stand",
+    "Attari Wagah Border",
+    "Harike Pattan Wetland",
+    "Makhu Bus Stand",
+    "Bagha Purana Bus Stand",
+    "Nihal Singh Wala Bus Stand",
+    "Dhariwal Bus Stand",
+    "Gardhiwala Bus Stand",
+    "Sham Chaurasi Bus Stand",
+    "Amargarh Bus Stand",
+    "Dhuri Bus Stand",
+    "Lehragaga Bus Stand",
+    "Ghanaur Bus Stand",
+    "Tapa Bus Stand",
+    "Bhadaur Bus Stand",
+    "Mehal Kalan Bus Stand",
+    "Goniana Mandi Bus Stand",
+    "Bhucho Mandi Bus Stand",
+    "Jhunir Bus Stand",
+    "Bareta Bus Stand",
+    "Longowal Bus Stand",
+    "Cheema Jodhpur Bus Stand",
+    "Bhawanigarh Bus Stand",
+    "Banur Bus Stand",
+    "Lalru Bus Stand",
+    "Kurali Bypass",
+    "Rupnagar Old Bus Stand",
+    "Sri Anandpur Sahib Bus Stand",
+    "Nangal Dam Bus Stand",
+    "Bassi Pathana Bus Stand",
+    "Mandi Gobindgarh GT Road",
+    "Doraha Bus Stand",
+    "Sahnewal Bus Stand",
+    "Samrala Chowk Ludhiana",
+    "Jalandhar Bypass Ludhiana",
+    "PAP Chowk Jalandhar",
+    "Rama Mandi Jalandhar",
+    "Phagwara Sugar Mill Chowk",
+    "Amritsar Railway Station",
+    "Ludhiana Railway Station",
+    "Jalandhar City Railway Station",
+    "Dera Bassi Highway Junction"
+  ])
 ).sort();
 
 // Curated Popular Trips covering all regions of Punjab (Majha, Doaba, and Malwa)
@@ -2287,45 +2344,4 @@ export const INQUIRY_CONTACTS: InquiryContact[] = [
   }
 ];
 
-export const INITIAL_SPOTTED_REPORTS = [
-  {
-    id: "spot-1",
-    operator: "Punbus",
-    stop: "Gharuan (CU Gate 2)",
-    direction: "Towards Ludhiana",
-    speedType: "Express" as const,
-    statusNote: "Just crossed Gate 2 (seats available). Running on time.",
-    timestamp: Date.now() - 6 * 60 * 1000,
-    crowdLevel: "Moderate" as const
-  },
-  {
-    id: "spot-2",
-    operator: "PRTC PEPSU",
-    stop: "Kharar",
-    direction: "Towards Ludhiana",
-    speedType: "Express" as const,
-    statusNote: "Cleared Kharar flyover. Arriving at CU Gate 2 in ~10 mins.",
-    timestamp: Date.now() - 14 * 60 * 1000,
-    crowdLevel: "Low" as const
-  },
-  {
-    id: "spot-3",
-    operator: "Orbit Aviators",
-    stop: "Phagwara",
-    direction: "Towards Amritsar",
-    speedType: "Express" as const,
-    statusNote: "Volvo AC coach passed Phagwara towards Jalandhar. Steady pace.",
-    timestamp: Date.now() - 22 * 60 * 1000,
-    crowdLevel: "Moderate" as const
-  },
-  {
-    id: "spot-4",
-    operator: "PRTC PEPSU",
-    stop: "Rajpura Bypass",
-    direction: "Towards Patiala",
-    speedType: "Express" as const,
-    statusNote: "Departed Rajpura bypass towards Patiala ISBT. Good seating.",
-    timestamp: Date.now() - 35 * 60 * 1000,
-    crowdLevel: "Low" as const
-  }
-];
+export const INITIAL_SPOTTED_REPORTS: SpottedReport[] = [];

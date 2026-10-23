@@ -1,10 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect, useMemo } from 'react';
 import {
   X,
   Radio,
   Plus,
   Users,
-  Clock,
   Send,
   CheckCircle2,
   MapPin,
@@ -12,15 +11,34 @@ import {
   Navigation,
   Bus,
   Zap,
-  MessageSquareQuote
+  MessageSquareQuote,
+  AlertCircle,
+  Building2,
+  ChevronDown
 } from 'lucide-react';
 import { SpottedReport } from '../types/transit';
+import { ALL_PUNJAB_LOCATIONS } from '../data/transitData';
+import { formatLocationDisplay, renderHighlightedLocation } from './StopSelectMenu';
+import { SharedBusCard } from './SharedBusCard';
+
+export const OPERATOR_FLEET_OPTIONS = [
+  { value: 'PRTC PEPSU', display: 'PRTC PEPSU (Punjab), Punjab, India', badge: 'Govt' },
+  { value: 'Punbus', display: 'Punbus / Punjab Roadways (Punjab), Punjab, India', badge: 'Govt' },
+  { value: 'Orbit Aviators', display: 'Orbit Aviators (Punjab), Punjab, India', badge: 'Volvo AC' },
+  { value: 'Libra Bus', display: 'Libra Bus Service (Punjab), Punjab, India', badge: 'Private' },
+  { value: 'New Deep', display: 'New Deep Transport (Punjab), Punjab, India', badge: 'Private' },
+  { value: 'Jujhar', display: 'Jujhar Bus Service (Punjab), Punjab, India', badge: 'Private' },
+  { value: 'CTU', display: 'CTU Chandigarh (Punjab), Punjab, India', badge: 'Govt' },
+  { value: 'Haryana Roadways', display: 'Haryana Roadways (Punjab), Punjab, India', badge: 'Govt' },
+  { value: 'Local Mini Bus', display: 'Local Mini Bus (Punjab), Punjab, India', badge: 'Local' },
+];
 
 interface SpottedFeedModalProps {
   isOpen: boolean;
   onClose: () => void;
   reports: SpottedReport[];
   onAddReport: (report: Omit<SpottedReport, 'id' | 'timestamp'>) => void;
+  onDeleteReport?: (id: string) => void;
   currentStop: string;
 }
 
@@ -29,25 +47,82 @@ export const SpottedFeedModal: React.FC<SpottedFeedModalProps> = ({
   onClose,
   reports,
   onAddReport,
+  onDeleteReport,
   currentStop
 }) => {
   const [showAddForm, setShowAddForm] = useState(false);
-  const [operator, setOperator] = useState('PRTC PEPSU');
-  const [stop, setStop] = useState(currentStop || 'Chandigarh ISBT 43');
-  const [direction, setDirection] = useState('Towards Ludhiana');
+  const [operator, setOperator] = useState('');
+  const [isOperatorOpen, setIsOperatorOpen] = useState(false);
+  const [operatorHighlightedIndex, setOperatorHighlightedIndex] = useState(0);
+  const operatorMenuRef = useRef<HTMLDivElement>(null);
+
+  const [stop, setStop] = useState('');
+  const [isStopOpen, setIsStopOpen] = useState(false);
+  const [stopHighlightedIndex, setStopHighlightedIndex] = useState(0);
+  const stopMenuRef = useRef<HTMLDivElement>(null);
+
+  const [direction, setDirection] = useState('');
+  const [isDirectionOpen, setIsDirectionOpen] = useState(false);
+  const [directionHighlightedIndex, setDirectionHighlightedIndex] = useState(0);
+  const directionMenuRef = useRef<HTMLDivElement>(null);
+
+  // Filter stop locations across all 23 districts of Punjab
+  const filteredStopLocations = useMemo(() => {
+    const q = stop.trim().toLowerCase();
+    if (!q) return ALL_PUNJAB_LOCATIONS.slice(0, 60);
+    return ALL_PUNJAB_LOCATIONS.filter((loc) => {
+      const formatted = formatLocationDisplay(loc).toLowerCase();
+      return loc.toLowerCase().includes(q) || formatted.includes(q);
+    });
+  }, [stop]);
+
+  // Filter direction destinations across Punjab
+  const filteredDirectionLocations = useMemo(() => {
+    const q = direction.replace(/^towards\s+/i, '').trim().toLowerCase();
+    if (!q) return ALL_PUNJAB_LOCATIONS.slice(0, 60);
+    return ALL_PUNJAB_LOCATIONS.filter((loc) => {
+      const formatted = formatLocationDisplay(loc).toLowerCase();
+      return loc.toLowerCase().includes(q) || formatted.includes(q);
+    });
+  }, [direction]);
+
   const [speedType, setSpeedType] = useState<'Express' | 'Local'>('Express');
   const [crowdLevel, setCrowdLevel] = useState<'Low' | 'Moderate' | 'Heavy Rush'>('Moderate');
   const [statusNote, setStatusNote] = useState('');
   const [submitted, setSubmitted] = useState(false);
+  const [openCardId, setOpenCardId] = useState<string | null>(null);
+
+  const isFormValid = Boolean(operator.trim() && stop.trim() && direction.trim());
+
+  // Close menus when clicking outside
+  useEffect(() => {
+    const handleOutsideClick = (e: MouseEvent) => {
+      const target = e.target as Node;
+      if (operatorMenuRef.current && !operatorMenuRef.current.contains(target)) {
+        setIsOperatorOpen(false);
+      }
+      if (stopMenuRef.current && !stopMenuRef.current.contains(target)) {
+        setIsStopOpen(false);
+      }
+      if (directionMenuRef.current && !directionMenuRef.current.contains(target)) {
+        setIsDirectionOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleOutsideClick);
+    return () => document.removeEventListener('mousedown', handleOutsideClick);
+  }, []);
 
   if (!isOpen) return null;
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    if (!operator.trim() || !stop.trim() || !direction.trim()) {
+      return;
+    }
     onAddReport({
-      operator,
-      stop: stop.trim() || currentStop || 'Punjab Highway Corridor',
-      direction: direction.trim() || 'On Route',
+      operator: operator.trim(),
+      stop: stop.trim(),
+      direction: direction.trim(),
       speedType,
       crowdLevel,
       statusNote: statusNote.trim() || 'Bus spotted running on corridor'
@@ -56,15 +131,11 @@ export const SpottedFeedModal: React.FC<SpottedFeedModalProps> = ({
     setTimeout(() => {
       setSubmitted(false);
       setShowAddForm(false);
+      setOperator('');
+      setStop('');
+      setDirection('');
       setStatusNote('');
     }, 1200);
-  };
-
-  const formatElapsed = (timestamp: number) => {
-    const mins = Math.max(1, Math.floor((Date.now() - timestamp) / 60000));
-    if (mins < 60) return `${mins}m ago`;
-    const hours = Math.floor(mins / 60);
-    return `${hours}h ${mins % 60}m ago`;
   };
 
   return (
@@ -73,7 +144,7 @@ export const SpottedFeedModal: React.FC<SpottedFeedModalProps> = ({
       onClick={onClose}
     >
       <div
-        className="w-full max-w-lg bg-white dark:bg-[#1E193C] rounded-[28px] shadow-2xl border border-[#E8DCCE] dark:border-[#38315E] overflow-hidden flex flex-col max-h-[90vh] transition-all"
+        className="w-full max-w-2xl bg-white dark:bg-[#1E193C] rounded-[28px] shadow-2xl border border-[#E8DCCE] dark:border-[#38315E] overflow-hidden flex flex-col max-h-[90vh] transition-all"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
@@ -154,26 +225,96 @@ export const SpottedFeedModal: React.FC<SpottedFeedModalProps> = ({
 
               {/* Row 1: Operator & Speed Type */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
-                <div>
+                <div className="relative" ref={operatorMenuRef}>
                   <label className="flex items-center gap-1.5 font-bold text-[#231F3D] dark:text-[#F6F1FF] mb-1.5">
                     <Bus className="w-3.5 h-3.5 text-[#0B8F82] dark:text-[#4DE0CF]" />
                     Operator Fleet
                   </label>
-                  <select
-                    value={operator}
-                    onChange={(e) => setOperator(e.target.value)}
-                    className="w-full h-10 rounded-xl border border-[#DFD2C4] dark:border-[#3B3264] bg-[#F9F5F0] dark:bg-[#181333] px-3 font-semibold text-[#231F3D] dark:text-[#F6F1FF] focus:outline-none focus:border-[#0B8F82] focus:ring-2 focus:ring-[#0B8F82]/20 transition-all"
+                  <button
+                    type="button"
+                    onClick={() => setIsOperatorOpen((prev) => !prev)}
+                    className="w-full h-10 rounded-xl border border-[#DFD2C4] dark:border-[#3B3264] bg-[#F9F5F0] dark:bg-[#181333] px-3 font-semibold text-[#231F3D] dark:text-[#F6F1FF] flex items-center justify-between focus:outline-none focus:border-[#0B8F82] focus:ring-2 focus:ring-[#0B8F82]/20 transition-all text-left"
                   >
-                    <option value="PRTC PEPSU">🏛 PRTC PEPSU (Govt)</option>
-                    <option value="Punbus">🏛 Punbus / Punjab Roadways (Govt)</option>
-                    <option value="Orbit Aviators">⭐ Orbit Aviators (Volvo AC)</option>
-                    <option value="Libra Bus">🚍 Libra Bus Service</option>
-                    <option value="New Deep">🚍 New Deep Transport</option>
-                    <option value="Jujhar">🚍 Jujhar Bus Service</option>
-                    <option value="CTU">🏛 CTU Chandigarh</option>
-                    <option value="Haryana Roadways">🏛 Haryana Roadways</option>
-                    <option value="Local Mini Bus">🚐 Local Mini Bus</option>
-                  </select>
+                    <div className="flex items-center gap-2 truncate">
+                      <Bus
+                        className={`w-4 h-4 shrink-0 ${
+                          operator ? 'text-[#0B8F82] dark:text-[#4DE0CF]' : 'text-[#8E87A5]'
+                        }`}
+                      />
+                      <span
+                        className={`truncate text-xs ${
+                          operator
+                            ? 'font-semibold text-[#231F3D] dark:text-[#F6F1FF]'
+                            : 'font-normal text-[#8E87A5]'
+                        }`}
+                      >
+                        {OPERATOR_FLEET_OPTIONS.find((o) => o.value === operator)?.display || 'Choose Operator Fleet...'}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-1 shrink-0">
+                      {operator && (
+                        <span
+                          role="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setOperator('');
+                            setIsOperatorOpen(true);
+                          }}
+                          className="p-1 rounded-md text-[#8E87A5] hover:text-[#231F3D] dark:hover:text-white cursor-pointer"
+                          title="Clear operator"
+                        >
+                          <X className="w-3 h-3" />
+                        </span>
+                      )}
+                      <ChevronDown
+                        className={`w-4 h-4 text-[#6B6585] dark:text-[#A9A2C8] shrink-0 transition-transform duration-200 ${
+                          isOperatorOpen ? 'rotate-180 text-[#0B8F82]' : ''
+                        }`}
+                      />
+                    </div>
+                  </button>
+
+                  {isOperatorOpen && (
+                    <div
+                      className="location-dropdown-menu"
+                      style={{
+                        position: 'absolute',
+                        top: 'calc(100% + 4px)',
+                        left: 0,
+                        right: 0,
+                        zIndex: 90,
+                        maxHeight: '230px',
+                        overflowY: 'auto'
+                      }}
+                      role="listbox"
+                    >
+                      <ul className="location-dropdown-list">
+                        {OPERATOR_FLEET_OPTIONS.map((opt, idx) => {
+                          const isSelected = operator === opt.value;
+                          const isHighlighted = idx === operatorHighlightedIndex;
+                          return (
+                            <li
+                              key={opt.value}
+                              role="option"
+                              aria-selected={isSelected}
+                              onMouseEnter={() => setOperatorHighlightedIndex(idx)}
+                              onClick={() => {
+                                setOperator(opt.value);
+                                setIsOperatorOpen(false);
+                              }}
+                              className={`location-menu-item ${isHighlighted ? 'highlighted' : ''} ${
+                                isSelected ? 'selected' : ''
+                              }`}
+                            >
+                              <Bus className="w-4 h-4 text-[#0B8F82] dark:text-[#4DE0CF] shrink-0 location-building-icon" />
+                              <span className="location-item-text truncate">{opt.display}</span>
+                              {opt.badge && <span className="location-item-badge">{opt.badge}</span>}
+                            </li>
+                          );
+                        })}
+                      </ul>
+                    </div>
+                  )}
                 </div>
 
                 <div>
@@ -210,32 +351,212 @@ export const SpottedFeedModal: React.FC<SpottedFeedModalProps> = ({
 
               {/* Row 2: Location & Direction */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
-                <div>
+                {/* At Stop / Landmark */}
+                <div className="relative" ref={stopMenuRef}>
                   <label className="flex items-center gap-1.5 font-bold text-[#231F3D] dark:text-[#F6F1FF] mb-1.5">
                     <MapPin className="w-3.5 h-3.5 text-[#FF5A4E]" />
                     At Stop / Landmark
                   </label>
-                  <input
-                    type="text"
-                    value={stop}
-                    onChange={(e) => setStop(e.target.value)}
-                    placeholder="e.g. Chandigarh ISBT 43, Kharar, Beas"
-                    className="w-full h-10 rounded-xl border border-[#DFD2C4] dark:border-[#3B3264] bg-[#F9F5F0] dark:bg-[#181333] px-3 font-semibold text-[#231F3D] dark:text-[#F6F1FF] placeholder-[#8E87A5] focus:outline-none focus:border-[#0B8F82] focus:ring-2 focus:ring-[#0B8F82]/20 transition-all"
-                  />
+                  <div className="w-full h-10 rounded-xl border border-[#DFD2C4] dark:border-[#3B3264] bg-[#F9F5F0] dark:bg-[#181333] px-3 flex items-center gap-2.5 focus-within:border-[#0B8F82] focus-within:ring-2 focus-within:ring-[#0B8F82]/20 transition-all">
+                    <Building2 className="w-4 h-4 text-[#6B6585] dark:text-[#A9A2C8] shrink-0 pointer-events-none" />
+                    <input
+                      type="text"
+                      value={stop}
+                      onChange={(e) => {
+                        setStop(e.target.value);
+                        setIsStopOpen(true);
+                      }}
+                      onFocus={() => setIsStopOpen(true)}
+                      placeholder="Search bus stand in Punjab..."
+                      className="flex-1 min-w-0 bg-transparent border-0 outline-none p-0 font-semibold text-xs text-[#231F3D] dark:text-[#F6F1FF] placeholder-[#8E87A5] truncate shadow-none ring-0 focus:ring-0 focus:outline-none"
+                      style={{ padding: 0, margin: 0, border: 'none', background: 'transparent' }}
+                    />
+                    <div className="flex items-center gap-1 shrink-0">
+                      {stop && (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setStop('');
+                            setIsStopOpen(true);
+                          }}
+                          className="p-1 rounded-md text-[#8E87A5] hover:text-[#231F3D] dark:hover:text-white cursor-pointer"
+                          title="Clear input"
+                        >
+                          <X className="w-3 h-3" />
+                        </button>
+                      )}
+                      <button
+                        type="button"
+                        onClick={() => setIsStopOpen((prev) => !prev)}
+                        className="p-1 text-[#8E87A5] hover:text-[#231F3D] dark:hover:text-white cursor-pointer"
+                        title="Toggle bus stands list"
+                      >
+                        <ChevronDown
+                          className={`w-3.5 h-3.5 transition-transform duration-200 ${
+                            isStopOpen ? 'rotate-180 text-[#0B8F82]' : ''
+                          }`}
+                        />
+                      </button>
+                    </div>
+                  </div>
+
+                  {isStopOpen && (
+                    <div
+                      className="location-dropdown-menu"
+                      style={{
+                        position: 'absolute',
+                        top: 'calc(100% + 4px)',
+                        left: 0,
+                        right: 0,
+                        zIndex: 90,
+                        maxHeight: '230px',
+                        overflowY: 'auto'
+                      }}
+                      role="listbox"
+                    >
+                      <ul className="location-dropdown-list">
+                        {filteredStopLocations.length === 0 ? (
+                          <div className="location-empty-state">
+                            <span>No Punjab bus stand matching "{stop}"</span>
+                          </div>
+                        ) : (
+                          filteredStopLocations.map((loc, idx) => {
+                            const formatted = formatLocationDisplay(loc);
+                            const isSelected = stop === loc;
+                            const isHighlighted = idx === stopHighlightedIndex;
+                            return (
+                              <li
+                                key={`stop-${loc}`}
+                                role="option"
+                                aria-selected={isSelected}
+                                onMouseEnter={() => setStopHighlightedIndex(idx)}
+                                onClick={() => {
+                                  setStop(loc);
+                                  setIsStopOpen(false);
+                                }}
+                                className={`location-menu-item ${isHighlighted ? 'highlighted' : ''} ${
+                                  isSelected ? 'selected' : ''
+                                }`}
+                              >
+                                <Building2 className="location-building-icon" />
+                                <span className="location-item-text truncate">
+                                  {renderHighlightedLocation(formatted, stop)}
+                                </span>
+                                <span className="location-item-badge">
+                                  {loc.toLowerCase().includes('isbt') ? 'ISBT' : 'Bus Stand'}
+                                </span>
+                              </li>
+                            );
+                          })
+                        )}
+                      </ul>
+                    </div>
+                  )}
                 </div>
 
-                <div>
+                {/* Heading Towards */}
+                <div className="relative" ref={directionMenuRef}>
                   <label className="flex items-center gap-1.5 font-bold text-[#231F3D] dark:text-[#F6F1FF] mb-1.5">
                     <Navigation className="w-3.5 h-3.5 text-[#0B8F82] dark:text-[#4DE0CF]" />
                     Heading Towards
                   </label>
-                  <input
-                    type="text"
-                    value={direction}
-                    onChange={(e) => setDirection(e.target.value)}
-                    placeholder="e.g. Towards Ludhiana, Amritsar, Bathinda"
-                    className="w-full h-10 rounded-xl border border-[#DFD2C4] dark:border-[#3B3264] bg-[#F9F5F0] dark:bg-[#181333] px-3 font-semibold text-[#231F3D] dark:text-[#F6F1FF] placeholder-[#8E87A5] focus:outline-none focus:border-[#0B8F82] focus:ring-2 focus:ring-[#0B8F82]/20 transition-all"
-                  />
+                  <div className="w-full h-10 rounded-xl border border-[#DFD2C4] dark:border-[#3B3264] bg-[#F9F5F0] dark:bg-[#181333] px-3 flex items-center gap-2.5 focus-within:border-[#0B8F82] focus-within:ring-2 focus-within:ring-[#0B8F82]/20 transition-all">
+                    <Navigation className="w-4 h-4 text-[#0B8F82] dark:text-[#4DE0CF] shrink-0 pointer-events-none" />
+                    <input
+                      type="text"
+                      value={direction}
+                      onChange={(e) => {
+                        setDirection(e.target.value);
+                        setIsDirectionOpen(true);
+                      }}
+                      onFocus={() => setIsDirectionOpen(true)}
+                      placeholder="Search destination in Punjab..."
+                      className="flex-1 min-w-0 bg-transparent border-0 outline-none p-0 font-semibold text-xs text-[#231F3D] dark:text-[#F6F1FF] placeholder-[#8E87A5] truncate shadow-none ring-0 focus:ring-0 focus:outline-none"
+                      style={{ padding: 0, margin: 0, border: 'none', background: 'transparent' }}
+                    />
+                    <div className="flex items-center gap-1 shrink-0">
+                      {direction && (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setDirection('');
+                            setIsDirectionOpen(true);
+                          }}
+                          className="p-1 rounded-md text-[#8E87A5] hover:text-[#231F3D] dark:hover:text-white cursor-pointer"
+                          title="Clear input"
+                        >
+                          <X className="w-3 h-3" />
+                        </button>
+                      )}
+                      <button
+                        type="button"
+                        onClick={() => setIsDirectionOpen((prev) => !prev)}
+                        className="p-1 text-[#8E87A5] hover:text-[#231F3D] dark:hover:text-white cursor-pointer"
+                        title="Toggle destinations list"
+                      >
+                        <ChevronDown
+                          className={`w-3.5 h-3.5 transition-transform duration-200 ${
+                            isDirectionOpen ? 'rotate-180 text-[#0B8F82]' : ''
+                          }`}
+                        />
+                      </button>
+                    </div>
+                  </div>
+
+                  {isDirectionOpen && (
+                    <div
+                      className="location-dropdown-menu"
+                      style={{
+                        position: 'absolute',
+                        top: 'calc(100% + 4px)',
+                        left: 0,
+                        right: 0,
+                        zIndex: 90,
+                        maxHeight: '230px',
+                        overflowY: 'auto'
+                      }}
+                      role="listbox"
+                    >
+                      <ul className="location-dropdown-list">
+                        {filteredDirectionLocations.length === 0 ? (
+                          <div className="location-empty-state">
+                            <span>No Punjab destination matching "{direction}"</span>
+                          </div>
+                        ) : (
+                          filteredDirectionLocations.map((loc, idx) => {
+                            const cleanLoc = loc.replace(/^towards\s+/i, '');
+                            const formatted = `Towards ${formatLocationDisplay(cleanLoc)}`;
+                            const isSelected = direction.toLowerCase().includes(cleanLoc.toLowerCase());
+                            const isHighlighted = idx === directionHighlightedIndex;
+                            const searchPart = direction.replace(/^towards\s+/i, '').trim();
+                            return (
+                              <li
+                                key={`dir-${loc}`}
+                                role="option"
+                                aria-selected={isSelected}
+                                onMouseEnter={() => setDirectionHighlightedIndex(idx)}
+                                onClick={() => {
+                                  setDirection(`Towards ${cleanLoc}`);
+                                  setIsDirectionOpen(false);
+                                }}
+                                className={`location-menu-item ${isHighlighted ? 'highlighted' : ''} ${
+                                  isSelected ? 'selected' : ''
+                                }`}
+                              >
+                                <Navigation className="location-building-icon text-[#0B8F82] dark:text-[#4DE0CF]" />
+                                <span className="location-item-text truncate">
+                                  {renderHighlightedLocation(formatted, searchPart)}
+                                </span>
+                                <span className="location-item-badge">
+                                  {loc.toLowerCase().includes('isbt') ? 'ISBT' : 'Route'}
+                                </span>
+                              </li>
+                            );
+                          })
+                        )}
+                      </ul>
+                    </div>
+                  )}
                 </div>
               </div>
 
@@ -245,42 +566,119 @@ export const SpottedFeedModal: React.FC<SpottedFeedModalProps> = ({
                   <Users className="w-3.5 h-3.5 text-[#FFB020]" />
                   Bus / Stop Crowd Level
                 </label>
-                <div className="grid grid-cols-3 gap-2 text-xs">
+                <div className="grid grid-cols-3 gap-2 sm:gap-2.5 text-xs">
+                  {/* Low Rush */}
                   <button
                     type="button"
                     onClick={() => setCrowdLevel('Low')}
-                    className={`p-2 rounded-xl border text-center font-bold transition-all ${
+                    className={`relative p-2.5 rounded-2xl border-2 text-left transition-all duration-200 cursor-pointer flex flex-col justify-between ${
                       crowdLevel === 'Low'
-                        ? 'bg-emerald-50 dark:bg-emerald-950/30 border-emerald-500 text-emerald-700 dark:text-emerald-300 ring-2 ring-emerald-500/20'
-                        : 'border-[#DFD2C4] dark:border-[#382F62] bg-[#F9F5F0] dark:bg-[#181333] text-[#6B6585] dark:text-[#A9A2C8]'
+                        ? 'border-emerald-500 bg-emerald-500/10 dark:bg-emerald-500/20 shadow-md shadow-emerald-500/10 scale-[1.02]'
+                        : 'border-[#E2D6C7] dark:border-[#332A5A] bg-[#F9F5F0] dark:bg-[#181333] hover:border-emerald-400/50 hover:bg-emerald-50/40 dark:hover:bg-emerald-950/20'
                     }`}
                   >
-                    🟢 Low Rush
-                    <span className="block text-[10px] font-normal opacity-80">Seats available</span>
+                    <div className="flex items-center gap-1.5">
+                      <span className="relative flex h-2.5 w-2.5 shrink-0">
+                        {crowdLevel === 'Low' && (
+                          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                        )}
+                        <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
+                      </span>
+                      <span
+                        className={`text-xs font-bold leading-tight ${
+                          crowdLevel === 'Low'
+                            ? 'text-emerald-700 dark:text-emerald-300'
+                            : 'text-[#231F3D] dark:text-[#F6F1FF]'
+                        }`}
+                      >
+                        Low Rush
+                      </span>
+                    </div>
+                    <span
+                      className={`text-[10px] mt-1 font-medium ${
+                        crowdLevel === 'Low'
+                          ? 'text-emerald-600/90 dark:text-emerald-300/80 font-semibold'
+                          : 'text-[#8E87A5]'
+                      }`}
+                    >
+                      Seats available
+                    </span>
                   </button>
+
+                  {/* Moderate */}
                   <button
                     type="button"
                     onClick={() => setCrowdLevel('Moderate')}
-                    className={`p-2 rounded-xl border text-center font-bold transition-all ${
+                    className={`relative p-2.5 rounded-2xl border-2 text-left transition-all duration-200 cursor-pointer flex flex-col justify-between ${
                       crowdLevel === 'Moderate'
-                        ? 'bg-amber-50 dark:bg-amber-950/30 border-amber-500 text-amber-700 dark:text-amber-300 ring-2 ring-amber-500/20'
-                        : 'border-[#DFD2C4] dark:border-[#382F62] bg-[#F9F5F0] dark:bg-[#181333] text-[#6B6585] dark:text-[#A9A2C8]'
+                        ? 'border-amber-500 bg-amber-500/10 dark:bg-amber-500/20 shadow-md shadow-amber-500/10 scale-[1.02]'
+                        : 'border-[#E2D6C7] dark:border-[#332A5A] bg-[#F9F5F0] dark:bg-[#181333] hover:border-amber-400/50 hover:bg-amber-50/40 dark:hover:bg-amber-950/20'
                     }`}
                   >
-                    🟡 Moderate
-                    <span className="block text-[10px] font-normal opacity-80">Standing room</span>
+                    <div className="flex items-center gap-1.5">
+                      <span className="relative flex h-2.5 w-2.5 shrink-0">
+                        {crowdLevel === 'Moderate' && (
+                          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
+                        )}
+                        <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-amber-500"></span>
+                      </span>
+                      <span
+                        className={`text-xs font-bold leading-tight ${
+                          crowdLevel === 'Moderate'
+                            ? 'text-amber-700 dark:text-amber-300'
+                            : 'text-[#231F3D] dark:text-[#F6F1FF]'
+                        }`}
+                      >
+                        Moderate
+                      </span>
+                    </div>
+                    <span
+                      className={`text-[10px] mt-1 font-medium ${
+                        crowdLevel === 'Moderate'
+                          ? 'text-amber-600/90 dark:text-amber-300/80 font-semibold'
+                          : 'text-[#8E87A5]'
+                      }`}
+                    >
+                      Standing room
+                    </span>
                   </button>
+
+                  {/* Heavy Rush */}
                   <button
                     type="button"
                     onClick={() => setCrowdLevel('Heavy Rush')}
-                    className={`p-2 rounded-xl border text-center font-bold transition-all ${
+                    className={`relative p-2.5 rounded-2xl border-2 text-left transition-all duration-200 cursor-pointer flex flex-col justify-between ${
                       crowdLevel === 'Heavy Rush'
-                        ? 'bg-rose-50 dark:bg-rose-950/30 border-rose-500 text-rose-700 dark:text-rose-300 ring-2 ring-rose-500/20'
-                        : 'border-[#DFD2C4] dark:border-[#382F62] bg-[#F9F5F0] dark:bg-[#181333] text-[#6B6585] dark:text-[#A9A2C8]'
+                        ? 'border-rose-500 bg-rose-500/10 dark:bg-rose-500/20 shadow-md shadow-rose-500/10 scale-[1.02]'
+                        : 'border-[#E2D6C7] dark:border-[#332A5A] bg-[#F9F5F0] dark:bg-[#181333] hover:border-rose-400/50 hover:bg-rose-50/40 dark:hover:bg-rose-950/20'
                     }`}
                   >
-                    🔴 Heavy Rush
-                    <span className="block text-[10px] font-normal opacity-80">Packed bus</span>
+                    <div className="flex items-center gap-1.5">
+                      <span className="relative flex h-2.5 w-2.5 shrink-0">
+                        {crowdLevel === 'Heavy Rush' && (
+                          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75"></span>
+                        )}
+                        <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-rose-500"></span>
+                      </span>
+                      <span
+                        className={`text-xs font-bold leading-tight ${
+                          crowdLevel === 'Heavy Rush'
+                            ? 'text-rose-700 dark:text-rose-300'
+                            : 'text-[#231F3D] dark:text-[#F6F1FF]'
+                        }`}
+                      >
+                        Heavy Rush
+                      </span>
+                    </div>
+                    <span
+                      className={`text-[10px] mt-1 font-medium ${
+                        crowdLevel === 'Heavy Rush'
+                          ? 'text-rose-600/90 dark:text-rose-300/80 font-semibold'
+                          : 'text-[#8E87A5]'
+                      }`}
+                    >
+                      Packed bus
+                    </span>
                   </button>
                 </div>
               </div>
@@ -303,13 +701,24 @@ export const SpottedFeedModal: React.FC<SpottedFeedModalProps> = ({
               {/* Submit Button */}
               <button
                 type="submit"
-                disabled={submitted}
-                className="w-full h-11 rounded-xl bg-gradient-to-r from-[#0B8F82] to-[#08776B] hover:from-[#09776c] hover:to-[#07685D] text-white font-extrabold text-sm flex items-center justify-center gap-2 shadow-lg shadow-[#0B8F82]/25 transition-all active:scale-[0.98]"
+                disabled={submitted || !isFormValid}
+                className={`w-full h-11 rounded-xl font-extrabold text-sm flex items-center justify-center gap-2 shadow-lg transition-all active:scale-[0.98] ${
+                  submitted
+                    ? 'bg-emerald-600 text-white shadow-emerald-600/25'
+                    : isFormValid
+                    ? 'bg-gradient-to-r from-[#0B8F82] to-[#08776B] hover:from-[#09776c] hover:to-[#07685D] text-white shadow-[#0B8F82]/25 cursor-pointer'
+                    : 'bg-[#E5DACF] dark:bg-[#2C2450] text-[#8E87A5] dark:text-[#7A729A] cursor-not-allowed shadow-none'
+                }`}
               >
                 {submitted ? (
                   <>
                     <CheckCircle2 className="w-5 h-5 text-white" />
                     <span>Sighting Logged to Punjab Feed!</span>
+                  </>
+                ) : !isFormValid ? (
+                  <>
+                    <Send className="w-4 h-4 opacity-50" />
+                    <span>Choose Fleet, Stop & Destination to Submit</span>
                   </>
                 ) : (
                   <>
@@ -335,78 +744,45 @@ export const SpottedFeedModal: React.FC<SpottedFeedModalProps> = ({
             </button>
           )}
 
-          {/* Sighting Feed Header */}
-          <div className="flex items-center justify-between pt-1">
-            <span className="text-xs font-bold text-[#6B6585] dark:text-[#A9A2C8] flex items-center gap-1.5">
-              <Clock className="w-3.5 h-3.5 text-[#0B8F82]" />
-              Recent Sightings Across Punjab ({reports.length})
+          {/* Sighting Feed Header - Exact .head style like the main search results */}
+          <div className="head" style={{ marginTop: '24px', marginBottom: '6px' }}>
+            <h2 className="disp flex items-center gap-2 text-[var(--ink)]">
+              <Radio className="w-5 h-5 text-[#0B8F82] animate-pulse shrink-0" />
+              <span>Live Buses Shared by Users</span>
+            </h2>
+            <span className="count">
+              {reports.length} shared {reports.length === 1 ? 'bus' : 'buses'}
             </span>
-            <span className="text-[11px] text-[#8E87A5]">Auto-updates</span>
           </div>
 
-          {/* Sighting List Cards */}
-          <div className="space-y-3">
-            {reports.map((rpt) => {
-              const isExpress = rpt.speedType === 'Express';
-              const crowdColor =
-                rpt.crowdLevel === 'Low'
-                  ? 'bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border-emerald-500/25'
-                  : rpt.crowdLevel === 'Moderate'
-                  ? 'bg-amber-500/15 text-amber-700 dark:text-amber-300 border-amber-500/25'
-                  : 'bg-rose-500/15 text-rose-700 dark:text-rose-300 border-rose-500/25';
+          {/* User-reported disclaimer notice */}
+          <p className="text-xs text-[var(--muted)] mb-3.5 flex items-start sm:items-center gap-1.5 leading-relaxed">
+            <AlertCircle className="w-3.5 h-3.5 text-amber-500 shrink-0 mt-0.5 sm:mt-0" />
+            <span>
+              <strong>Note:</strong> We don't guarantee departure times or seat availability as this bus information is uploaded by fellow users.
+            </span>
+          </p>
 
-              return (
-                <div
+          {/* Sighting List Cards - Exact AnyStop card style */}
+          <div className="list">
+            {reports.length === 0 ? (
+              <div className="empty" style={{ padding: '36px 16px', borderRadius: '20px' }}>
+                <b>No shared buses yet.</b>
+                <br />
+                Be the first commuter to spot and share a live bus on this route!
+              </div>
+            ) : (
+              reports.map((rpt, idx) => (
+                <SharedBusCard
                   key={rpt.id}
-                  className="p-4 rounded-2xl bg-white dark:bg-[#211B42] border border-[#E4D5C7] dark:border-[#383060] shadow-sm hover:shadow-md hover:border-[#0B8F82]/40 transition-all space-y-2.5"
-                >
-                  {/* Card Header: Operator + Speed + Crowd + Time */}
-                  <div className="flex items-center justify-between flex-wrap gap-2 text-xs">
-                    <div className="flex items-center gap-2">
-                      <span className="font-display font-bold text-base text-[#231F3D] dark:text-[#F6F1FF]">
-                        {rpt.operator}
-                      </span>
-                      <span
-                        className={`px-2 py-0.5 rounded-full text-[11px] font-extrabold border ${
-                          isExpress
-                            ? 'bg-[#D8F5F0] text-[#077066] border-[#0B8F82]/30 dark:bg-[#0E3B3A] dark:text-[#4DE0CF]'
-                            : 'bg-[#FFF1D6] text-[#8C5500] border-[#FFB020]/35 dark:bg-[#3D2F0A] dark:text-[#FFB020]'
-                        }`}
-                      >
-                        {isExpress ? '⚡ Express' : '🐢 All-stop'}
-                      </span>
-                      <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold border ${crowdColor}`}>
-                        {rpt.crowdLevel}
-                      </span>
-                    </div>
-
-                    <span className="text-[11px] font-semibold text-[#6B6585] dark:text-[#A9A2C8] flex items-center gap-1 bg-[#F4ECE3] dark:bg-[#181333] px-2 py-0.5 rounded-md">
-                      <Clock className="w-3 h-3 text-[#FF5A4E]" />
-                      {formatElapsed(rpt.timestamp)}
-                    </span>
-                  </div>
-
-                  {/* Location & Direction */}
-                  <div className="flex items-center gap-1.5 text-xs text-[#6B6585] dark:text-[#A9A2C8]">
-                    <MapPin className="w-3.5 h-3.5 text-[#FF5A4E] shrink-0" />
-                    <span className="font-bold text-[#231F3D] dark:text-[#F6F1FF]">
-                      {rpt.stop}
-                    </span>
-                    <span className="opacity-40">•</span>
-                    <span className="flex items-center gap-1 text-[#0B8F82] dark:text-[#4DE0CF] font-semibold">
-                      <Navigation className="w-3 h-3" />
-                      {rpt.direction}
-                    </span>
-                  </div>
-
-                  {/* Quote Status Box */}
-                  <div className="relative pl-7 pr-3 py-2.5 rounded-xl bg-[#F8F2EB] dark:bg-[#181333] border border-[#E8DDD1] dark:border-[#322A5A] text-xs font-medium text-[#231F3D] dark:text-[#F6F1FF] leading-relaxed">
-                    <MessageSquareQuote className="w-4 h-4 text-[#FF5A4E] absolute left-2 top-2.5 opacity-80" />
-                    "{rpt.statusNote}"
-                  </div>
-                </div>
-              );
-            })}
+                  report={rpt}
+                  index={idx}
+                  isOpen={openCardId === rpt.id}
+                  onToggleOpen={() => setOpenCardId(prev => prev === rpt.id ? null : rpt.id)}
+                  onDelete={onDeleteReport}
+                />
+              ))
+            )}
           </div>
         </div>
       </div>

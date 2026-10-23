@@ -30,6 +30,34 @@ export const formatLocationDisplay = (stop: string): string => {
   return `${trimmed} (Punjab), Punjab, India`;
 };
 
+/**
+ * Helper to highlight matching letters in the search results
+ */
+export const renderHighlightedLocation = (fullLocation: string, searchQuery: string) => {
+  const q = searchQuery.trim();
+  if (!q) return fullLocation;
+
+  const regex = new RegExp(`(${q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
+  const parts = fullLocation.split(regex);
+
+  return (
+    <>
+      {parts.map((part, idx) =>
+        part.toLowerCase() === q.toLowerCase() ? (
+          <mark
+            key={idx}
+            className="bg-transparent font-extrabold text-[var(--coral)] underline decoration-[var(--coral)] decoration-2"
+          >
+            {part}
+          </mark>
+        ) : (
+          <React.Fragment key={idx}>{part}</React.Fragment>
+        )
+      )}
+    </>
+  );
+};
+
 export const StopSelectMenu: React.FC<StopSelectMenuProps> = ({
   id,
   label,
@@ -118,32 +146,6 @@ export const StopSelectMenu: React.FC<StopSelectMenuProps> = ({
     } else if (e.key === 'Escape') {
       setIsOpen(false);
     }
-  };
-
-  // Helper to highlight matching letters in the search results
-  const renderHighlightedLocation = (fullLocation: string, searchQuery: string) => {
-    const q = searchQuery.trim();
-    if (!q) return fullLocation;
-
-    const regex = new RegExp(`(${q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
-    const parts = fullLocation.split(regex);
-
-    return (
-      <>
-        {parts.map((part, idx) =>
-          part.toLowerCase() === q.toLowerCase() ? (
-            <mark
-              key={idx}
-              className="bg-transparent font-extrabold text-[var(--coral)] underline decoration-[var(--coral)] decoration-2"
-            >
-              {part}
-            </mark>
-          ) : (
-            <React.Fragment key={idx}>{part}</React.Fragment>
-          )
-        )}
-      </>
-    );
   };
 
   return (

@@ -129,8 +129,11 @@ export const BusCard: React.FC<BusCardProps> = ({
                   style={{ ['--i' as any]: x }}
                   className={isEnd ? 'end' : isIn ? 'in' : ''}
                 >
-                  <span>{stopName}</span>
-                  <span>{stopTime}</span>
+                  <span className="stop-name">{stopName}</span>
+                  <div className="stop-time-wrap">
+                    <span className="stop-time-val">~{stopTime}</span>
+                    <span className="stop-time-badge">Expected</span>
+                  </div>
                 </li>
               );
             })}
