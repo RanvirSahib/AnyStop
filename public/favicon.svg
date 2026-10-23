@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160" fill="none" aria-label="AnyStop Favicon">
+  <defs>
+    <linearGradient id="favPin" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#FF6B5E"/>
+      <stop offset="100%" stop-color="#FF473B"/>
+    </linearGradient>
+    <linearGradient id="favRoad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#FFB326"/>
+      <stop offset="100%" stop-color="#FF9615"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background circle/squircle -->
+  <rect width="160" height="160" rx="38" fill="#1F1A3F"/>
+
+  <!-- Broadcast Waves -->
+  <path d="M 39 52 A 38 38 0 0 0 39 100" stroke="#FFA726" stroke-width="5.5" stroke-linecap="round" fill="none"/>
+  <path d="M 49 61 A 26 26 0 0 0 49 91" stroke="#FF5A4E" stroke-width="5" stroke-linecap="round" fill="none"/>
+
+  <path d="M 111 61 A 26 26 0 0 1 111 91" stroke="#FF5A4E" stroke-width="5" stroke-linecap="round" fill="none"/>
+  <path d="M 121 52 A 38 38 0 0 1 121 100" stroke="#FFA726" stroke-width="5.5" stroke-linecap="round" fill="none"/>
+
+  <!-- Location Pin Body -->
+  <path d="M 80 118 C 68 100 48 80 48 56 A 32 32 0 1 1 112 56 C 112 80 92 100 80 118 Z" fill="url(#favPin)"/>
+
+  <!-- Bus Silhouette -->
+  <rect x="63" y="38" width="34" height="40" rx="9" fill="#1F1A3F"/>
+  <rect x="68" y="44" width="24" height="12" rx="3" fill="#FF5A4E"/>
+  <circle cx="70.5" cy="67" r="2.5" fill="#FF5A4E"/>
+  <circle cx="89.5" cy="67" r="2.5" fill="#FF5A4E"/>
+  <rect x="75" y="69" width="10" height="2" rx="1" fill="#FF5A4E"/>
+
+  <!-- Road Shaped as Letter 'A' -->
+  <path d="M 74.5 73 L 85.5 73 L 97 122 L 87 122 L 83.5 106 L 76.5 106 L 73 122 L 63 122 Z" fill="url(#favRoad)"/>
+  <polygon points="80,80 75.5,95 84.5,95" fill="#1F1A3F"/>
+  <polygon points="80,106 76.5,122 83.5,122" fill="#1F1A3F"/>
+
+  <!-- Center road dashed lane -->
+  <line x1="80" y1="84" x2="80" y2="92" stroke="#FFFFFF" stroke-width="2.5" stroke-linecap="round"/>
+  <line x1="80" y1="99" x2="80" y2="105" stroke="#FFFFFF" stroke-width="2.5" stroke-linecap="round"/>
+  <line x1="80" y1="109" x2="80" y2="119" stroke="#FFFFFF" stroke-width="2.5" stroke-linecap="round"/>
+</svg>

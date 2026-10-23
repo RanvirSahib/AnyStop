@@ -1,0 +1,17 @@
+{
+  "name": "AnyStop — Real-Time Bus Transit",
+  "short_name": "AnyStop",
+  "description": "Real-time intelligence for unreserved, offline, and highway bus transit.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#1F1A3F",
+  "theme_color": "#1F1A3F",
+  "icons": [
+    {
+      "src": "/bus-icon.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

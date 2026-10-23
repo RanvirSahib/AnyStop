@@ -1,0 +1,73 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 80" fill="none" aria-label="AnyStop Logo">
+  <defs>
+    <!-- Coral Pin Gradient -->
+    <linearGradient id="pinGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#FF6B5E"/>
+      <stop offset="100%" stop-color="#FF4B3E"/>
+    </linearGradient>
+
+    <!-- Amber Road Gradient -->
+    <linearGradient id="roadGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#FFB326"/>
+      <stop offset="100%" stop-color="#FF981A"/>
+    </linearGradient>
+
+    <!-- Soft Drop Shadow for Mark -->
+    <filter id="markShadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#000000" flood-opacity="0.25"/>
+    </filter>
+  </defs>
+
+  <!-- ICON MARK (Left) -->
+  <g transform="translate(10, 4)" filter="url(#markShadow)">
+    <!-- Broadcast Waves (Left) -->
+    <path d="M 23 23 A 28 28 0 0 0 23 51" stroke="#FFA726" stroke-width="3.5" stroke-linecap="round" fill="none" opacity="0.95"/>
+    <path d="M 29 28 A 18 18 0 0 0 29 46" stroke="#FF5A4E" stroke-width="3.2" stroke-linecap="round" fill="none"/>
+
+    <!-- Broadcast Waves (Right) -->
+    <path d="M 67 28 A 18 18 0 0 1 67 46" stroke="#FF5A4E" stroke-width="3.2" stroke-linecap="round" fill="none"/>
+    <path d="M 73 23 A 28 28 0 0 1 73 51" stroke="#FFA726" stroke-width="3.5" stroke-linecap="round" fill="none" opacity="0.95"/>
+
+    <!-- Location Pin Body -->
+    <path d="M 48 64 C 41 53 28 41 28 26 A 20 20 0 1 1 68 26 C 68 41 55 53 48 64 Z" fill="url(#pinGrad)"/>
+
+    <!-- Bus Silhouette (Dark Navy inside Pin) -->
+    <rect x="37" y="14" width="22" height="26" rx="5.5" fill="#1F1A3F"/>
+
+    <!-- Bus Windshield Cutout -->
+    <rect x="40.5" y="18" width="15" height="7.5" rx="2" fill="#FF5A4E"/>
+
+    <!-- Bus Headlights -->
+    <circle cx="41.5" cy="32.5" r="1.6" fill="#FF5A4E"/>
+    <circle cx="54.5" cy="32.5" r="1.6" fill="#FF5A4E"/>
+
+    <!-- Bus Grille Bar -->
+    <rect x="45" y="33.5" width="6" height="1.4" rx="0.7" fill="#FF5A4E"/>
+
+    <!-- Road Shaped as Letter 'A' -->
+    <!-- Road Base & Legs -->
+    <path d="M 44.5 37 L 51.5 37 L 59 66 L 52.5 66 L 50 56 L 46 56 L 43.5 66 L 37 66 Z" fill="url(#roadGrad)"/>
+
+    <!-- 'A' Inner Top Hole (Dark Triangle) -->
+    <polygon points="48,41 45.2,50.5 50.8,50.5" fill="#1F1A3F"/>
+
+    <!-- 'A' Lower Highway Cutout -->
+    <polygon points="48,56 46,66 50,66" fill="#1F1A3F"/>
+
+    <!-- Road Center Dashed Line -->
+    <line x1="48" y1="44" x2="48" y2="49" stroke="#FFFFFF" stroke-width="1.6" stroke-linecap="round"/>
+    <line x1="48" y1="52" x2="48" y2="55" stroke="#FFFFFF" stroke-width="1.6" stroke-linecap="round"/>
+    <line x1="48" y1="58" x2="48" y2="64" stroke="#FFFFFF" stroke-width="1.6" stroke-linecap="round"/>
+  </g>
+
+  <!-- BRAND TYPOGRAPHY: "AnyStop" -->
+  <g font-family="'Bricolage Grotesque', 'Figtree', sans-serif" font-weight="800" font-size="38" letter-spacing="-0.5">
+    <!-- "Any" in Amber/Gold -->
+    <text x="96" y="52" fill="#FFA726">Any</text>
+    <!-- "Stop" in Crisp White -->
+    <text x="174" y="52" fill="#FFFFFF">Stop</text>
+  </g>
+
+  <!-- Sparkle Star at Top Right of "Stop" -->
+  <path d="M 276 26 Q 276 32 282 32 Q 276 32 276 38 Q 276 32 270 32 Q 276 32 276 26 Z" fill="#8E8AA8" opacity="0.85"/>
+</svg>

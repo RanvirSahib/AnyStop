@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 340 340" fill="none" aria-label="AnyStop Circle Emblem">
+  <defs>
+    <linearGradient id="embPinGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#FF6B5E"/>
+      <stop offset="100%" stop-color="#FF473B"/>
+    </linearGradient>
+    <linearGradient id="embRoadGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#FFB326"/>
+      <stop offset="100%" stop-color="#FF9615"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Circular Badge Border -->
+  <circle cx="170" cy="170" r="156" fill="#1F1A3F" stroke="#FFA726" stroke-width="12"/>
+
+  <!-- Inner Mark Group -->
+  <g transform="translate(170, 142) scale(1.4)">
+    <g transform="translate(-48, -48)">
+      <!-- Broadcast Waves -->
+      <path d="M 23 23 A 28 28 0 0 0 23 51" stroke="#FFA726" stroke-width="3.5" stroke-linecap="round" fill="none" opacity="0.95"/>
+      <path d="M 29 28 A 18 18 0 0 0 29 46" stroke="#FF5A4E" stroke-width="3.2" stroke-linecap="round" fill="none"/>
+      <path d="M 67 28 A 18 18 0 0 1 67 46" stroke="#FF5A4E" stroke-width="3.2" stroke-linecap="round" fill="none"/>
+      <path d="M 73 23 A 28 28 0 0 1 73 51" stroke="#FFA726" stroke-width="3.5" stroke-linecap="round" fill="none" opacity="0.95"/>
+
+      <!-- Location Pin -->
+      <path d="M 48 64 C 41 53 28 41 28 26 A 20 20 0 1 1 68 26 C 68 41 55 53 48 64 Z" fill="url(#embPinGrad)"/>
+
+      <!-- Bus Silhouette -->
+      <rect x="37" y="14" width="22" height="26" rx="5.5" fill="#1F1A3F"/>
+      <rect x="40.5" y="18" width="15" height="7.5" rx="2" fill="#FF5A4E"/>
+      <circle cx="41.5" cy="32.5" r="1.6" fill="#FF5A4E"/>
+      <circle cx="54.5" cy="32.5" r="1.6" fill="#FF5A4E"/>
+      <rect x="45" y="33.5" width="6" height="1.4" rx="0.7" fill="#FF5A4E"/>
+
+      <!-- Road 'A' -->
+      <path d="M 44.5 37 L 51.5 37 L 59 66 L 52.5 66 L 50 56 L 46 56 L 43.5 66 L 37 66 Z" fill="url(#embRoadGrad)"/>
+      <polygon points="48,41 45.2,50.5 50.8,50.5" fill="#1F1A3F"/>
+      <polygon points="48,56 46,66 50,66" fill="#1F1A3F"/>
+
+      <!-- Lane Line -->
+      <line x1="48" y1="44" x2="48" y2="49" stroke="#FFFFFF" stroke-width="1.6" stroke-linecap="round"/>
+      <line x1="48" y1="52" x2="48" y2="55" stroke="#FFFFFF" stroke-width="1.6" stroke-linecap="round"/>
+      <line x1="48" y1="58" x2="48" y2="64" stroke="#FFFFFF" stroke-width="1.6" stroke-linecap="round"/>
+    </g>
+  </g>
+
+  <!-- Typography inside Circle -->
+  <g font-family="'Bricolage Grotesque', 'Figtree', sans-serif" font-weight="800" font-size="34" letter-spacing="-0.5" text-anchor="middle">
+    <text x="170" y="278">
+      <tspan fill="#FFA726">Any</tspan><tspan fill="#FFFFFF">Stop</tspan>
+    </text>
+  </g>
+
+  <!-- Sparkle Stars -->
+  <path d="M 245 200 Q 245 208 253 208 Q 245 208 245 216 Q 245 208 237 208 Q 245 208 245 200 Z" fill="#8E8AA8" opacity="0.6"/>
+</svg>
