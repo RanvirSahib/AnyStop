@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>StopSense – Board your account</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&family=Figtree:wght@400;500;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--paper:#FFF8F1;--ink:#231F3D;--muted:#6B6585;--line:#E4D3C3;--field:#fff;--coral:#FF5A4E;--coral2:#E8433A;--sun:#FFB020;--teal:#0B8F82;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);color-scheme:light}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--paper:#241E45;--ink:#F6F1FF;--muted:#A9A2C8;--line:#3C3566;--field:#1A1535;--teal:#4DE0CF;color-scheme:dark}}
+*{box-sizing:border-box;margin:0}
+html,body{height:100%}
+body{font:400 17px/1.5 "Figtree",system-ui,sans-serif;color:var(--ink);background:radial-gradient(700px 420px at 15% 0%,rgba(255,90,78,.38),transparent 60%),radial-gradient(600px 400px at 100% 100%,rgba(255,176,32,.25),transparent 60%),linear-gradient(160deg,#1F1A3F,#3B1D63);overflow-x:hidden;-webkit-font-smoothing:antialiased;position:relative}
+body::before{content:"";position:fixed;inset:0;z-index:1;background-image:url('/transit-doodle-dark.svg');background-repeat:repeat;background-size:500px 500px;opacity:.65;pointer-events:none;transform:translateZ(0)}
+button,input{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--sun);outline-offset:2px}
+.stage{min-height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px 16px 110px;position:relative;z-index:2}
+.topbar{display:flex;align-items:center;justify-content:space-between;width:100%;max-width:420px;margin:0 auto 16px;gap:12px}
+.logo{font-family:"Bricolage Grotesque",sans-serif;font-weight:800;font-size:23px;color:#fff;text-decoration:none;display:inline-flex;align-items:center;gap:8px;letter-spacing:-.01em}
+.logo i{width:14px;height:14px;border-radius:50%;background:var(--coral);box-shadow:0 0 0 4px rgba(255,90,78,.3);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 4px rgba(255,90,78,.3)}50%{box-shadow:0 0 0 9px rgba(255,90,78,.1)}}
+.back{color:#DAD3F2;text-decoration:none;font-weight:500;font-size:15px;white-space:nowrap}
+.back:hover{color:#fff}
+
+
+.ticket{width:100%;max-width:420px;background:var(--paper);border-radius:24px;position:relative;animation:enter 1s cubic-bezier(.2,.9,.25,1) both;
+ --cut:112px;-webkit-mask:radial-gradient(circle 14px at 0 calc(100% - var(--cut)),#0000 97%,#000) left/51% 100% no-repeat,radial-gradient(circle 14px at 100% calc(100% - var(--cut)),#0000 97%,#000) right/51% 100% no-repeat;mask:radial-gradient(circle 14px at 0 calc(100% - var(--cut)),#0000 97%,#000) left/51% 100% no-repeat,radial-gradient(circle 14px at 100% calc(100% - var(--cut)),#0000 97%,#000) right/51% 100% no-repeat;filter:drop-shadow(0 24px 40px rgba(0,0,0,.35))}
+@keyframes enter{from{opacity:0;transform:translateY(60px) rotate(-4deg) scale(.94)}to{opacity:1;transform:none}}
+.main{padding:22px 22px 18px;position:relative;min-height:380px}
+.tophead{display:flex;justify-content:space-between;align-items:center;font-family:"DM Mono",monospace;font-size:12px;letter-spacing:.14em;color:var(--muted)}
+.tophead b{color:var(--coral);font-weight:500}
+.route{display:flex;align-items:center;gap:10px;margin:14px 0 4px;font-family:"Bricolage Grotesque",sans-serif;font-weight:800;font-size:15px;letter-spacing:.04em}
+.route .l{flex:1;height:4px;border-radius:2px;background:repeating-linear-gradient(90deg,var(--coral) 0 8px,transparent 8px 14px);position:relative}
+.route .l:after{content:"🚌";position:absolute;top:-12px;left:0;font-size:20px;animation:go 3.2s ease-in-out infinite}
+@keyframes go{0%,15%{left:0}85%,100%{left:calc(100% - 24px)}}
+h1{font-family:"Bricolage Grotesque",sans-serif;font-weight:800;font-size:34px;line-height:1.05;letter-spacing:-.02em;margin:10px 0 4px;transition:opacity .25s,transform .25s}
+.sub{color:var(--muted);margin-bottom:14px;transition:opacity .25s}
+.swap-out{opacity:0;transform:translateY(-8px)}
+.seg{display:grid;grid-template-columns:1fr 1fr;background:var(--field);border:2px solid var(--line);border-radius:99px;padding:3px;position:relative;margin-bottom:12px}
+.seg:before{content:"";position:absolute;top:3px;bottom:3px;left:3px;width:calc(50% - 3px);border-radius:99px;background:var(--ink);transition:transform .45s cubic-bezier(.3,1.3,.4,1)}
+.seg.su:before{transform:translateX(100%)}
+.seg button{position:relative;border:0;background:none;min-height:44px;font-weight:700;border-radius:99px;transition:color .3s;cursor:pointer;color:var(--muted)}
+.seg button[aria-pressed=true]{color:var(--paper)}
+.fld{display:block;margin-top:10px}
+.fld span{font-family:"DM Mono",monospace;font-size:11px;letter-spacing:.14em;color:var(--muted)}
+.inp{display:flex;align-items:center;background:var(--field);border:2px solid var(--line);border-radius:14px;margin-top:4px;transition:border-color .2s,box-shadow .2s}
+.inp:focus-within{border-color:var(--coral);box-shadow:0 0 0 4px rgba(255,90,78,.18)}
+.inp input{flex:1;min-width:0;height:48px;border:0;background:none;padding:0 14px;font-weight:500}
+.inp input:focus{outline:0}
+.inp button{border:0;background:none;padding:0 14px;min-height:44px;cursor:pointer;font-size:14px;font-weight:700;color:var(--coral2)}
+.fld.bad .inp{border-color:var(--coral2);animation:shake .4s}
+.msg{display:none;color:var(--coral2);font-size:14px;font-weight:700;margin-top:3px}
+.fld.bad .msg{display:block}
+@keyframes shake{25%{transform:translateX(-7px)}50%{transform:translateX(7px)}75%{transform:translateX(-4px)}}
+.name{display:grid;grid-template-rows:0fr;transition:grid-template-rows .45s ease,opacity .35s;opacity:0}
+.su .name,.name.on{grid-template-rows:1fr;opacity:1}
+.name>div{overflow:hidden}
+.name .fld{margin-top:10px;padding-bottom:2px}
+.barcode{height:26px;margin-top:16px;border-radius:2px;background:repeating-linear-gradient(90deg,var(--ink) 0 2px,transparent 2px 5px,var(--ink) 5px 6px,transparent 6px 11px,var(--ink) 11px 14px,transparent 14px 16px);opacity:.75}
+
+.stub{height:var(--cut);border-top:3px dashed var(--line);padding:16px 22px;display:flex;flex-direction:column;justify-content:center;gap:8px;transform-origin:0 0;transition:transform .9s cubic-bezier(.5,0,.8,.4),opacity .9s}
+.go{border:0;border-radius:14px;min-height:52px;background:var(--coral);color:#fff;font-weight:700;font-size:18px;cursor:pointer;position:relative;overflow:hidden;transition:transform .15s,background .2s}
+.go:hover{background:var(--coral2)}.go:active{transform:scale(.97)}
+.go:after{content:"";position:absolute;inset:0;background:linear-gradient(100deg,transparent 30%,rgba(255,255,255,.4) 50%,transparent 70%);transform:translateX(-120%);animation:shine 3.4s 1.2s infinite}
+@keyframes shine{40%,100%{transform:translateX(120%)}}
+.guest{background:none;border:0;color:var(--muted);cursor:pointer;min-height:44px;font-weight:500;text-decoration:underline;text-underline-offset:3px}
+.guest:hover{color:var(--ink)}
+.tear .stub{transform:translateY(70px) rotate(9deg);opacity:0;pointer-events:none}
+
+.ok{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:24px;opacity:0;pointer-events:none;transition:opacity .5s .5s}
+.tear .ok{opacity:1;pointer-events:auto}
+.tear .form{opacity:0;transform:scale(.96);pointer-events:none}
+.form{transition:opacity .4s,transform .4s}
+.ok svg{width:96px;height:96px;margin-bottom:10px}
+.ok circle,.ok path{fill:none;stroke:var(--teal);stroke-width:6;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:300;stroke-dashoffset:300}
+.tear .ok circle{animation:draw .8s .7s ease forwards}.tear .ok path{animation:draw .5s 1.3s ease forwards}
+@keyframes draw{to{stroke-dashoffset:0}}
+.ok h2{font-family:"Bricolage Grotesque",sans-serif;font-weight:800;font-size:30px;line-height:1.1}
+.ok p{color:var(--muted);margin:6px 0 16px}
+.ok a{background:var(--ink);color:var(--paper);text-decoration:none;border-radius:99px;padding:12px 22px;font-weight:700;min-height:44px}
+
+.road{position:fixed;left:0;right:0;bottom:0;height:64px;background:#17132E;border-top:3px solid rgba(255,255,255,.7);padding-bottom:env(safe-area-inset-bottom,0px)}
+.road:before{content:"";position:absolute;left:0;right:0;top:50%;height:4px;background:repeating-linear-gradient(90deg,var(--sun) 0 30px,transparent 30px 66px);animation:dash 1s linear infinite}
+@keyframes dash{to{background-position:-66px 0}}
+.bus{position:absolute;left:-120px;bottom:12px;width:100px;transition:none}
+.bus.run{animation:drive 2.2s .9s cubic-bezier(.5,0,.7,1) forwards}
+@keyframes drive{to{left:calc(100% + 20px)}}
+@media(prefers-reduced-motion:reduce){*,*:before,*:after{animation:none!important;transition-duration:.01ms!important;transition-delay:0s!important}.ticket{opacity:1}.ok circle,.ok path{stroke-dashoffset:0}}
+</style>
+</head>
+<body>
+<div class="stage">
+  <div class="topbar">
+    <a class="logo" href="/" title="AnyStop Home">
+      <svg viewBox="0 0 248 72" style="height:34px;width:auto;" fill="none" aria-label="AnyStop Logo">
+        <defs>
+          <linearGradient id="pinGrad-nav" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stop-color="#FF6B5E" />
+            <stop offset="100%" stop-color="#FF4B3E" />
+          </linearGradient>
+          <linearGradient id="roadGrad-nav" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stop-color="#FFB326" />
+            <stop offset="100%" stop-color="#FF981A" />
+          </linearGradient>
+        </defs>
+        <g transform="translate(4, 2)">
+          <path d="M 23 23 A 28 28 0 0 0 23 51" stroke="#FFA726" stroke-width="3.5" stroke-linecap="round" fill="none" opacity="0.95" />
+          <path d="M 29 28 A 18 18 0 0 0 29 46" stroke="#FF5A4E" stroke-width="3.2" stroke-linecap="round" fill="none" />
+          <path d="M 67 28 A 18 18 0 0 1 67 46" stroke="#FF5A4E" stroke-width="3.2" stroke-linecap="round" fill="none" />
+          <path d="M 73 23 A 28 28 0 0 1 73 51" stroke="#FFA726" stroke-width="3.5" stroke-linecap="round" fill="none" opacity="0.95" />
+          <path d="M 48 64 C 41 53 28 41 28 26 A 20 20 0 1 1 68 26 C 68 41 55 53 48 64 Z" fill="url(#pinGrad-nav)" />
+          <rect x="37" y="14" width="22" height="26" rx="5.5" fill="#1F1A3F" />
+          <rect x="40.5" y="18" width="15" height="7.5" rx="2" fill="#FF5A4E" />
+          <circle cx="41.5" cy="32.5" r="1.6" fill="#FF5A4E" />
+          <circle cx="54.5" cy="32.5" r="1.6" fill="#FF5A4E" />
+          <rect x="45" y="33.5" width="6" height="1.4" rx="0.7" fill="#FF5A4E" />
+          <path d="M 44.5 37 L 51.5 37 L 59 66 L 52.5 66 L 50 56 L 46 56 L 43.5 66 L 37 66 Z" fill="url(#roadGrad-nav)" />
+          <polygon points="48,41 45.2,50.5 50.8,50.5" fill="#1F1A3F" />
+          <polygon points="48,56 46,66 50,66" fill="#1F1A3F" />
+          <line x1="48" y1="44" x2="48" y2="49" stroke="#FFFFFF" stroke-width="1.6" stroke-linecap="round" />
+          <line x1="48" y1="52" x2="48" y2="55" stroke="#FFFFFF" stroke-width="1.6" stroke-linecap="round" />
+          <line x1="48" y1="58" x2="48" y2="64" stroke="#FFFFFF" stroke-width="1.6" stroke-linecap="round" />
+        </g>
+        <g font-family="'Bricolage Grotesque', 'Figtree', sans-serif" font-weight="800" font-size="38" letter-spacing="-0.5">
+          <text x="88" y="51" fill="#FFA726">Any</text>
+          <text x="162" y="51" fill="#FFFFFF">Stop</text>
+        </g>
+      </svg>
+    </a>
+    <a class="back" href="/">← Back to landing page</a>
+  </div>
+  <div class="ticket" id="ticket">
+    <div class="main">
+      <div class="form" id="form">
+        <div class="tophead"><span>BOARDING PASS</span><b id="pn">NO. 0001</b></div>
+        <div class="route"><div class="l"></div><span>ANYWHERE</span></div>
+        <h1 id="ttl">Welcome back, traveller</h1>
+        <p class="sub" id="sub">Log in to save your favourite routes.</p>
+        <div class="seg" id="seg" role="group" aria-label="Log in or sign up">
+          <button type="button" data-m="in" aria-pressed="true">Log in</button><button type="button" data-m="up" aria-pressed="false">Sign up</button>
+        </div>
+        <form id="f" novalidate autocomplete="on">
+          <div class="name"><div><label class="fld" id="fn"><span>PASSENGER NAME</span><div class="inp"><input id="name" autocomplete="name" placeholder="Your name"></div><div class="msg">Tell us what to print on your pass.</div></label></div></div>
+          <label class="fld" id="fe"><span>EMAIL OR PHONE</span><div class="inp"><input id="id" autocomplete="username" inputmode="email" placeholder="you@example.com"></div><div class="msg">Enter a valid email or 10-digit phone number.</div></label>
+          <label class="fld" id="fp"><span>PASSWORD</span><div class="inp"><input id="pw" type="password" autocomplete="current-password" placeholder="At least 6 characters"><button type="button" id="eye" aria-label="Show password">Show</button></div><div class="msg">Use at least 6 characters.</div></label>
+          <div class="barcode" aria-hidden="true"></div>
+        </form>
+      </div>
+      <div class="ok" aria-live="polite"><svg viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="44"/><path d="M30 52l14 14 27-30"/></svg>
+        <h2 id="wel">Welcome aboard!</h2><p>Your seat is saved. Time to find your bus.</p><a href="https://claude.ai/artifact/4Rvd4U8DexvTfNXgbMztDj">Find my bus</a></div>
+    </div>
+    <div class="stub">
+      <button class="go" id="go" form="f">Punch my ticket →</button>
+      <button class="guest" id="guest" type="button">Continue as guest</button>
+    </div>
+  </div>
+</div>
+<div class="road" aria-hidden="true"><svg class="bus" id="bus" viewBox="0 0 120 50"><rect x="4" y="6" width="108" height="32" rx="7" fill="#FF5A4E"/><rect x="12" y="12" width="20" height="12" rx="2" fill="#1F1A3F"/><rect x="36" y="12" width="20" height="12" rx="2" fill="#1F1A3F"/><rect x="60" y="12" width="20" height="12" rx="2" fill="#1F1A3F"/><rect x="86" y="12" width="20" height="14" rx="2" fill="#9ED8F0"/><rect x="4" y="29" width="108" height="4" fill="#FFB020"/><circle cx="28" cy="40" r="7" fill="#1F1A3F"/><circle cx="88" cy="40" r="7" fill="#1F1A3F"/><circle cx="28" cy="40" r="3" fill="#ccc"/><circle cx="88" cy="40" r="3" fill="#ccc"/></svg></div>
+
+<script>
+const $=id=>document.getElementById(id);
+let mode="in";
+$("pn").textContent="NO. "+String(Math.floor(Math.random()*9000)+1000);
+const COPY={in:["Welcome back, traveller","Log in to save your favourite routes.","Punch my ticket →","current-password"],up:["Get your first ticket","Create an account in under a minute.","Issue my ticket →","new-password"]};
+$("seg").onclick=e=>{const m=e.target.closest("button")?.dataset.m;if(!m||m===mode)return;mode=m;
+ $("seg").classList.toggle("su",m==="up");[...$("seg").children].forEach(b=>b.setAttribute("aria-pressed",b.dataset.m===m));
+ document.querySelectorAll(".bad").forEach(x=>x.classList.remove("bad"));
+ [$("ttl"),$("sub")].forEach(x=>x.classList.add("swap-out"));
+ setTimeout(()=>{$("ttl").textContent=COPY[m][0];$("sub").textContent=COPY[m][1];$("go").textContent=COPY[m][2];$("pw").autocomplete=COPY[m][3];
+  document.querySelector(".form").classList.toggle("su",m==="up");document.querySelector(".name").classList.toggle("on",m==="up");
+  [$("ttl"),$("sub")].forEach(x=>x.classList.remove("swap-out"))},220)};
+$("eye").onclick=()=>{const p=$("pw"),s=p.type==="password";p.type=s?"text":"password";$("eye").textContent=s?"Hide":"Show";$("eye").setAttribute("aria-label",s?"Hide password":"Show password")};
+const bad=(id,on)=>{const f=$(id);f.classList.remove("bad");if(on){void f.offsetWidth;f.classList.add("bad")}return on};
+function validId(v){return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v)||/^[6-9]\d{9}$/.test(v.replace(/[\s-]/g,""))}
+function board(who){
+ $("wel").textContent="Welcome aboard, "+who+"!";
+ $("go").textContent="Punching…";
+ setTimeout(()=>{$("ticket").classList.add("tear");$("bus").classList.add("run")},650);
+}
+$("f").onsubmit=e=>{e.preventDefault();
+ const n=$("name").value.trim(),i=$("id").value.trim(),p=$("pw").value;
+ const e1=mode==="up"&&bad("fn",n.length<2),e2=bad("fe",!validId(i)),e3=bad("fp",p.length<6);
+ if(e1||e2||e3)return;
+ board(mode==="up"?n.split(" ")[0]:(i.includes("@")?i.split("@")[0]:"traveller"));
+};
+$("guest").onclick=()=>board("guest");
+</script>
+</body>
+</html>

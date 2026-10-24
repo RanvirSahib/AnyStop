@@ -1,0 +1,919 @@
+/* ==========================================================================
+   AnyStop - Login Boarding Pass
+   Direct 1:1 match with StopSense Login.html
+   ========================================================================== */
+
+.stopsense-login {
+  --paper: #FFF8F1;
+  --ink: #231F3D;
+  --muted: #6B6585;
+  --line: #E4D3C3;
+  --field: #fff;
+  --coral: #FF5A4E;
+  --coral2: #E8433A;
+  --sun: #FFB020;
+  --teal: #0B8F82;
+  box-sizing: border-box;
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  color-scheme: light;
+  font: 400 17px/1.5 "Figtree", system-ui, sans-serif;
+  color: var(--ink);
+  background: radial-gradient(700px 420px at 15% 0%, rgba(255,90,78,.38), transparent 60%),
+              radial-gradient(600px 400px at 100% 100%, rgba(255,176,32,.25), transparent 60%),
+              linear-gradient(160deg, #1F1A3F, #3B1D63);
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  min-height: 100vh;
+  position: relative;
+}
+
+/* Hardware-accelerated transit doodle layer */
+.stopsense-login::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  background-image: url('/transit-doodle-dark.svg');
+  background-repeat: repeat;
+  background-size: 500px 500px;
+  opacity: 0.65;
+  pointer-events: none;
+  transform: translateZ(0);
+}
+
+@media (prefers-color-scheme: dark) {
+  .stopsense-login:not([data-theme="light"]) {
+    --paper: #241E45;
+    --ink: #F6F1FF;
+    --muted: #A9A2C8;
+    --line: #3C3566;
+    --field: #1A1535;
+    --teal: #4DE0CF;
+    color-scheme: dark;
+  }
+}
+
+.stopsense-login[data-theme="dark"] {
+  --paper: #241E45;
+  --ink: #F6F1FF;
+  --muted: #A9A2C8;
+  --line: #3C3566;
+  --field: #1A1535;
+  --teal: #4DE0CF;
+  color-scheme: dark;
+}
+
+.stopsense-login button,
+.stopsense-login input {
+  font: inherit;
+  color: inherit;
+}
+
+.stopsense-login :focus-visible {
+  outline: 3px solid var(--sun);
+  outline-offset: 2px;
+}
+
+.stopsense-login .stage {
+  height: 100vh;
+  max-height: 100vh;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 16px 74px;
+  position: relative;
+  z-index: 2;
+  overflow: hidden;
+}
+
+.stopsense-login .topbar {
+  position: relative;
+  z-index: 50 !important;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  max-width: 390px;
+  margin: 0 auto 24px;
+  gap: 12px;
+}
+
+.stopsense-login .logo {
+  font-family: "Bricolage Grotesque", sans-serif;
+  font-weight: 800;
+  font-size: 23px;
+  color: #fff;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  letter-spacing: -0.01em;
+  cursor: pointer;
+  background: none;
+  border: none;
+  padding: 0;
+}
+
+.stopsense-login .logo i {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--coral);
+  box-shadow: 0 0 0 4px rgba(255, 90, 78, 0.3);
+  animation: ss-pulse 2s infinite;
+  display: inline-block;
+}
+
+@keyframes ss-pulse {
+  0%, 100% {
+    box-shadow: 0 0 0 4px rgba(255, 90, 78, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 0 9px rgba(255, 90, 78, 0.1);
+  }
+}
+
+.stopsense-login .back {
+  color: #DAD3F2;
+  text-decoration: none;
+  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  background: none;
+  border: none;
+  padding: 0;
+  font-size: 14px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.stopsense-login .back:hover {
+  color: #fff;
+}
+
+.stopsense-login .ticket-stack {
+  display: grid;
+  grid-template-columns: 100%;
+  grid-template-rows: auto;
+  perspective: 1200px;
+  perspective-origin: 50% 40%;
+  position: relative;
+  width: 100%;
+  max-width: 390px;
+  margin: 0 auto;
+  animation: ss-enter 0.8s cubic-bezier(.2,.9,.25,1) both;
+}
+
+@keyframes ss-enter {
+  from {
+    opacity: 0;
+    transform: translateY(40px) scale(.96);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.stopsense-login .ticket-stack .ticket {
+  grid-column: 1;
+  grid-row: 1;
+  width: 100%;
+  max-width: 390px;
+  background: var(--paper);
+  border-radius: 20px;
+  position: relative;
+  --cut: 84px;
+  -webkit-mask: radial-gradient(circle 12px at 0 calc(100% - var(--cut)), #0000 97%, #000) left/51% 100% no-repeat,
+                radial-gradient(circle 12px at 100% calc(100% - var(--cut)), #0000 97%, #000) right/51% 100% no-repeat;
+  mask: radial-gradient(circle 12px at 0 calc(100% - var(--cut)), #0000 97%, #000) left/51% 100% no-repeat,
+        radial-gradient(circle 12px at 100% calc(100% - var(--cut)), #0000 97%, #000) right/51% 100% no-repeat;
+  filter: drop-shadow(0 18px 30px rgba(0,0,0,.35));
+  will-change: transform, opacity, filter;
+  transform-style: preserve-3d;
+}
+
+/* Front Ticket */
+.stopsense-login .ticket.ticket-front {
+  position: relative;
+  z-index: 30 !important;
+  opacity: 1;
+  transform: translate3d(0, 0, 0) scale(1) rotate(0deg);
+  pointer-events: auto !important;
+  filter: drop-shadow(0 20px 32px rgba(0, 0, 0, 0.38));
+}
+
+.stopsense-login .ticket.ticket-front * {
+  pointer-events: auto;
+}
+
+/* Ensure form, fields, and inputs on front card are always top layer and receive all pointer/keyboard events */
+.stopsense-login .ticket.ticket-front .main,
+.stopsense-login .ticket.ticket-front .form,
+.stopsense-login .ticket.ticket-front form,
+.stopsense-login .ticket.ticket-front .fld,
+.stopsense-login .ticket.ticket-front .inp {
+  position: relative;
+  z-index: 35 !important;
+  pointer-events: auto !important;
+}
+
+.stopsense-login .ticket.ticket-front .inp input {
+  position: relative;
+  z-index: 40 !important;
+  pointer-events: auto !important;
+  user-select: text !important;
+  -webkit-user-select: text !important;
+  cursor: text !important;
+}
+
+/* Back Tickets Initial & Idle Resting Positions - Completely ignore pointer events so front card inputs are never blocked */
+.stopsense-login .ticket.ticket-back:not(.deal-to-top):not(.deal-front) {
+  pointer-events: none !important;
+}
+
+.stopsense-login .ticket-signup.ticket-back {
+  position: relative;
+  z-index: 1 !important;
+  opacity: 0.94;
+  transform: translate3d(16px, -10px, -30px) scale(0.97) rotate(2.8deg);
+  cursor: pointer;
+  filter: drop-shadow(0 12px 20px rgba(0, 0, 0, 0.28)) brightness(0.96);
+  transition: transform 0.35s cubic-bezier(0.34, 1.3, 0.64, 1),
+              opacity 0.3s ease,
+              filter 0.3s ease;
+}
+
+.stopsense-login .ticket-login.ticket-back {
+  position: relative;
+  z-index: 1 !important;
+  opacity: 0.94;
+  transform: translate3d(-16px, -10px, -30px) scale(0.97) rotate(-2.8deg);
+  cursor: pointer;
+  filter: drop-shadow(0 12px 20px rgba(0, 0, 0, 0.28)) brightness(0.96);
+  transition: transform 0.35s cubic-bezier(0.34, 1.3, 0.64, 1),
+              opacity 0.3s ease,
+              filter 0.3s ease;
+}
+
+/* Peeking top zone of back card remains clickable to switch cards without covering form */
+.stopsense-login .ticket-signup.ticket-back::after {
+  content: "";
+  position: absolute;
+  top: -16px;
+  right: -20px;
+  width: 140px;
+  height: 50px;
+  pointer-events: auto !important;
+  cursor: pointer;
+  z-index: 5;
+}
+
+.stopsense-login .ticket-login.ticket-back::after {
+  content: "";
+  position: absolute;
+  top: -16px;
+  left: -20px;
+  width: 140px;
+  height: 50px;
+  pointer-events: auto !important;
+  cursor: pointer;
+  z-index: 5;
+}
+
+/* Hover effects on the peeking back tickets */
+.stopsense-login .ticket-signup.ticket-back:hover {
+  transform: translate3d(20px, -14px, -15px) scale(0.98) rotate(3.6deg);
+  opacity: 1;
+  filter: drop-shadow(0 18px 28px rgba(0, 0, 0, 0.38)) brightness(1);
+}
+
+.stopsense-login .ticket-login.ticket-back:hover {
+  transform: translate3d(-20px, -14px, -15px) scale(0.98) rotate(-3.6deg);
+  opacity: 1;
+  filter: drop-shadow(0 18px 28px rgba(0, 0, 0, 0.38)) brightness(1);
+}
+
+/* While resting in the background, hide interior text/buttons so nothing overlaps behind the front card */
+.stopsense-login .ticket.ticket-back:not(.deal-to-top):not(.deal-front) .form,
+.stopsense-login .ticket.ticket-back:not(.deal-to-top):not(.deal-front) .stub {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+}
+
+/* Front card and card actively dealing to the front has 100% visible active contents */
+.stopsense-login .ticket.ticket-front .form,
+.stopsense-login .ticket.ticket-front .stub,
+.stopsense-login .ticket.deal-to-top .form,
+.stopsense-login .ticket.deal-to-top .stub,
+.stopsense-login .ticket.deal-front .form,
+.stopsense-login .ticket.deal-front .stub {
+  opacity: 1;
+  pointer-events: auto;
+  transition: opacity 0.25s ease;
+}
+
+/* Back ticket itself has no clickable form elements */
+.stopsense-login .ticket.ticket-back:not(.deal-to-top):not(.deal-front) input,
+.stopsense-login .ticket.ticket-back:not(.deal-to-top):not(.deal-front) button {
+  pointer-events: none !important;
+}
+
+.stopsense-login .ticket-peek-tab,
+.stopsense-login .ticket-back-hint {
+  display: none !important;
+}
+
+/* When switching to Sign up */
+.stopsense-login .ticket-signup.deal-to-top,
+.stopsense-login .ticket-signup.deal-front {
+  animation: ss-deal-signup-top 0.75s cubic-bezier(0.2, 0.88, 0.3, 1.08) forwards;
+  z-index: 25 !important;
+}
+
+.stopsense-login .ticket-login.drop-to-back,
+.stopsense-login .ticket-login.drop-back {
+  animation: ss-drop-login-back 0.7s cubic-bezier(0.25, 0.9, 0.35, 1) forwards;
+  z-index: 1 !important;
+}
+
+/* When switching to Log in */
+.stopsense-login .ticket-login.deal-to-top,
+.stopsense-login .ticket-login.deal-front {
+  animation: ss-deal-login-top 0.75s cubic-bezier(0.2, 0.88, 0.3, 1.08) forwards;
+  z-index: 25 !important;
+}
+
+.stopsense-login .ticket-signup.drop-to-back,
+.stopsense-login .ticket-signup.drop-back {
+  animation: ss-drop-signup-back 0.7s cubic-bezier(0.25, 0.9, 0.35, 1) forwards;
+  z-index: 1 !important;
+}
+
+/* Keyframes for Dealing & Dropping */
+@keyframes ss-deal-signup-top {
+  0% {
+    transform: translate3d(16px, -10px, -30px) scale(0.97) rotate(2.8deg);
+    opacity: 0.92;
+    z-index: 2;
+  }
+  35% {
+    transform: translate3d(68px, -115px, 95px) scale(1.07) rotate(10.5deg);
+    opacity: 1;
+    z-index: 30;
+    filter: drop-shadow(0 38px 65px rgba(0, 0, 0, 0.52)) brightness(1.03);
+  }
+  68% {
+    transform: translate3d(12px, -8px, 25px) scale(1.015) rotate(1.2deg);
+    z-index: 25;
+  }
+  88% {
+    transform: translate3d(-3px, 2px, 5px) scale(0.995) rotate(-0.4deg);
+  }
+  100% {
+    transform: translate3d(0, 0, 0) scale(1) rotate(0deg);
+    opacity: 1;
+    z-index: 15;
+    filter: drop-shadow(0 20px 32px rgba(0, 0, 0, 0.38)) brightness(1);
+  }
+}
+
+@keyframes ss-drop-login-back {
+  0% {
+    transform: translate3d(0, 0, 0) scale(1) rotate(0deg);
+    opacity: 1;
+    z-index: 15;
+  }
+  30% {
+    transform: translate3d(-20px, 14px, -15px) scale(0.985) rotate(-1.5deg);
+    opacity: 0.95;
+    z-index: 1;
+  }
+  100% {
+    transform: translate3d(-16px, -10px, -30px) scale(0.97) rotate(-2.8deg);
+    opacity: 0.92;
+    z-index: 1;
+    filter: drop-shadow(0 10px 18px rgba(0, 0, 0, 0.25)) brightness(0.96);
+  }
+}
+
+@keyframes ss-deal-login-top {
+  0% {
+    transform: translate3d(-16px, -10px, -30px) scale(0.97) rotate(-2.8deg);
+    opacity: 0.92;
+    z-index: 2;
+  }
+  35% {
+    transform: translate3d(-68px, -115px, 95px) scale(1.07) rotate(-10.5deg);
+    opacity: 1;
+    z-index: 30;
+    filter: drop-shadow(0 38px 65px rgba(0, 0, 0, 0.52)) brightness(1.03);
+  }
+  68% {
+    transform: translate3d(-12px, -8px, 25px) scale(1.015) rotate(-1.2deg);
+    z-index: 25;
+  }
+  88% {
+    transform: translate3d(3px, 2px, 5px) scale(0.995) rotate(0.4deg);
+  }
+  100% {
+    transform: translate3d(0, 0, 0) scale(1) rotate(0deg);
+    opacity: 1;
+    z-index: 15;
+    filter: drop-shadow(0 20px 32px rgba(0, 0, 0, 0.38)) brightness(1);
+  }
+}
+
+@keyframes ss-drop-signup-back {
+  0% {
+    transform: translate3d(0, 0, 0) scale(1) rotate(0deg);
+    opacity: 1;
+    z-index: 15;
+  }
+  30% {
+    transform: translate3d(20px, 14px, -15px) scale(0.985) rotate(1.5deg);
+    opacity: 0.95;
+    z-index: 1;
+  }
+  100% {
+    transform: translate3d(16px, -10px, -30px) scale(0.97) rotate(2.8deg);
+    opacity: 0.92;
+    z-index: 1;
+    filter: drop-shadow(0 10px 18px rgba(0, 0, 0, 0.25)) brightness(0.96);
+  }
+}
+
+/* Tear handling: fade out the back ticket */
+.stopsense-login .ticket-stack.tear .ticket-back {
+  opacity: 0 !important;
+  transform: translate3d(0, 40px, -40px) scale(0.92) !important;
+  pointer-events: none !important;
+  transition: opacity 0.45s ease, transform 0.45s ease !important;
+}
+
+.stopsense-login .main {
+  padding: 14px 18px 8px;
+  position: relative;
+  min-height: auto;
+}
+
+.stopsense-login .tophead {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-family: "DM Mono", monospace;
+  font-size: 11px;
+  letter-spacing: .12em;
+  color: var(--muted);
+}
+
+.stopsense-login .tophead b {
+  color: var(--coral);
+  font-weight: 500;
+}
+
+.stopsense-login .route {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 5px 0 2px;
+  font-family: "Bricolage Grotesque", sans-serif;
+  font-weight: 800;
+  font-size: 13px;
+  letter-spacing: .04em;
+}
+
+.stopsense-login .route .l {
+  flex: 1;
+  height: 3px;
+  border-radius: 2px;
+  background: repeating-linear-gradient(90deg, var(--coral) 0 8px, transparent 8px 14px);
+  position: relative;
+}
+
+.stopsense-login .route .l:after {
+  content: "🚌";
+  position: absolute;
+  top: -10px;
+  left: 0;
+  font-size: 16px;
+  animation: ss-go 3.2s ease-in-out infinite;
+}
+
+@keyframes ss-go {
+  0%, 15% {
+    left: 0;
+  }
+  85%, 100% {
+    left: calc(100% - 24px);
+  }
+}
+
+.stopsense-login h1 {
+  font-family: "Bricolage Grotesque", sans-serif;
+  font-weight: 800;
+  font-size: 22px;
+  line-height: 1.1;
+  letter-spacing: -.02em;
+  margin: 3px 0 2px;
+  transition: opacity .25s, transform .25s;
+}
+
+.stopsense-login .sub {
+  color: var(--muted);
+  font-size: 13px;
+  margin-bottom: 7px;
+  transition: opacity .25s;
+}
+
+.stopsense-login .swap-out {
+  opacity: 0;
+  transform: translateY(-8px);
+}
+
+.stopsense-login .seg {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  background: var(--field);
+  border: 1.5px solid var(--line);
+  border-radius: 99px;
+  padding: 2px;
+  position: relative;
+  margin-bottom: 7px;
+  z-index: 20;
+}
+
+.stopsense-login .seg:before {
+  content: "";
+  position: absolute;
+  top: 2px;
+  bottom: 2px;
+  left: 2px;
+  width: calc(50% - 2px);
+  border-radius: 99px;
+  background: var(--ink);
+  transition: transform .45s cubic-bezier(.3,1.3,.4,1);
+  pointer-events: none !important;
+}
+
+.stopsense-login .seg.su:before {
+  transform: translateX(100%);
+}
+
+.stopsense-login .seg button {
+  position: relative;
+  border: 0;
+  background: none;
+  min-height: 36px;
+  font-weight: 700;
+  font-size: 14px;
+  border-radius: 99px;
+  transition: color .3s;
+  cursor: pointer;
+  color: var(--muted);
+  z-index: 25 !important;
+  pointer-events: auto !important;
+}
+
+.stopsense-login .seg button[aria-pressed="true"] {
+  color: var(--paper);
+}
+
+.stopsense-login .fld {
+  display: block;
+  margin-top: 6px;
+}
+
+.stopsense-login .fld span {
+  font-family: "DM Mono", monospace;
+  font-size: 10px;
+  letter-spacing: .12em;
+  color: var(--muted);
+}
+
+.stopsense-login .inp {
+  display: flex;
+  align-items: center;
+  background: var(--field);
+  border: 1.5px solid var(--line);
+  border-radius: 11px;
+  margin-top: 2px;
+  transition: border-color .2s, box-shadow .2s;
+}
+
+.stopsense-login .inp:focus-within {
+  border-color: var(--coral);
+  box-shadow: 0 0 0 3px rgba(255,90,78,.18);
+}
+
+.stopsense-login .inp input {
+  flex: 1;
+  min-width: 0;
+  height: 38px;
+  border: 0;
+  background: none;
+  padding: 0 12px;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.stopsense-login .inp input:focus {
+  outline: 0;
+}
+
+.stopsense-login .inp button {
+  border: 0;
+  background: none;
+  padding: 0 12px;
+  min-height: 38px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--coral2);
+}
+
+.stopsense-login .fld.bad .inp {
+  border-color: var(--coral2);
+  animation: ss-shake .4s;
+}
+
+.stopsense-login .msg {
+  display: none;
+  color: var(--coral2);
+  font-size: 12px;
+  font-weight: 700;
+  margin-top: 2px;
+}
+
+.stopsense-login .fld.bad .msg {
+  display: block;
+}
+
+@keyframes ss-shake {
+  25% { transform: translateX(-7px); }
+  50% { transform: translateX(7px); }
+  75% { transform: translateX(-4px); }
+}
+
+.stopsense-login .name {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows .45s ease, opacity .35s;
+  opacity: 0;
+}
+
+.stopsense-login .su .name,
+.stopsense-login .name.on {
+  grid-template-rows: 1fr;
+  opacity: 1;
+}
+
+.stopsense-login .name > div {
+  overflow: hidden;
+}
+
+.stopsense-login .name .fld {
+  margin-top: 6px;
+  padding-bottom: 2px;
+}
+
+.stopsense-login .barcode {
+  height: 18px;
+  margin-top: 7px;
+  border-radius: 2px;
+  background: repeating-linear-gradient(90deg, var(--ink) 0 2px, transparent 2px 5px, var(--ink) 5px 6px, transparent 6px 11px, var(--ink) 11px 14px, transparent 14px 16px);
+  opacity: .75;
+}
+
+.stopsense-login .stub {
+  height: var(--cut);
+  border-top: 2.5px dashed var(--line);
+  padding: 8px 18px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 4px;
+  transform-origin: 0 0;
+  transition: transform .9s cubic-bezier(.5,0,.8,.4), opacity .9s;
+}
+
+.stopsense-login .go {
+  border: 0;
+  border-radius: 12px;
+  min-height: 42px;
+  background: var(--coral);
+  color: #fff;
+  font-weight: 700;
+  font-size: 16px;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  transition: transform .15s, background .2s;
+  width: 100%;
+}
+
+.stopsense-login .go:hover {
+  background: var(--coral2);
+}
+
+.stopsense-login .go:active {
+  transform: scale(.97);
+}
+
+.stopsense-login .go:after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(100deg, transparent 30%, rgba(255,255,255,.4) 50%, transparent 70%);
+  transform: translateX(-120%);
+  animation: ss-shine 3.4s 1.2s infinite;
+}
+
+@keyframes ss-shine {
+  40%, 100% { transform: translateX(120%); }
+}
+
+.stopsense-login .guest {
+  background: none;
+  border: 0;
+  color: var(--muted);
+  cursor: pointer;
+  min-height: 28px;
+  font-size: 13px;
+  font-weight: 500;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  width: 100%;
+}
+
+.stopsense-login .guest:hover {
+  color: var(--ink);
+}
+
+.stopsense-login .ticket.tear .stub,
+.stopsense-login .tear .stub {
+  transform: translateY(70px) rotate(9deg);
+  opacity: 0;
+  pointer-events: none;
+}
+
+.stopsense-login .ok {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 24px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .5s .5s;
+}
+
+.stopsense-login .ticket.tear .ok,
+.stopsense-login .tear .ok {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.stopsense-login .ticket.tear .form,
+.stopsense-login .tear .form {
+  opacity: 0;
+  transform: scale(.96);
+  pointer-events: none;
+}
+
+.stopsense-login .form {
+  transition: opacity .4s, transform .4s;
+}
+
+.stopsense-login .ok svg {
+  width: 96px;
+  height: 96px;
+  margin-bottom: 10px;
+}
+
+.stopsense-login .ok circle,
+.stopsense-login .ok path {
+  fill: none;
+  stroke: var(--teal);
+  stroke-width: 6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 300;
+  stroke-dashoffset: 300;
+}
+
+.stopsense-login .ticket.tear .ok circle,
+.stopsense-login .tear .ok circle {
+  animation: ss-draw .8s .7s ease forwards;
+}
+
+.stopsense-login .ticket.tear .ok path,
+.stopsense-login .tear .ok path {
+  animation: ss-draw .5s 1.3s ease forwards;
+}
+
+@keyframes ss-draw {
+  to { stroke-dashoffset: 0; }
+}
+
+.stopsense-login .ok h2 {
+  font-family: "Bricolage Grotesque", sans-serif;
+  font-weight: 800;
+  font-size: 30px;
+  line-height: 1.1;
+}
+
+.stopsense-login .ok p {
+  color: var(--muted);
+  margin: 6px 0 16px;
+}
+
+.stopsense-login .ok a,
+.stopsense-login .ok button.find-link {
+  background: var(--ink);
+  color: var(--paper);
+  text-decoration: none;
+  border-radius: 99px;
+  padding: 12px 22px;
+  font-weight: 700;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  cursor: pointer;
+}
+
+.stopsense-login .road {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 64px;
+  background: #17132E;
+  border-top: 3px solid rgba(255,255,255,.7);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  z-index: 10;
+}
+
+.stopsense-login .road:before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  height: 4px;
+  background: repeating-linear-gradient(90deg, var(--sun) 0 30px, transparent 30px 66px);
+  animation: ss-dash 1s linear infinite;
+}
+
+@keyframes ss-dash {
+  to { background-position: -66px 0; }
+}
+
+.stopsense-login .bus {
+  position: absolute;
+  left: -120px;
+  bottom: 12px;
+  width: 100px;
+  z-index: 12;
+  will-change: left, transform;
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.45));
+}
+
+.stopsense-login .bus.driving {
+  animation: ss-bus-bob 0.25s infinite linear;
+}
+
+.stopsense-login .bus.depart {
+  animation: ss-bus-bob 0.15s infinite linear;
+}
+
+@keyframes ss-bus-bob {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-1.5px); }
+}
+
+@media(prefers-reduced-motion: reduce) {
+  .stopsense-login *,
+  .stopsense-login *:before,
+  .stopsense-login *:after {
+    animation: none !important;
+    transition-duration: .01ms !important;
+    transition-delay: 0s !important;
+  }
+  .stopsense-login .ticket {
+    opacity: 1;
+  }
+  .stopsense-login .ok circle,
+  .stopsense-login .ok path {
+    stroke-dashoffset: 0;
+  }
+}

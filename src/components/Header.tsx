@@ -1,5 +1,4 @@
-import React from 'react';
-import { Radio, PhoneCall, Sun, Moon } from 'lucide-react';
+import { Radio, PhoneCall, Sun, Moon, Ticket, LogOut } from 'lucide-react';
 import { AnyStopLogo } from './AnyStopLogo';
 
 interface HeaderProps {
@@ -8,6 +7,10 @@ interface HeaderProps {
   onOpenInquiries: () => void;
   onOpenSpottedFeed: () => void;
   spottedCount: number;
+  currentUser?: { name: string; isGuest?: boolean } | null;
+  onNavigateLanding?: () => void;
+  onNavigateLogin?: () => void;
+  onLogout?: () => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -15,13 +18,27 @@ export const Header: React.FC<HeaderProps> = ({
   onToggleDarkMode,
   onOpenInquiries,
   onOpenSpottedFeed,
-  spottedCount
+  spottedCount,
+  currentUser,
+  onNavigateLanding,
+  onNavigateLogin,
+  onLogout
 }) => {
   return (
     <header className="hero">
       <div className="wrap">
         <div className="top">
-          <div className="logo shrink-0 cursor-pointer" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
+          <div
+            className="logo shrink-0 cursor-pointer"
+            onClick={() => {
+              if (onNavigateLanding) {
+                onNavigateLanding();
+              } else {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+              }
+            }}
+            title="Return to AnyStop Home"
+          >
             <AnyStopLogo variant="navbar" animated={true} />
           </div>
 
@@ -62,6 +79,34 @@ export const Header: React.FC<HeaderProps> = ({
                 </span>
               )}
             </button>
+
+            {/* Boarding Pass / Account Button */}
+            {onNavigateLogin && (
+              <button
+                onClick={onNavigateLogin}
+                className="tbtn shrink-0"
+                title="Boarding Pass / Account"
+                aria-label="Boarding Pass / Account"
+              >
+                <Ticket style={{ width: '14px', height: '14px', color: 'var(--sun)' }} />
+                <span className="text-[11.5px] sm:text-sm font-semibold max-w-[80px] truncate">
+                  {currentUser ? currentUser.name : 'Pass'}
+                </span>
+              </button>
+            )}
+
+            {/* Logout button if authenticated */}
+            {currentUser && onLogout && (
+              <button
+                onClick={onLogout}
+                className="tbtn shrink-0 text-red-300 hover:text-red-200"
+                title="Log out and return to landing"
+                aria-label="Log out"
+              >
+                <LogOut style={{ width: '13.5px', height: '13.5px' }} />
+                <span className="hidden lg:inline text-xs font-semibold">Exit</span>
+              </button>
+            )}
 
             {/* Theme toggle */}
             <button

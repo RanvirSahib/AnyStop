@@ -1,0 +1,1006 @@
+/* Exact CSS from StopSense – know your bus before it arrives.html */
+.stopsense-landing {
+  --bg: #FFF5EC;
+  --surface: #fff;
+  --ink: #231F3D;
+  --muted: #6B6585;
+  --line: #EBDDD0;
+  --coral: #FF5A4E;
+  --coral2: #E8433A;
+  --sun: #FFB020;
+  --teal: #0B8F82;
+  --tealbg: #D8F5F0;
+  --sunbg: #FFF0D0;
+  --sunink: #8A5A00;
+  --night: #1F1A3F;
+  background: transparent;
+  color: var(--ink);
+  font: 400 18px/1.6 "Figtree", system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+  min-height: 100vh;
+}
+
+@media (prefers-color-scheme: dark) {
+  .stopsense-landing {
+    --bg: #15122B;
+    --surface: #211C40;
+    --ink: #F6F1FF;
+    --muted: #A9A2C8;
+    --line: #342E5A;
+    --tealbg: #0E3B3A;
+    --teal: #4DE0CF;
+    --sunbg: #3D2F0A;
+    --sunink: #FFB020;
+  }
+}
+
+[data-theme="dark"] .stopsense-landing {
+  --bg: #15122B;
+  --surface: #211C40;
+  --ink: #F6F1FF;
+  --muted: #A9A2C8;
+  --line: #342E5A;
+  --tealbg: #0E3B3A;
+  --teal: #4DE0CF;
+  --sunbg: #3D2F0A;
+  --sunink: #FFB020;
+}
+
+[data-theme="light"] .stopsense-landing {
+  --bg: #FFF5EC;
+  --surface: #fff;
+  --ink: #231F3D;
+  --muted: #6B6585;
+  --line: #EBDDD0;
+  --coral: #FF5A4E;
+  --coral2: #E8433A;
+  --sun: #FFB020;
+  --teal: #0B8F82;
+  --tealbg: #D8F5F0;
+  --sunbg: #FFF0D0;
+  --sunink: #8A5A00;
+  --night: #1F1A3F;
+}
+
+.stopsense-landing h1,
+.stopsense-landing h2,
+.stopsense-landing h3 {
+  font-family: "Bricolage Grotesque", Georgia, sans-serif;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1.04;
+}
+
+.stopsense-landing a {
+  color: inherit;
+}
+
+.stopsense-landing .wrap {
+  max-width: 1020px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+.stopsense-landing .btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 50px;
+  padding: 0 24px;
+  border-radius: 99px;
+  font-weight: 700;
+  text-decoration: none;
+  transition: transform .2s, background .2s, box-shadow .2s;
+  cursor: pointer;
+  border: none;
+  font-family: inherit;
+}
+
+.stopsense-landing .btn:hover {
+  transform: translateY(-2px);
+}
+
+.stopsense-landing .btn:active {
+  transform: scale(.96);
+}
+
+.stopsense-landing .b1 {
+  background: var(--coral);
+  color: #fff;
+  box-shadow: 0 10px 28px rgba(255,90,78,.45);
+}
+
+.stopsense-landing .b1:hover {
+  background: var(--coral2);
+}
+
+.stopsense-landing .b2 {
+  border: 2px solid rgba(255,255,255,.4);
+  color: #fff;
+  background: transparent;
+}
+
+.stopsense-landing .b2:hover {
+  background: rgba(255,255,255,.12);
+}
+
+.stopsense-landing nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 20;
+  padding-top: env(safe-area-inset-top, 0px);
+  transition: background .3s, box-shadow .3s;
+}
+
+.stopsense-landing nav.sc {
+  background: rgba(31,26,63,.95);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  box-shadow: 0 6px 24px rgba(0,0,0,.25);
+  transform: translateZ(0);
+}
+
+.stopsense-landing nav .wrap {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 68px;
+}
+
+.stopsense-landing .logo {
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  transition: opacity 0.2s, transform 0.2s;
+}
+
+.stopsense-landing .logo:hover {
+  opacity: 0.95;
+  transform: scale(1.02);
+}
+
+.stopsense-landing .logo i {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--coral);
+  box-shadow: 0 0 0 4px rgba(255,90,78,.3);
+  animation: ss-pulse 2s infinite;
+}
+
+@keyframes ss-pulse {
+  50% {
+    box-shadow: 0 0 0 9px rgba(255,90,78,0);
+  }
+}
+
+.stopsense-landing .links {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.stopsense-landing .links a {
+  color: #DAD3F2;
+  text-decoration: none;
+  padding: 10px 12px;
+  font-weight: 500;
+  display: none;
+}
+
+@media (min-width: 760px) {
+  .stopsense-landing .links a {
+    display: block;
+  }
+}
+
+.stopsense-landing .links .btn {
+  min-height: 44px;
+  padding: 0 20px 0 16px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: #fff;
+  background: linear-gradient(135deg, var(--coral), #B8338A);
+  box-shadow: 0 6px 20px rgba(255,90,78,.45), inset 0 1px 0 rgba(255,255,255,.35);
+  position: relative;
+  overflow: hidden;
+}
+
+.stopsense-landing .links .btn svg {
+  width: 18px;
+  height: 18px;
+  transition: transform .3s;
+}
+
+.stopsense-landing .links .btn:hover svg {
+  transform: scale(1.18) rotate(-8deg);
+}
+
+.stopsense-landing .links .btn:hover {
+  box-shadow: 0 10px 28px rgba(255,90,78,.6), inset 0 1px 0 rgba(255,255,255,.4);
+}
+
+.stopsense-landing .links .btn:after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(100deg, transparent 30%, rgba(255,255,255,.4) 50%, transparent 70%);
+  transform: translateX(-130%);
+  animation: ss-shine 3.6s 1.5s infinite;
+}
+
+.stopsense-landing .hero {
+  background: radial-gradient(900px 500px at 90% 90%, rgba(255,90,78,.5), transparent 60%), radial-gradient(600px 400px at 0 0, rgba(255,176,32,.2), transparent 60%), linear-gradient(160deg, #1F1A3F, #3B1D63);
+  color: #fff;
+  padding: 130px 0 90px;
+  position: relative;
+  overflow: hidden;
+}
+
+.stopsense-landing .hero::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: url('/transit-doodle-dark.svg');
+  background-repeat: repeat;
+  background-size: 500px 500px;
+  opacity: 0.55;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.stopsense-landing .hero .wrap {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  gap: 50px;
+  align-items: center;
+}
+
+@media (min-width: 860px) {
+  .stopsense-landing .hero .wrap {
+    grid-template-columns: 1.1fr .9fr;
+  }
+}
+
+.stopsense-landing .tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-family: "DM Mono", monospace;
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: .14em;
+  color: #fff;
+  padding: 9px 20px;
+  border-radius: 99px;
+  margin-bottom: 20px;
+  position: relative;
+  overflow: hidden;
+  border: 2px solid transparent;
+  background: linear-gradient(#2B2152, #2B2152) padding-box, linear-gradient(90deg, var(--coral), var(--sun), var(--coral)) border-box;
+  background-size: auto, 200% 100%;
+  box-shadow: 0 8px 26px rgba(255,90,78,.28);
+  animation: ss-rise .8s both, ss-flow 4s linear infinite;
+}
+
+.stopsense-landing .tag b {
+  color: var(--sun);
+  font-weight: 700;
+  font-size: 17px;
+  line-height: 1;
+  display: inline-block;
+  margin: 0 4px;
+  vertical-align: middle;
+  transition: transform .3s;
+}
+
+.stopsense-landing .tag:hover b {
+  transform: translateX(4px);
+}
+
+.stopsense-landing .tag .td {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--coral);
+  box-shadow: 0 0 0 0 rgba(255,90,78,.7);
+  animation: ss-ping 1.8s infinite;
+}
+
+.stopsense-landing .tag:after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(100deg, transparent 35%, rgba(255,255,255,.22) 50%, transparent 65%);
+  transform: translateX(-130%);
+  animation: ss-shine 4s 1s infinite;
+}
+
+@keyframes ss-flow {
+  to {
+    background-position: 0 0, 200% 0;
+  }
+}
+
+@keyframes ss-ping {
+  70% {
+    box-shadow: 0 0 0 9px rgba(255,90,78,0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(255,90,78,0);
+  }
+}
+
+@keyframes ss-shine {
+  40%, 100% {
+    transform: translateX(130%);
+  }
+}
+
+.stopsense-landing .hero h1 {
+  font-size: clamp(42px, 9.5vw, 80px);
+  animation: ss-rise .8s .08s both;
+}
+
+.stopsense-landing .hero h1 em {
+  font-style: normal;
+  color: var(--sun);
+  position: relative;
+  white-space: nowrap;
+}
+
+.stopsense-landing .hero h1 em:after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -4px;
+  height: 6px;
+  border-radius: 3px;
+  background: var(--coral);
+  transform-origin: 0;
+  animation: ss-grow 1s .9s both;
+}
+
+@keyframes ss-grow {
+  from {
+    transform: scaleX(0);
+  }
+}
+
+.stopsense-landing .hero p.lead {
+  font-size: 20px;
+  color: #DAD3F2;
+  max-width: 34ch;
+  margin: 20px 0 28px;
+  animation: ss-rise .8s .18s both;
+}
+
+.stopsense-landing .cta {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  animation: ss-rise .8s .28s both;
+}
+
+@keyframes ss-rise {
+  from {
+    opacity: 0;
+    transform: translateY(26px);
+  }
+}
+
+.stopsense-landing .phone {
+  display: none;
+}
+
+@media (min-width: 860px) {
+  .stopsense-landing .phone {
+    display: block;
+    justify-self: center;
+    width: min(300px, 86%);
+    background: #120E2B;
+    border-radius: 38px;
+    padding: 14px;
+    border: 3px solid rgba(255, 255, 255, .2);
+    box-shadow: 0 40px 80px rgba(0, 0, 0, .45);
+    transform: rotate(4deg);
+    animation: ss-rise 1s .3s both, ss-bob 6s 1.3s ease-in-out infinite;
+    will-change: transform;
+  }
+}
+
+@keyframes ss-bob {
+  50% {
+    transform: rotate(2deg) translateY(-14px);
+  }
+}
+
+.stopsense-landing .screen {
+  background: var(--bg);
+  border-radius: 26px;
+  padding: 16px;
+  color: var(--ink);
+  display: grid;
+  gap: 10px;
+}
+
+.stopsense-landing .mini {
+  background: var(--surface);
+  border-radius: 16px;
+  padding: 12px;
+  box-shadow: 0 2px 0 var(--line);
+}
+
+.stopsense-landing .mini .tr {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: "Bricolage Grotesque";
+  font-weight: 800;
+  font-size: 19px;
+}
+
+.stopsense-landing .mini small {
+  display: block;
+  font-family: "Figtree";
+  font-weight: 500;
+  font-size: 11px;
+  color: var(--muted);
+}
+
+.stopsense-landing .mini .bar {
+  flex: 1;
+  height: 5px;
+  border-radius: 3px;
+  background: linear-gradient(90deg, var(--coral), var(--sun));
+  transform-origin: 0;
+  animation: ss-grow 2.4s 1s infinite alternate;
+}
+
+.stopsense-landing .chip {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 700;
+  border-radius: 99px;
+  padding: 1px 9px;
+  margin: 6px 4px 0 0;
+  background: var(--bg);
+}
+
+.stopsense-landing .chip.e {
+  background: var(--tealbg);
+  color: var(--teal);
+}
+
+.stopsense-landing .chip.g {
+  background: rgba(110,100,230,.2);
+}
+
+.stopsense-landing .mini:nth-child(2) {
+  opacity: .75;
+  transform: scale(.96);
+}
+
+.stopsense-landing .mini:nth-child(3) {
+  opacity: .5;
+  transform: scale(.92);
+}
+
+.stopsense-landing .mq {
+  background: var(--coral);
+  color: #fff;
+  overflow: hidden;
+  white-space: nowrap;
+  padding: 13px 0;
+  font-family: "Bricolage Grotesque", -apple-system, BlinkMacSystemFont, sans-serif;
+  font-weight: 700;
+  font-size: 20px;
+  transform: rotate(-1.2deg);
+  margin: -14px -10px 0;
+  position: relative;
+  z-index: 2;
+  display: flex;
+  user-select: none;
+  box-shadow: 0 4px 16px rgba(255, 90, 78, 0.25);
+}
+
+.stopsense-landing .mq-track {
+  display: flex;
+  flex-shrink: 0;
+  width: max-content;
+  will-change: transform;
+  animation: ss-mq 58s linear infinite;
+}
+
+.stopsense-landing .mq:hover .mq-track,
+.stopsense-landing .mq-track:hover,
+.stopsense-landing .mq-track:focus-within {
+  animation-play-state: paused;
+}
+
+.stopsense-landing .mq-slide {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+/* Fallback for simple div container */
+.stopsense-landing .mq > div:not(.mq-track) {
+  display: inline-block;
+  white-space: nowrap;
+  animation: ss-mq 58s linear infinite;
+  will-change: transform;
+}
+
+@keyframes ss-mq {
+  0% {
+    transform: translate3d(0, 0, 0);
+  }
+  100% {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+
+.stopsense-landing .mq span {
+  display: inline-flex;
+  align-items: center;
+  margin: 0 16px;
+  opacity: .95;
+  letter-spacing: -0.01em;
+}
+
+.stopsense-landing .mq span:after {
+  content: "✦";
+  margin-left: 20px;
+  color: var(--night);
+  font-size: 15px;
+  opacity: 0.85;
+}
+
+.stopsense-landing section {
+  padding: 84px 0;
+}
+
+.stopsense-landing h2 {
+  font-size: clamp(32px, 6.5vw, 52px);
+  margin-bottom: 10px;
+}
+
+.stopsense-landing .kick {
+  font-family: "DM Mono", monospace;
+  font-size: 13px;
+  letter-spacing: .14em;
+  color: var(--coral2);
+  font-weight: 500;
+  margin-bottom: 10px;
+}
+
+.stopsense-landing .lede {
+  color: var(--muted);
+  max-width: 52ch;
+  margin-bottom: 40px;
+}
+
+.stopsense-landing .steps {
+  display: grid;
+  gap: 12px;
+}
+
+.stopsense-landing .step {
+  background: var(--surface);
+  border-radius: 18px;
+  padding: 18px 20px;
+  position: relative;
+  box-shadow: 0 2px 0 var(--line);
+}
+
+.stopsense-landing .step b {
+  font-family: "Bricolage Grotesque";
+  font-size: 42px;
+  line-height: 1;
+  color: var(--coral);
+  opacity: .9;
+  display: block;
+  margin-bottom: 6px;
+}
+
+.stopsense-landing .step h3 {
+  font-size: 20px;
+  margin-bottom: 4px;
+}
+
+.stopsense-landing .step p {
+  color: var(--muted);
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+@media (min-width: 760px) {
+  .stopsense-landing .steps {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 18px;
+  }
+
+  .stopsense-landing .step {
+    border-radius: 22px;
+    padding: 26px;
+  }
+
+  .stopsense-landing .step b {
+    font-size: 64px;
+    margin-bottom: 6px;
+  }
+
+  .stopsense-landing .step h3 {
+    font-size: 24px;
+    margin-bottom: 6px;
+  }
+
+  .stopsense-landing .step p {
+    font-size: 16px;
+    line-height: 1.6;
+  }
+}
+
+.stopsense-landing .feats {
+  display: grid;
+  gap: 12px;
+}
+
+.stopsense-landing .f {
+  background: var(--surface);
+  border-radius: 18px;
+  padding: 18px 20px;
+  box-shadow: 0 2px 0 var(--line);
+  transition: transform .3s, box-shadow .3s;
+}
+
+.stopsense-landing .f:hover {
+  transform: translateY(-6px) rotate(-.6deg);
+  box-shadow: 0 18px 36px rgba(31,26,63,.16);
+}
+
+.stopsense-landing .f .ic {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 13px;
+  background: var(--sunbg);
+  margin-bottom: 12px;
+}
+
+.stopsense-landing .f .ic svg {
+  width: 20px;
+  height: 20px;
+  transition: transform 0.3s;
+}
+
+.stopsense-landing .f:hover .ic svg {
+  transform: scale(1.15);
+}
+
+.stopsense-landing .f h3 {
+  font-size: 20px;
+  margin-bottom: 6px;
+}
+
+.stopsense-landing .f p {
+  font-size: 15px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+@media (min-width: 640px) {
+  .stopsense-landing .feats {
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+
+  .stopsense-landing .f {
+    border-radius: 22px;
+    padding: 24px;
+  }
+
+  .stopsense-landing .f .ic {
+    width: 52px;
+    height: 52px;
+    border-radius: 16px;
+    margin-bottom: 14px;
+  }
+
+  .stopsense-landing .f .ic svg {
+    width: 24px;
+    height: 24px;
+  }
+
+  .stopsense-landing .f h3 {
+    font-size: 22px;
+    margin-bottom: 6px;
+  }
+
+  .stopsense-landing .f p {
+    font-size: 16px;
+    line-height: 1.6;
+  }
+}
+
+@media (min-width: 960px) {
+  .stopsense-landing .feats {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.stopsense-landing .f.soon .ic {
+  background: var(--tealbg);
+}
+
+.stopsense-landing .soonb {
+  font-family: "DM Mono", monospace;
+  font-size: 11px;
+  letter-spacing: .1em;
+  background: var(--tealbg);
+  color: var(--teal);
+  border-radius: 99px;
+  padding: 2px 10px;
+  margin-left: 6px;
+  vertical-align: middle;
+}
+
+.stopsense-landing .race {
+  background: var(--night);
+  color: #fff;
+  position: relative;
+  overflow: hidden;
+}
+
+.stopsense-landing .race h2 {
+  color: #FFFFFF !important;
+}
+
+.stopsense-landing .race::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: url('/transit-doodle-dark.svg');
+  background-repeat: repeat;
+  background-size: 500px 500px;
+  opacity: 0.45;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.stopsense-landing .race .wrap {
+  position: relative;
+  z-index: 1;
+}
+
+.stopsense-landing .race .lede {
+  color: #DAD3F2 !important;
+}
+
+.stopsense-landing .track {
+  margin: 18px 0 26px;
+}
+
+.stopsense-landing .track .t {
+  display: flex;
+  justify-content: space-between;
+  font-weight: 700;
+  margin-bottom: 8px;
+  flex-wrap: wrap;
+  gap: 6px;
+  color: #FFFFFF !important;
+}
+
+.stopsense-landing .track .t span:first-child {
+  color: #FFFFFF !important;
+  font-weight: 700;
+}
+
+.stopsense-landing .track .t span:last-child {
+  font-family: "DM Mono", monospace;
+  font-weight: 600;
+  color: var(--sun) !important;
+}
+
+.stopsense-landing .rail {
+  height: 10px;
+  border-radius: 5px;
+  background: rgba(255,255,255,.12);
+  position: relative;
+}
+
+.stopsense-landing .rail i {
+  position: absolute;
+  top: 50%;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: rgba(255,255,255,.5);
+  transform: translateY(-50%);
+}
+
+.stopsense-landing .rail b {
+  position: absolute;
+  left: 0;
+  top: 50%;
+  width: 26px;
+  height: 26px;
+  margin: -13px 0 0 0;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-size: 15px;
+  background: var(--coral);
+  box-shadow: 0 0 0 6px rgba(255,90,78,.25);
+}
+
+.stopsense-landing .slow b {
+  background: var(--sun);
+  box-shadow: 0 0 0 6px rgba(255,176,32,.25);
+}
+
+.stopsense-landing .race.go .fast b {
+  animation: ss-run 3s cubic-bezier(.5,0,.3,1) forwards;
+}
+
+.stopsense-landing .race.go .slow b {
+  animation: ss-run 5.5s linear forwards;
+}
+
+@keyframes ss-run {
+  to {
+    left: calc(100% - 26px);
+  }
+}
+
+.stopsense-landing .faq details {
+  background: var(--surface);
+  border-radius: 18px;
+  margin-bottom: 10px;
+  padding: 0 20px;
+  box-shadow: 0 2px 0 var(--line);
+}
+
+.stopsense-landing .faq summary {
+  list-style: none;
+  cursor: pointer;
+  min-height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-weight: 700;
+  gap: 10px;
+}
+
+.stopsense-landing .faq summary::-webkit-details-marker {
+  display: none;
+}
+
+.stopsense-landing .faq summary:after {
+  content: "+";
+  font-size: 28px;
+  color: var(--coral);
+  transition: transform .3s;
+}
+
+.stopsense-landing .faq details[open] summary:after {
+  transform: rotate(45deg);
+}
+
+.stopsense-landing .faq details p {
+  color: var(--muted);
+  padding-bottom: 18px;
+  animation: ss-rise .4s both;
+}
+
+.stopsense-landing .final {
+  background: linear-gradient(135deg, var(--coral), #B8338A);
+  color: #fff;
+  border-radius: 30px;
+  padding: 56px 26px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.stopsense-landing .final h2 {
+  color: #FFFFFF !important;
+  margin-bottom: 12px;
+}
+
+.stopsense-landing .final p {
+  max-width: 40ch;
+  margin: 0 auto 26px;
+  opacity: .95;
+}
+
+.stopsense-landing .final .btn {
+  background: #fff;
+  color: var(--night);
+}
+
+.stopsense-landing footer {
+  background: var(--night);
+  color: #BDB5DD;
+  padding: 30px 0;
+  font-size: 15px;
+  position: relative;
+  overflow: hidden;
+}
+
+.stopsense-landing footer::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: url('/transit-doodle-dark.svg');
+  background-repeat: repeat;
+  background-size: 500px 500px;
+  opacity: 0.12;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.stopsense-landing footer .wrap {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.stopsense-landing footer a {
+  margin-left: 14px;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.stopsense-landing footer a:hover {
+  color: #fff;
+}
+
+.stopsense-landing .rv {
+  opacity: 0;
+  transform: translateY(34px);
+  transition: opacity .7s, transform .7s cubic-bezier(.2,.9,.3,1);
+  transition-delay: calc(var(--d, 0) * 90ms);
+}
+
+.stopsense-landing .rv.in {
+  opacity: 1;
+  transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .stopsense-landing *:not(.mq-track):not(.mq-slide):not(.mq span):not(.mq *),
+  .stopsense-landing *:not(.mq-track):not(.mq-slide):not(.mq span):not(.mq *):before,
+  .stopsense-landing *:not(.mq-track):not(.mq-slide):not(.mq span):not(.mq *):after {
+    animation: none !important;
+    transition-duration: .01ms !important;
+    transition-delay: 0s !important;
+  }
+  .stopsense-landing .mq-track,
+  .stopsense-landing .mq > div:not(.mq-track) {
+    animation: ss-mq 75s linear infinite !important;
+  }
+  .stopsense-landing .rv {
+    opacity: 1;
+    transform: none;
+  }
+  .stopsense-landing .phone {
+    transform: rotate(3deg);
+  }
+  .stopsense-landing .race .rail b {
+    left: calc(100% - 26px);
+  }
+}

@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>AnyStop – Board your account</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&family=Figtree:wght@400;500;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--paper:#FFF8F1;--ink:#231F3D;--muted:#6B6585;--line:#E4D3C3;--field:#fff;--coral:#FF5A4E;--coral2:#E8433A;--sun:#FFB020;--teal:#0B8F82;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);color-scheme:light}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--paper:#241E45;--ink:#F6F1FF;--muted:#A9A2C8;--line:#3C3566;--field:#1A1535;--teal:#4DE0CF;color-scheme:dark}}
+*{box-sizing:border-box;margin:0}
+html,body{height:100%}
+body{font:400 17px/1.5 "Figtree",system-ui,sans-serif;color:var(--ink);background:radial-gradient(700px 420px at 15% 0%,rgba(255,90,78,.38),transparent 60%),radial-gradient(600px 400px at 100% 100%,rgba(255,176,32,.25),transparent 60%),linear-gradient(160deg,#1F1A3F,#3B1D63);overflow-x:hidden;-webkit-font-smoothing:antialiased;position:relative}
+body::before{content:"";position:fixed;inset:0;z-index:1;background-image:url('/transit-doodle-dark.svg');background-repeat:repeat;background-size:500px 500px;opacity:.65;pointer-events:none;transform:translateZ(0)}
+button,input{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--sun);outline-offset:2px}
+.stage{height:100vh;max-height:100vh;box-sizing:border-box;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:8px 16px 74px;position:relative;z-index:2;overflow:hidden}
+.topbar{position:relative;z-index:50!important;display:flex;align-items:center;justify-content:space-between;width:100%;max-width:390px;margin:0 auto 24px;gap:12px}
+.logo{font-family:"Bricolage Grotesque",sans-serif;font-weight:800;font-size:23px;color:#fff;text-decoration:none;display:inline-flex;align-items:center;gap:8px;letter-spacing:-.01em}
+.logo i{width:14px;height:14px;border-radius:50%;background:var(--coral);box-shadow:0 0 0 4px rgba(255,90,78,.3);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 4px rgba(255,90,78,.3)}50%{box-shadow:0 0 0 9px rgba(255,90,78,.1)}}
+.back{color:#DAD3F2;text-decoration:none;font-weight:500;font-size:14px;white-space:nowrap}
+.back:hover{color:#fff}
+
+.ticket-stack{display:grid;grid-template-columns:100%;grid-template-rows:auto;perspective:1200px;perspective-origin:50% 40%;position:relative;width:100%;max-width:390px;margin:0 auto;animation:enter 0.8s cubic-bezier(.2,.9,.25,1) both}
+@keyframes enter{from{opacity:0;transform:translateY(40px) scale(.96)}to{opacity:1;transform:none}}
+.ticket-stack .ticket{grid-column:1;grid-row:1;width:100%;max-width:390px;background:var(--paper);border-radius:20px;position:relative;--cut:84px;-webkit-mask:radial-gradient(circle 12px at 0 calc(100% - var(--cut)),#0000 97%,#000) left/51% 100% no-repeat,radial-gradient(circle 12px at 100% calc(100% - var(--cut)),#0000 97%,#000) right/51% 100% no-repeat;mask:radial-gradient(circle 12px at 0 calc(100% - var(--cut)),#0000 97%,#000) left/51% 100% no-repeat,radial-gradient(circle 12px at 100% calc(100% - var(--cut)),#0000 97%,#000) right/51% 100% no-repeat;filter:drop-shadow(0 18px 30px rgba(0,0,0,.35));will-change:transform,opacity,filter;transform-style:preserve-3d}
+.ticket.ticket-front{position:relative;z-index:30!important;opacity:1;transform:translate3d(0,0,0) scale(1) rotate(0deg);pointer-events:auto!important;filter:drop-shadow(0 20px 32px rgba(0,0,0,.38))}
+.ticket.ticket-front *{pointer-events:auto}
+.ticket.ticket-front .main,.ticket.ticket-front .form,.ticket.ticket-front form,.ticket.ticket-front .fld,.ticket.ticket-front .inp{position:relative;z-index:35!important;pointer-events:auto!important}
+.ticket.ticket-front .inp input{position:relative;z-index:40!important;pointer-events:auto!important;user-select:text!important;-webkit-user-select:text!important;cursor:text!important}
+.ticket.ticket-back:not(.deal-front){pointer-events:none!important}
+.ticket-signup.ticket-back{position:relative;z-index:1!important;opacity:.94;transform:translate3d(16px,-10px,-30px) scale(.97) rotate(2.8deg);cursor:pointer;filter:drop-shadow(0 12px 20px rgba(0,0,0,.28)) brightness(.96);transition:transform .35s cubic-bezier(.34,1.3,.64,1),opacity .3s ease,filter .3s ease}
+.ticket-login.ticket-back{position:relative;z-index:1!important;opacity:.94;transform:translate3d(-16px,-10px,-30px) scale(.97) rotate(-2.8deg);cursor:pointer;filter:drop-shadow(0 12px 20px rgba(0,0,0,.28)) brightness(.96);transition:transform .35s cubic-bezier(.34,1.3,.64,1),opacity .3s ease,filter .3s ease}
+.ticket-signup.ticket-back::after{content:"";position:absolute;top:-16px;right:-20px;width:140px;height:50px;pointer-events:auto!important;cursor:pointer;z-index:5}
+.ticket-login.ticket-back::after{content:"";position:absolute;top:-16px;left:-20px;width:140px;height:50px;pointer-events:auto!important;cursor:pointer;z-index:5}
+.ticket-signup.ticket-back:hover{transform:translate3d(20px,-14px,-15px) scale(.98) rotate(3.6deg);opacity:1;filter:drop-shadow(0 18px 28px rgba(0,0,0,.38)) brightness(1)}
+.ticket-login.ticket-back:hover{transform:translate3d(-20px,-14px,-15px) scale(.98) rotate(-3.6deg);opacity:1;filter:drop-shadow(0 18px 28px rgba(0,0,0,.38)) brightness(1)}
+.ticket .form,.ticket .stub{transition:opacity .28s ease}
+.ticket.ticket-back:not(.deal-front) .form,.ticket.ticket-back:not(.deal-front) .stub{opacity:0;pointer-events:none}
+.ticket.ticket-front .form,.ticket.ticket-front .stub,.ticket.deal-front .form,.ticket.deal-front .stub{opacity:1;pointer-events:auto}
+.ticket.ticket-back:not(.deal-front) input,.ticket.ticket-back:not(.deal-front) button{pointer-events:none!important}
+.ticket-peek-tab,.ticket-back-hint{display:none!important}
+.ticket-signup.deal-front{animation:deal-signup .75s cubic-bezier(.2,.88,.3,1.08) forwards;z-index:25!important}
+.ticket-login.drop-back{animation:drop-login .7s cubic-bezier(.25,.9,.35,1) forwards;z-index:1!important}
+.ticket-login.deal-front{animation:deal-login .75s cubic-bezier(.2,.88,.3,1.08) forwards;z-index:25!important}
+.ticket-signup.drop-back{animation:drop-signup .7s cubic-bezier(.25,.9,.35,1) forwards;z-index:1!important}
+@keyframes deal-signup{0%{transform:translate3d(16px,-10px,-30px) scale(.97) rotate(2.8deg);opacity:.92;z-index:2}35%{transform:translate3d(68px,-115px,95px) scale(1.07) rotate(10.5deg);opacity:1;z-index:30;filter:drop-shadow(0 38px 65px rgba(0,0,0,.52)) brightness(1.03)}68%{transform:translate3d(12px,-8px,25px) scale(1.015) rotate(1.2deg);z-index:25}88%{transform:translate3d(-3px,2px,5px) scale(.995) rotate(-.4deg)}100%{transform:translate3d(0,0,0) scale(1) rotate(0deg);opacity:1;z-index:15;filter:drop-shadow(0 20px 32px rgba(0,0,0,.38)) brightness(1)}}
+@keyframes drop-login{0%{transform:translate3d(0,0,0) scale(1) rotate(0deg);opacity:1;z-index:15}30%{transform:translate3d(-20px,14px,-15px) scale(.985) rotate(-1.5deg);opacity:.95;z-index:1}100%{transform:translate3d(-16px,-10px,-30px) scale(.97) rotate(-2.8deg);opacity:.92;z-index:1;filter:drop-shadow(0 10px 18px rgba(0,0,0,.25)) brightness(.96)}}
+@keyframes deal-login{0%{transform:translate3d(-16px,-10px,-30px) scale(.97) rotate(-2.8deg);opacity:.92;z-index:2}35%{transform:translate3d(-68px,-115px,95px) scale(1.07) rotate(-10.5deg);opacity:1;z-index:30;filter:drop-shadow(0 38px 65px rgba(0,0,0,.52)) brightness(1.03)}68%{transform:translate3d(-12px,-8px,25px) scale(1.015) rotate(-1.2deg);z-index:25}88%{transform:translate3d(3px,2px,5px) scale(.995) rotate(.4deg)}100%{transform:translate3d(0,0,0) scale(1) rotate(0deg);opacity:1;z-index:15;filter:drop-shadow(0 20px 32px rgba(0,0,0,.38)) brightness(1)}}
+@keyframes drop-signup{0%{transform:translate3d(0,0,0) scale(1) rotate(0deg);opacity:1;z-index:15}30%{transform:translate3d(20px,14px,-15px) scale(.985) rotate(1.5deg);opacity:.95;z-index:1}100%{transform:translate3d(16px,-10px,-30px) scale(.97) rotate(2.8deg);opacity:.92;z-index:1;filter:drop-shadow(0 10px 18px rgba(0,0,0,.25)) brightness(.96)}}
+.ticket-stack.tear .ticket-back{opacity:0!important;transform:translate3d(0,40px,-40px) scale(.92)!important;pointer-events:none!important;transition:opacity .45s ease,transform .45s ease!important}
+.main{padding:14px 18px 8px;position:relative;min-height:auto}
+.tophead{display:flex;justify-content:space-between;align-items:center;font-family:"DM Mono",monospace;font-size:11px;letter-spacing:.12em;color:var(--muted)}
+.tophead b{color:var(--coral);font-weight:500}
+.route{display:flex;align-items:center;gap:8px;margin:5px 0 2px;font-family:"Bricolage Grotesque",sans-serif;font-weight:800;font-size:13px;letter-spacing:.04em}
+.route .l{flex:1;height:3px;border-radius:2px;background:repeating-linear-gradient(90deg,var(--coral) 0 8px,transparent 8px 14px);position:relative}
+.route .l:after{content:"🚌";position:absolute;top:-10px;left:0;font-size:16px;animation:go 3.2s ease-in-out infinite}
+@keyframes go{0%,15%{left:0}85%,100%{left:calc(100% - 24px)}}
+h1{font-family:"Bricolage Grotesque",sans-serif;font-weight:800;font-size:22px;line-height:1.1;letter-spacing:-.02em;margin:3px 0 2px;transition:opacity .25s,transform .25s}
+.sub{color:var(--muted);font-size:13px;margin-bottom:7px;transition:opacity .25s}
+.swap-out{opacity:0;transform:translateY(-8px)}
+.seg{display:grid;grid-template-columns:1fr 1fr;background:var(--field);border:1.5px solid var(--line);border-radius:99px;padding:2px;position:relative;margin-bottom:7px;z-index:20}
+.seg:before{content:"";position:absolute;top:2px;bottom:2px;left:2px;width:calc(50% - 2px);border-radius:99px;background:var(--ink);transition:transform .45s cubic-bezier(.3,1.3,.4,1);pointer-events:none!important}
+.seg.su:before{transform:translateX(100%)}
+.seg button{position:relative;border:0;background:none;min-height:36px;font-weight:700;font-size:14px;border-radius:99px;transition:color .3s;cursor:pointer;color:var(--muted);z-index:25!important;pointer-events:auto!important}
+.seg button[aria-pressed=true]{color:var(--paper)}
+.fld{display:block;margin-top:6px}
+.fld span{font-family:"DM Mono",monospace;font-size:10px;letter-spacing:.12em;color:var(--muted)}
+.inp{display:flex;align-items:center;background:var(--field);border:1.5px solid var(--line);border-radius:11px;margin-top:2px;transition:border-color .2s,box-shadow .2s}
+.inp:focus-within{border-color:var(--coral);box-shadow:0 0 0 3px rgba(255,90,78,.18)}
+.inp input{flex:1;min-width:0;height:38px;border:0;background:none;padding:0 12px;font-size:14px;font-weight:500}
+.inp input:focus{outline:0}
+.inp button{border:0;background:none;padding:0 12px;min-height:38px;cursor:pointer;font-size:13px;font-weight:700;color:var(--coral2)}
+.fld.bad .inp{border-color:var(--coral2);animation:shake .4s}
+.msg{display:none;color:var(--coral2);font-size:12px;font-weight:700;margin-top:2px}
+.fld.bad .msg{display:block}
+@keyframes shake{25%{transform:translateX(-7px)}50%{transform:translateX(7px)}75%{transform:translateX(-4px)}}
+.name{display:grid;grid-template-rows:0fr;transition:grid-template-rows .45s ease,opacity .35s;opacity:0}
+.su .name,.name.on{grid-template-rows:1fr;opacity:1}
+.name>div{overflow:hidden}
+.name .fld{margin-top:6px;padding-bottom:2px}
+.barcode{height:18px;margin-top:7px;border-radius:2px;background:repeating-linear-gradient(90deg,var(--ink) 0 2px,transparent 2px 5px,var(--ink) 5px 6px,transparent 6px 11px,var(--ink) 11px 14px,transparent 14px 16px);opacity:.75}
+
+.stub{height:var(--cut);border-top:2.5px dashed var(--line);padding:8px 18px;display:flex;flex-direction:column;justify-content:center;gap:4px;transform-origin:0 0;transition:transform .9s cubic-bezier(.5,0,.8,.4),opacity .9s}
+.go{border:0;border-radius:12px;min-height:42px;background:var(--coral);color:#fff;font-weight:700;font-size:16px;cursor:pointer;position:relative;overflow:hidden;transition:transform .15s,background .2s;width:100%}
+.go:hover{background:var(--coral2)}.go:active{transform:scale(.97)}
+.go:after{content:"";position:absolute;inset:0;background:linear-gradient(100deg,transparent 30%,rgba(255,255,255,.4) 50%,transparent 70%);transform:translateX(-120%);animation:shine 3.4s 1.2s infinite}
+@keyframes shine{40%,100%{transform:translateX(120%)}}
+.guest{background:none;border:0;color:var(--muted);cursor:pointer;min-height:28px;font-size:13px;font-weight:500;text-decoration:underline;text-underline-offset:3px;width:100%}
+.guest:hover{color:var(--ink)}
+.tear .stub{transform:translateY(70px) rotate(9deg);opacity:0;pointer-events:none}
+
+.ok{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:24px;opacity:0;pointer-events:none;transition:opacity .5s .5s}
+.tear .ok{opacity:1;pointer-events:auto}
+.tear .form{opacity:0;transform:scale(.96);pointer-events:none}
+.form{transition:opacity .4s,transform .4s}
+.ok svg{width:96px;height:96px;margin-bottom:10px}
+.ok circle,.ok path{fill:none;stroke:var(--teal);stroke-width:6;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:300;stroke-dashoffset:300}
+.tear .ok circle{animation:draw .8s .7s ease forwards}.tear .ok path{animation:draw .5s 1.3s ease forwards}
+@keyframes draw{to{stroke-dashoffset:0}}
+.ok h2{font-family:"Bricolage Grotesque",sans-serif;font-weight:800;font-size:30px;line-height:1.1}
+.ok p{color:var(--muted);margin:6px 0 16px}
+.ok a{background:var(--ink);color:var(--paper);text-decoration:none;border-radius:99px;padding:12px 22px;font-weight:700;min-height:44px}
+
+.road{position:fixed;left:0;right:0;bottom:0;height:64px;background:#17132E;border-top:3px solid rgba(255,255,255,.7);padding-bottom:env(safe-area-inset-bottom,0px);z-index:10}
+.road:before{content:"";position:absolute;left:0;right:0;top:50%;height:4px;background:repeating-linear-gradient(90deg,var(--sun) 0 30px,transparent 30px 66px);animation:dash 1s linear infinite}
+@keyframes dash{to{background-position:-66px 0}}
+.bus{position:absolute;left:-120px;bottom:12px;width:100px;z-index:12;transition:left .7s cubic-bezier(.25,1,.5,1);will-change:left,transform;filter:drop-shadow(0 4px 8px rgba(0,0,0,.45))}
+.bus.driving{animation:bus-bob .25s infinite linear}
+.bus.depart{animation:bus-bob .15s infinite linear}
+@keyframes bus-bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-1.5px)}}
+@media(prefers-reduced-motion:reduce){*,*:before,*:after{animation:none!important;transition-duration:.01ms!important;transition-delay:0s!important}.ticket{opacity:1}.ok circle,.ok path{stroke-dashoffset:0}}
+</style>
+</head>
+<body>
+<div class="stage">
+  <div class="topbar">
+    <a class="logo" href="/" title="AnyStop Home">
+      <svg viewBox="0 0 248 72" style="height:34px;width:auto;" fill="none" aria-label="AnyStop Logo">
+        <defs>
+          <linearGradient id="pinGrad-nav" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stop-color="#FF6B5E" />
+            <stop offset="100%" stop-color="#FF4B3E" />
+          </linearGradient>
+          <linearGradient id="roadGrad-nav" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stop-color="#FFB326" />
+            <stop offset="100%" stop-color="#FF981A" />
+          </linearGradient>
+        </defs>
+        <g transform="translate(4, 2)">
+          <path d="M 23 23 A 28 28 0 0 0 23 51" stroke="#FFA726" stroke-width="3.5" stroke-linecap="round" fill="none" opacity="0.95" />
+          <path d="M 29 28 A 18 18 0 0 0 29 46" stroke="#FF5A4E" stroke-width="3.2" stroke-linecap="round" fill="none" />
+          <path d="M 67 28 A 18 18 0 0 1 67 46" stroke="#FF5A4E" stroke-width="3.2" stroke-linecap="round" fill="none" />
+          <path d="M 73 23 A 28 28 0 0 1 73 51" stroke="#FFA726" stroke-width="3.5" stroke-linecap="round" fill="none" opacity="0.95" />
+          <path d="M 48 64 C 41 53 28 41 28 26 A 20 20 0 1 1 68 26 C 68 41 55 53 48 64 Z" fill="url(#pinGrad-nav)" />
+          <rect x="37" y="14" width="22" height="26" rx="5.5" fill="#1F1A3F" />
+          <rect x="40.5" y="18" width="15" height="7.5" rx="2" fill="#FF5A4E" />
+          <circle cx="41.5" cy="32.5" r="1.6" fill="#FF5A4E" />
+          <circle cx="54.5" cy="32.5" r="1.6" fill="#FF5A4E" />
+          <rect x="45" y="33.5" width="6" height="1.4" rx="0.7" fill="#FF5A4E" />
+          <path d="M 44.5 37 L 51.5 37 L 59 66 L 52.5 66 L 50 56 L 46 56 L 43.5 66 L 37 66 Z" fill="url(#roadGrad-nav)" />
+          <polygon points="48,41 45.2,50.5 50.8,50.5" fill="#1F1A3F" />
+          <polygon points="48,56 46,66 50,66" fill="#1F1A3F" />
+          <line x1="48" y1="44" x2="48" y2="49" stroke="#FFFFFF" stroke-width="1.6" stroke-linecap="round" />
+          <line x1="48" y1="52" x2="48" y2="55" stroke="#FFFFFF" stroke-width="1.6" stroke-linecap="round" />
+          <line x1="48" y1="58" x2="48" y2="64" stroke="#FFFFFF" stroke-width="1.6" stroke-linecap="round" />
+        </g>
+        <g font-family="'Bricolage Grotesque', 'Figtree', sans-serif" font-weight="800" font-size="38" letter-spacing="-0.5">
+          <text x="88" y="51" fill="#FFA726">Any</text>
+          <text x="162" y="51" fill="#FFFFFF">Stop</text>
+        </g>
+      </svg>
+    </a>
+    <a class="back" href="/">← Back to landing page</a>
+  </div>
+  <div class="ticket-stack" id="ticket-stack">
+    <!-- TICKET 1: LOGIN -->
+    <div class="ticket ticket-login ticket-front" id="ticket-login">
+      <div class="main">
+        <div class="form" id="form-login">
+          <div class="tophead"><span>BOARDING PASS</span><b id="pn-login">NO. 3870</b></div>
+          <div class="route"><div class="l"></div><span>ANYWHERE</span></div>
+          <h1>Welcome back, traveller</h1>
+          <p class="sub">Log in to save your favourite routes.</p>
+          <div class="seg" id="seg-login" role="group" aria-label="Log in or sign up">
+            <button type="button" data-m="in" aria-pressed="true">Log in</button>
+            <button type="button" data-m="up" aria-pressed="false">Sign up</button>
+          </div>
+          <form id="f-login" novalidate autocomplete="on">
+            <label class="fld" id="fe-login"><span>EMAIL OR PHONE</span><div class="inp"><input id="id-login" autocomplete="username" inputmode="email" placeholder="you@example.com"></div><div class="msg">Enter a valid email or 10-digit phone number.</div></label>
+            <label class="fld" id="fp-login"><span>PASSWORD</span><div class="inp"><input id="pw-login" type="password" autocomplete="current-password" placeholder="At least 6 characters"><button type="button" id="eye-login" aria-label="Show password">Show</button></div><div class="msg">Use at least 6 characters.</div></label>
+            <div class="barcode" aria-hidden="true"></div>
+          </form>
+        </div>
+        <div class="ok" aria-live="polite"><svg viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="44"/><path d="M30 52l14 14 27-30"/></svg>
+          <h2 id="wel-login">Welcome aboard!</h2><p>Your seat is saved. Time to find your bus.</p><a href="/buses">Find my bus</a></div>
+      </div>
+      <div class="stub">
+        <button class="go" id="go-login" form="f-login">Punch my ticket →</button>
+        <button class="guest" id="guest-login" type="button">Continue as guest</button>
+      </div>
+    </div>
+
+    <!-- TICKET 2: SIGN UP -->
+    <div class="ticket ticket-signup ticket-back" id="ticket-signup">
+      <div class="main">
+        <div class="form su" id="form-signup">
+          <div class="tophead"><span>BOARDING PASS</span><b id="pn-signup">NO. 7249</b></div>
+          <div class="route"><div class="l"></div><span>ANYWHERE</span></div>
+          <h1>Get your first ticket</h1>
+          <p class="sub">Fast boarding, saved stops & live alerts.</p>
+          <div class="seg su" id="seg-signup" role="group" aria-label="Log in or sign up">
+            <button type="button" data-m="in" aria-pressed="false">Log in</button>
+            <button type="button" data-m="up" aria-pressed="true">Sign up</button>
+          </div>
+          <form id="f-signup" novalidate autocomplete="on">
+            <div class="name on"><div><label class="fld" id="fn-signup"><span>PASSENGER NAME</span><div class="inp"><input id="name-signup" autocomplete="name" placeholder="Your name"></div><div class="msg">Tell us what to print on your pass.</div></label></div></div>
+            <label class="fld" id="fe-signup"><span>EMAIL OR PHONE</span><div class="inp"><input id="id-signup" autocomplete="username" inputmode="email" placeholder="you@example.com"></div><div class="msg">Enter a valid email or 10-digit phone number.</div></label>
+            <label class="fld" id="fp-signup"><span>PASSWORD</span><div class="inp"><input id="pw-signup" type="password" autocomplete="new-password" placeholder="At least 6 characters"><button type="button" id="eye-signup" aria-label="Show password">Show</button></div><div class="msg">Use at least 6 characters.</div></label>
+            <div class="barcode" aria-hidden="true"></div>
+          </form>
+        </div>
+        <div class="ok" aria-live="polite"><svg viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="44"/><path d="M30 52l14 14 27-30"/></svg>
+          <h2 id="wel-signup">Welcome aboard!</h2><p>Your seat is saved. Time to find your bus.</p><a href="/buses">Find my bus</a></div>
+      </div>
+      <div class="stub">
+        <button class="go" id="go-signup" form="f-signup">Issue my ticket →</button>
+        <button class="guest" id="guest-signup" type="button">Continue as guest</button>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="road" aria-hidden="true"><svg class="bus" id="bus" viewBox="0 0 120 50"><rect x="4" y="6" width="108" height="32" rx="7" fill="#FF5A4E"/><rect x="12" y="12" width="20" height="12" rx="2" fill="#1F1A3F"/><rect x="36" y="12" width="20" height="12" rx="2" fill="#1F1A3F"/><rect x="60" y="12" width="20" height="12" rx="2" fill="#1F1A3F"/><rect x="86" y="12" width="20" height="14" rx="2" fill="#9ED8F0"/><rect x="4" y="29" width="108" height="4" fill="#FFB020"/><circle cx="28" cy="40" r="7" fill="#1F1A3F"/><circle cx="88" cy="40" r="7" fill="#1F1A3F"/><circle cx="28" cy="40" r="3" fill="#ccc"/><circle cx="88" cy="40" r="3" fill="#ccc"/></svg></div>
+
+<script>
+const $=id=>document.getElementById(id);
+let mode="in";
+$("pn-login").textContent="NO. "+String(Math.floor(Math.random()*4000)+1000);
+$("pn-signup").textContent="NO. "+String(Math.floor(Math.random()*4000)+5000);
+
+const tLogin=$("ticket-login");
+const tSignup=$("ticket-signup");
+
+function switchMode(newMode){
+  if(newMode===mode)return;
+  mode=newMode;
+  document.querySelectorAll(".bad").forEach(x=>x.classList.remove("bad"));
+  
+  if(newMode==="up"){
+    $("id-signup").value=$("id-login").value;
+    $("pw-signup").value=$("pw-login").value;
+
+    tLogin.classList.remove("ticket-front","deal-front","drop-back");
+    void tLogin.offsetWidth;
+    tLogin.classList.add("ticket-back","drop-back");
+
+    tSignup.classList.remove("ticket-back","drop-back","deal-front");
+    void tSignup.offsetWidth;
+    tSignup.classList.add("ticket-front","deal-front");
+  } else {
+    $("id-login").value=$("id-signup").value;
+    $("pw-login").value=$("pw-signup").value;
+
+    tSignup.classList.remove("ticket-front","deal-front","drop-back");
+    void tSignup.offsetWidth;
+    tSignup.classList.add("ticket-back","drop-back");
+
+    tLogin.classList.remove("ticket-back","drop-back","deal-front");
+    void tLogin.offsetWidth;
+    tLogin.classList.add("ticket-front","deal-front");
+  }
+  updateBus();
+}
+
+let busDeparted = false;
+function updateBus() {
+  if (busDeparted) return;
+  const isUp = mode === "up";
+  let score = 0;
+  const total = isUp ? 3 : 2;
+
+  if (isUp) {
+    const n = ($("name-signup")?.value || "").trim();
+    const id = ($("id-signup")?.value || "").trim();
+    const pw = $("pw-signup")?.value || "";
+    if (n.length > 0) score += Math.min(1, n.length / 3);
+    if (id.length > 0) score += Math.min(1, id.length / 5);
+    if (pw.length > 0) score += Math.min(1, pw.length / 6);
+  } else {
+    const id = ($("id-login")?.value || "").trim();
+    const pw = $("pw-login")?.value || "";
+    if (id.length > 0) score += Math.min(1, id.length / 5);
+    if (pw.length > 0) score += Math.min(1, pw.length / 6);
+  }
+
+  const p = score / total;
+  const b = $("bus");
+  if (!b) return;
+  if (score > 0) {
+    b.classList.add("driving");
+    b.style.left = `calc(${15 + p * 68}% - 50px)`;
+  } else {
+    b.classList.remove("driving");
+    b.style.left = "-120px";
+  }
+}
+
+document.querySelectorAll("input").forEach(inp => {
+  inp.addEventListener("input", updateBus);
+});
+
+document.querySelectorAll(".seg button").forEach(b=>{
+  b.addEventListener("click", e=>{
+    e.stopPropagation();
+    e.preventDefault();
+    const m = b.getAttribute("data-m");
+    if(m) switchMode(m);
+  });
+});
+
+tLogin.addEventListener("click", e=>{
+  if(e.target.closest("button")||e.target.closest("input")||e.target.closest("a")) return;
+  if(mode==="up") switchMode("in");
+});
+tSignup.addEventListener("click", e=>{
+  if(e.target.closest("button")||e.target.closest("input")||e.target.closest("a")) return;
+  if(mode==="in") switchMode("up");
+});
+
+function setupEye(eyeId,pwId){
+  const eye=$(eyeId),p=$(pwId);
+  eye.onclick=e=>{
+    e.stopPropagation();
+    const s=p.type==="password";
+    p.type=s?"text":"password";
+    eye.textContent=s?"Hide":"Show";
+    eye.setAttribute("aria-label",s?"Hide password":"Show password");
+  };
+}
+setupEye("eye-login","pw-login");
+setupEye("eye-signup","pw-signup");
+
+const bad=(id,on)=>{const f=$(id);f.classList.remove("bad");if(on){void f.offsetWidth;f.classList.add("bad")}return on};
+function validId(v){return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v)||/^[6-9]\d{9}$/.test(v.replace(/[\s-]/g,""))}
+
+function board(who){
+  const activeTicket=mode==="up"?tSignup:tLogin;
+  const welId=mode==="up"?"wel-signup":"wel-login";
+  const goId=mode==="up"?"go-signup":"go-login";
+  const tNo=mode==="up"?$("pn-signup").textContent:$("pn-login").textContent;
+  $(welId).textContent="Welcome aboard, "+who+"!";
+  $(goId).textContent="Punching…";
+  try {
+    localStorage.setItem('stopsense_auth', JSON.stringify({ name: who, isGuest: who === 'guest', ticketNo: tNo, boardedAt: Date.now() }));
+  } catch (err) {}
+  $("ticket-stack").classList.add("tear");
+  activeTicket.classList.add("tear");
+
+  busDeparted = true;
+  const b = $("bus");
+  b.classList.remove("driving");
+  b.classList.add("depart");
+  b.style.transition = "left 1.8s cubic-bezier(.4, 0, .2, 1)";
+  setTimeout(() => {
+    b.style.left = "calc(100% + 140px)";
+    setTimeout(()=>{ window.location.href = "/buses"; }, 2000);
+  }, 450);
+}
+
+$("f-login").onsubmit=e=>{
+  e.preventDefault();
+  const i=$("id-login").value.trim(),p=$("pw-login").value;
+  const e2=bad("fe-login",!validId(i)),e3=bad("fp-login",p.length<6);
+  if(e2||e3)return;
+  board(i.includes("@")?i.split("@")[0]:"traveller");
+};
+
+$("f-signup").onsubmit=e=>{
+  e.preventDefault();
+  const n=$("name-signup").value.trim(),i=$("id-signup").value.trim(),p=$("pw-signup").value;
+  const e1=bad("fn-signup",n.length<2),e2=bad("fe-signup",!validId(i)),e3=bad("fp-signup",p.length<6);
+  if(e1||e2||e3)return;
+  board(n.split(" ")[0]);
+};
+
+$("guest-login").onclick=()=>board("guest");
+$("guest-signup").onclick=()=>board("guest");
+</script>
+</body>
+</html>

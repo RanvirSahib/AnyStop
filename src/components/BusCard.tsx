@@ -33,7 +33,7 @@ export const BusCard: React.FC<BusCardProps> = ({
   return (
     <article
       className={`card ${trip.hasDeparted ? 'gone' : ''} ${isOpen ? 'open' : ''}`}
-      style={{ animationDelay: `${index * 55}ms` }}
+      style={{ animationDelay: `${Math.min(index * 25, 200)}ms` }}
     >
       <div className="row">
         {/* Trip Departure and Arrival Times */}

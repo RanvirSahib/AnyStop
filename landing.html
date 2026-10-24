@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>AnyStop – know your bus before it arrives</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&family=Figtree:wght@400;500;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#FFF5EC;--surface:#fff;--ink:#231F3D;--muted:#6B6585;--line:#EBDDD0;--coral:#FF5A4E;--coral2:#E8433A;--sun:#FFB020;--teal:#0B8F82;--tealbg:#D8F5F0;--sunbg:#FFF0D0;--sunink:#8A5A00;--night:#1F1A3F;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);color-scheme:light}
+html{scroll-padding-top:calc(72px + env(safe-area-inset-top,0px));scroll-behavior:smooth}
+@media (prefers-color-scheme:dark){:root{--bg:#15122B;--surface:#211C40;--ink:#F6F1FF;--muted:#A9A2C8;--line:#342E5A;--tealbg:#0E3B3A;--teal:#4DE0CF;--sunbg:#3D2F0A;--sunink:#FFB020;color-scheme:dark}}
+*{box-sizing:border-box;margin:0}
+body{background-color:var(--bg);color:var(--ink);font:400 18px/1.6 "Figtree",system-ui,sans-serif;-webkit-font-smoothing:antialiased;overflow-x:hidden;position:relative;min-height:100vh}
+body::before{content:"";position:fixed;inset:0;z-index:-1;background-image:url('/transit-doodle-light.svg');background-repeat:repeat;background-size:500px 500px;pointer-events:none;transform:translateZ(0)}
+@media(prefers-color-scheme:dark){body::before{background-image:url('/transit-doodle-dark.svg')}}
+h1,h2,h3{font-family:"Bricolage Grotesque",Georgia,sans-serif;font-weight:800;letter-spacing:-.02em;line-height:1.04}
+a{color:inherit}
+:focus-visible{outline:3px solid var(--sun);outline-offset:2px}
+.wrap{max-width:1020px;margin:0 auto;padding:0 20px}
+.btn{display:inline-flex;align-items:center;justify-content:center;min-height:50px;padding:0 24px;border-radius:99px;font-weight:700;text-decoration:none;transition:transform .2s,background .2s,box-shadow .2s;cursor:pointer}
+.btn:hover{transform:translateY(-2px)}.btn:active{transform:scale(.96)}
+.b1{background:var(--coral);color:#fff;box-shadow:0 10px 28px rgba(255,90,78,.45)}.b1:hover{background:var(--coral2)}
+.b2{border:2px solid rgba(255,255,255,.4);color:#fff}.b2:hover{background:rgba(255,255,255,.12)}
+
+nav{position:fixed;top:0;left:0;right:0;z-index:20;padding-top:env(safe-area-inset-top,0px);transition:background .3s,box-shadow .3s}
+nav.sc{background:rgba(31,26,63,.92);backdrop-filter:blur(10px);box-shadow:0 6px 24px rgba(0,0,0,.25)}
+nav .wrap{display:flex;align-items:center;justify-content:space-between;height:68px}
+.logo{font-family:"Bricolage Grotesque",sans-serif;font-weight:800;font-size:23px;color:#fff;text-decoration:none;display:flex;align-items:center;gap:8px}
+.logo i{width:14px;height:14px;border-radius:50%;background:var(--coral);box-shadow:0 0 0 4px rgba(255,90,78,.3);animation:pulse 2s infinite}
+@keyframes pulse{50%{box-shadow:0 0 0 9px rgba(255,90,78,0)}}
+.links{display:flex;align-items:center;gap:6px}
+.links a{color:#DAD3F2;text-decoration:none;padding:10px 12px;font-weight:500;display:none}
+@media(min-width:760px){.links a{display:block}}
+.links .btn{min-height:44px;padding:0 20px 0 16px;display:inline-flex;align-items:center;gap:8px;color:#fff;background:linear-gradient(135deg,var(--coral),#B8338A);box-shadow:0 6px 20px rgba(255,90,78,.45),inset 0 1px 0 rgba(255,255,255,.35);position:relative;overflow:hidden}
+.links .btn svg{width:18px;height:18px;transition:transform .3s}
+.links .btn:hover svg{transform:scale(1.18) rotate(-8deg)}
+.links .btn:hover{box-shadow:0 10px 28px rgba(255,90,78,.6),inset 0 1px 0 rgba(255,255,255,.4)}
+.links .btn:after{content:"";position:absolute;inset:0;background:linear-gradient(100deg,transparent 30%,rgba(255,255,255,.4) 50%,transparent 70%);transform:translateX(-130%);animation:shine 3.6s 1.5s infinite}
+
+.hero{background:radial-gradient(900px 500px at 90% 90%,rgba(255,90,78,.5),transparent 60%),radial-gradient(600px 400px at 0 0,rgba(255,176,32,.2),transparent 60%),linear-gradient(160deg,#1F1A3F,#3B1D63);color:#fff;padding:130px 0 90px;position:relative;overflow:hidden}
+.hero::before{content:"";position:absolute;inset:0;background-image:url('/transit-doodle-dark.svg');background-repeat:repeat;background-size:500px 500px;opacity:.55;pointer-events:none;z-index:0}
+.hero .wrap{position:relative;z-index:1;display:grid;gap:50px;align-items:center}
+@media(min-width:860px){.hero .wrap{grid-template-columns:1.1fr .9fr}}
+.tag{display:inline-flex;align-items:center;gap:10px;font-family:"DM Mono",monospace;font-size:13px;font-weight:500;letter-spacing:.14em;color:#fff;padding:9px 20px;border-radius:99px;margin-bottom:20px;position:relative;overflow:hidden;border:2px solid transparent;background:linear-gradient(#2B2152,#2B2152) padding-box,linear-gradient(90deg,var(--coral),var(--sun),var(--coral)) border-box;background-size:auto,200% 100%;box-shadow:0 8px 26px rgba(255,90,78,.28);animation:rise .8s both,flow 4s linear infinite}
+.tag b{color:var(--sun);font-weight:700;font-size:17px;line-height:1;display:inline-block;margin:0 4px;vertical-align:middle;transition:transform .3s}
+.tag:hover b{transform:translateX(4px)}
+.tag .td{width:9px;height:9px;border-radius:50%;background:var(--coral);box-shadow:0 0 0 0 rgba(255,90,78,.7);animation:ping 1.8s infinite}
+.tag:after{content:"";position:absolute;inset:0;background:linear-gradient(100deg,transparent 35%,rgba(255,255,255,.22) 50%,transparent 65%);transform:translateX(-130%);animation:shine 4s 1s infinite}
+@keyframes flow{to{background-position:0 0,200% 0}}
+@keyframes ping{70%{box-shadow:0 0 0 9px rgba(255,90,78,0)}100%{box-shadow:0 0 0 0 rgba(255,90,78,0)}}
+@keyframes shine{40%,100%{transform:translateX(130%)}}
+.hero h1{font-size:clamp(42px,9.5vw,80px);animation:rise .8s .08s both}
+.hero h1 em{font-style:normal;color:var(--sun);position:relative;white-space:nowrap}
+.hero h1 em:after{content:"";position:absolute;left:0;right:0;bottom:-4px;height:6px;border-radius:3px;background:var(--coral);transform-origin:0;animation:grow 1s .9s both}
+@keyframes grow{from{transform:scaleX(0)}}
+.hero p.lead{font-size:20px;color:#DAD3F2;max-width:34ch;margin:20px 0 28px;animation:rise .8s .18s both}
+.cta{display:flex;gap:12px;flex-wrap:wrap;animation:rise .8s .28s both}
+@keyframes rise{from{opacity:0;transform:translateY(26px)}}
+.phone{display:none}
+@media(min-width:860px){.phone{display:block;justify-self:center;width:min(300px,86%);background:#120E2B;border-radius:38px;padding:14px;border:3px solid rgba(255,255,255,.2);box-shadow:0 40px 80px rgba(0,0,0,.45);transform:rotate(4deg);animation:rise 1s .3s both,bob 6s 1.3s ease-in-out infinite}}
+@keyframes bob{50%{transform:rotate(2deg) translateY(-14px)}}
+.screen{background:var(--bg);border-radius:26px;padding:16px;color:var(--ink);display:grid;gap:10px}
+.mini{background:var(--surface);border-radius:16px;padding:12px;box-shadow:0 2px 0 var(--line)}
+.mini .tr{display:flex;align-items:center;gap:8px;font-family:"Bricolage Grotesque";font-weight:800;font-size:19px}
+.mini small{display:block;font-family:"Figtree";font-weight:500;font-size:11px;color:var(--muted)}
+.mini .bar{flex:1;height:5px;border-radius:3px;background:linear-gradient(90deg,var(--coral),var(--sun));transform-origin:0;animation:grow 2.4s 1s infinite alternate}
+.chip{display:inline-block;font-size:11px;font-weight:700;border-radius:99px;padding:1px 9px;margin:6px 4px 0 0;background:var(--bg)}
+.chip.e{background:var(--tealbg);color:var(--teal)}.chip.g{background:rgba(110,100,230,.2)}
+.mini:nth-child(2){opacity:.75;transform:scale(.96)}.mini:nth-child(3){opacity:.5;transform:scale(.92)}
+
+.mq{background:var(--coral);color:#fff;overflow:hidden;white-space:nowrap;padding:13px 0;font-family:"Bricolage Grotesque",sans-serif;font-weight:700;font-size:20px;transform:rotate(-1.2deg);margin:-14px -10px 0;position:relative;z-index:2;display:flex;user-select:none;box-shadow:0 4px 16px rgba(255,90,78,0.25)}
+.mq div{display:flex;flex-shrink:0;width:max-content;animation:mq 58s linear infinite;will-change:transform}
+.mq:hover div{animation-play-state:paused}
+@keyframes mq{0%{transform:translate3d(0,0,0)}100%{transform:translate3d(-50%,0,0)}}
+.mq span{display:inline-flex;align-items:center;margin:0 16px;opacity:.95}.mq span:after{content:"✦";margin-left:20px;color:var(--night);font-size:15px;opacity:.85}
+
+section{padding:84px 0}
+h2{font-size:clamp(32px,6.5vw,52px);margin-bottom:10px}
+.kick{font-family:"DM Mono",monospace;font-size:13px;letter-spacing:.14em;color:var(--coral2);font-weight:500;margin-bottom:10px}
+.lede{color:var(--muted);max-width:52ch;margin-bottom:40px}
+.steps{display:grid;gap:12px}
+.step{background:var(--surface);border-radius:18px;padding:18px 20px;position:relative;box-shadow:0 2px 0 var(--line)}
+.step b{font-family:"Bricolage Grotesque";font-size:42px;line-height:1;color:var(--coral);opacity:.9;display:block;margin-bottom:6px}
+.step h3{font-size:20px;margin-bottom:4px}.step p{color:var(--muted);font-size:15px;line-height:1.5}
+@media(min-width:760px){.steps{grid-template-columns:repeat(3,1fr);gap:18px}.step{border-radius:22px;padding:26px}.step b{font-size:64px}.step h3{font-size:24px}.step p{font-size:16px;line-height:1.6}}
+.feats{display:grid;gap:12px}
+.f{background:var(--surface);border-radius:18px;padding:18px 20px;box-shadow:0 2px 0 var(--line);transition:transform .3s,box-shadow .3s}
+.f:hover{transform:translateY(-6px) rotate(-.6deg);box-shadow:0 18px 36px rgba(31,26,63,.16)}
+.f .ic{display:grid;place-items:center;width:42px;height:42px;border-radius:13px;background:var(--sunbg);margin-bottom:12px}
+.f .ic svg{width:20px;height:20px;transition:transform .3s}
+.f:hover .ic svg{transform:scale(1.15)}
+.f h3{font-size:20px;margin-bottom:6px}.f p{font-size:15px;color:var(--muted);line-height:1.5}
+@media(min-width:640px){.feats{grid-template-columns:1fr 1fr;gap:16px}.f{border-radius:22px;padding:24px}.f .ic{width:52px;height:52px;border-radius:16px;margin-bottom:14px}.f .ic svg{width:24px;height:24px}.f h3{font-size:22px}.f p{font-size:16px;line-height:1.6}}
+@media(min-width:960px){.feats{grid-template-columns:repeat(3,1fr)}}
+.f.soon .ic{background:var(--tealbg)}
+.soonb{font-family:"DM Mono",monospace;font-size:11px;letter-spacing:.1em;background:var(--tealbg);color:var(--teal);border-radius:99px;padding:2px 10px;margin-left:6px;vertical-align:middle}
+
+.race{background:var(--night);color:#fff;position:relative;overflow:hidden}
+.race h2{color:#fff!important}
+.race::before{content:"";position:absolute;inset:0;background-image:url('/transit-doodle-dark.svg');background-repeat:repeat;background-size:500px 500px;opacity:.45;pointer-events:none;z-index:0}
+.race .wrap{position:relative;z-index:1}
+.race .lede{color:#DAD3F2!important}
+.track{margin:18px 0 26px}
+.track .t{display:flex;justify-content:space-between;font-weight:700;margin-bottom:8px;flex-wrap:wrap;gap:6px;color:#fff!important}
+.track .t span:first-child{color:#fff!important;font-weight:700}
+.track .t span:last-child{font-family:"DM Mono",monospace;font-weight:600;color:var(--sun)!important}
+.rail{height:10px;border-radius:5px;background:rgba(255,255,255,.12);position:relative}
+.rail i{position:absolute;top:50%;width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.5);transform:translateY(-50%)}
+.rail b{position:absolute;left:0;top:50%;width:26px;height:26px;margin:-13px 0 0 0;border-radius:50%;display:grid;place-items:center;font-size:15px;background:var(--coral);box-shadow:0 0 0 6px rgba(255,90,78,.25)}
+.slow b{background:var(--sun);box-shadow:0 0 0 6px rgba(255,176,32,.25)}
+.race.go .fast b{animation:run 3s cubic-bezier(.5,0,.3,1) forwards}
+.race.go .slow b{animation:run 5.5s linear forwards}
+@keyframes run{to{left:calc(100% - 26px)}}
+
+.faq details{background:var(--surface);border-radius:18px;margin-bottom:10px;padding:0 20px;box-shadow:0 2px 0 var(--line)}
+.faq summary{list-style:none;cursor:pointer;min-height:56px;display:flex;align-items:center;justify-content:space-between;font-weight:700;gap:10px}
+.faq summary::-webkit-details-marker{display:none}
+.faq summary:after{content:"+";font-size:28px;color:var(--coral);transition:transform .3s}
+.faq details[open] summary:after{transform:rotate(45deg)}
+.faq details p{color:var(--muted);padding-bottom:18px;animation:rise .4s both}
+
+.final{background:linear-gradient(135deg,var(--coral),#B8338A);color:#fff;border-radius:30px;padding:56px 26px;text-align:center;position:relative;overflow:hidden}
+.final h2{margin-bottom:12px}.final p{max-width:40ch;margin:0 auto 26px;opacity:.95}
+.final .btn{background:#fff;color:var(--night)}
+footer{background:var(--night);color:#BDB5DD;padding:30px 0;font-size:15px;position:relative;overflow:hidden}
+footer::before{content:"";position:absolute;inset:0;background-image:url('/transit-doodle-dark.svg');background-repeat:repeat;background-size:500px 500px;opacity:.12;pointer-events:none;z-index:0}
+footer .wrap{position:relative;z-index:1;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
+footer a{margin-left:14px;text-decoration:none}footer a:hover{color:#fff}
+
+.rv{opacity:0;transform:translateY(34px);transition:opacity .7s,transform .7s cubic-bezier(.2,.9,.3,1);transition-delay:calc(var(--d,0)*90ms)}
+.rv.in{opacity:1;transform:none}
+@media(prefers-reduced-motion:reduce){*:not(#mq):not(#mq *){animation:none!important;transition-duration:.01ms!important;transition-delay:0s!important}#mq{animation:mq 75s linear infinite!important}.rv{opacity:1;transform:none}.phone{transform:rotate(3deg)}.race .rail b{left:calc(100% - 26px)}}
+</style>
+</head>
+<body>
+<nav id="nav"><div class="wrap">
+  <a class="logo" href="#top" title="AnyStop Home">
+    <svg viewBox="0 0 248 72" style="height:36px;width:auto;" fill="none" aria-label="AnyStop Logo">
+      <defs>
+        <linearGradient id="pinGrad-nav" x1="0%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%" stop-color="#FF6B5E" />
+          <stop offset="100%" stop-color="#FF4B3E" />
+        </linearGradient>
+        <linearGradient id="roadGrad-nav" x1="0%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%" stop-color="#FFB326" />
+          <stop offset="100%" stop-color="#FF981A" />
+        </linearGradient>
+      </defs>
+      <g transform="translate(4, 2)">
+        <path d="M 23 23 A 28 28 0 0 0 23 51" stroke="#FFA726" stroke-width="3.5" stroke-linecap="round" fill="none" opacity="0.95" />
+        <path d="M 29 28 A 18 18 0 0 0 29 46" stroke="#FF5A4E" stroke-width="3.2" stroke-linecap="round" fill="none" />
+        <path d="M 67 28 A 18 18 0 0 1 67 46" stroke="#FF5A4E" stroke-width="3.2" stroke-linecap="round" fill="none" />
+        <path d="M 73 23 A 28 28 0 0 1 73 51" stroke="#FFA726" stroke-width="3.5" stroke-linecap="round" fill="none" opacity="0.95" />
+        <path d="M 48 64 C 41 53 28 41 28 26 A 20 20 0 1 1 68 26 C 68 41 55 53 48 64 Z" fill="url(#pinGrad-nav)" />
+        <rect x="37" y="14" width="22" height="26" rx="5.5" fill="#1F1A3F" />
+        <rect x="40.5" y="18" width="15" height="7.5" rx="2" fill="#FF5A4E" />
+        <circle cx="41.5" cy="32.5" r="1.6" fill="#FF5A4E" />
+        <circle cx="54.5" cy="32.5" r="1.6" fill="#FF5A4E" />
+        <rect x="45" y="33.5" width="6" height="1.4" rx="0.7" fill="#FF5A4E" />
+        <path d="M 44.5 37 L 51.5 37 L 59 66 L 52.5 66 L 50 56 L 46 56 L 43.5 66 L 37 66 Z" fill="url(#roadGrad-nav)" />
+        <polygon points="48,41 45.2,50.5 50.8,50.5" fill="#1F1A3F" />
+        <polygon points="48,56 46,66 50,66" fill="#1F1A3F" />
+        <line x1="48" y1="44" x2="48" y2="49" stroke="#FFFFFF" stroke-width="1.6" stroke-linecap="round" />
+        <line x1="48" y1="52" x2="48" y2="55" stroke="#FFFFFF" stroke-width="1.6" stroke-linecap="round" />
+        <line x1="48" y1="58" x2="48" y2="64" stroke="#FFFFFF" stroke-width="1.6" stroke-linecap="round" />
+      </g>
+      <g font-family="'Bricolage Grotesque', 'Figtree', sans-serif" font-weight="800" font-size="38" letter-spacing="-0.5">
+        <text x="88" y="51" fill="#FFA726">Any</text>
+        <text x="162" y="51" fill="#FFFFFF">Stop</text>
+      </g>
+    </svg>
+  </a>
+  <div class="links"><a href="#how">How it works</a><a href="#features">Features</a><a href="#faq">FAQ</a><a class="btn" href="/login"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/></svg>Log in</a></div>
+</div></nav>
+
+<header class="hero" id="top"><div class="wrap">
+  <div>
+    <span class="tag">ANY STOP<b>→</b>ANY BUS</span>
+    <h1>Know your bus <em>before</em> it arrives.</h1>
+    <p class="lead">Pick two stops. See which buses run between them, how many stops they make, and what the ticket costs.</p>
+    <div class="cta"><a class="btn b1" href="/buses">Find my bus →</a><a class="btn b2" href="#how">How it works</a></div>
+  </div>
+  <div class="phone" aria-hidden="true"><div class="screen">
+    <div class="mini"><div class="tr"><div>6:00 AM<small>Chandigarh</small></div><div class="bar"></div><div>7:40 AM<small>Ludhiana</small></div></div><span class="chip e">⚡ Express</span><span class="chip g">Government</span><span class="chip">~₹90</span></div>
+    <div class="mini"><div class="tr"><div>7:15 AM<small>Chandigarh</small></div><div class="bar" style="animation-delay:.4s"></div><div>10:05 AM<small>Ludhiana</small></div></div><span class="chip">🐢 All-stop</span><span class="chip">~₹85</span></div>
+    <div class="mini"><div class="tr"><div>9:30 AM<small>Chandigarh</small></div><div class="bar" style="animation-delay:.8s"></div><div>11:10 AM<small>Ludhiana</small></div></div><span class="chip">Private</span></div>
+  </div></div>
+</div></header>
+
+<div class="mq" aria-hidden="true"><div id="mq"></div></div>
+
+<section id="how"><div class="wrap">
+  <p class="kick rv">HOW IT WORKS</p><h2 class="rv">Three taps. No guessing.</h2><p class="lede rv">Skip the “is this the fast bus?” moment at the roadside.</p>
+  <div class="steps">
+    <div class="step rv"><b>1</b><h3>Pick your stops</h3><p>Type where you are and where you’re going. Swap them with one tap.</p></div>
+    <div class="step rv" style="--d:1"><b>2</b><h3>Compare buses</h3><p>Filter by time, Express or All-stop, and government or private.</p></div>
+    <div class="step rv" style="--d:2"><b>3</b><h3>Board with confidence</h3><p>Open the full stop list, check the fare, and book online where it’s possible.</p></div>
+  </div>
+</div></section>
+
+<section class="race" id="race"><div class="wrap">
+  <p class="kick rv" style="color:var(--sun)">EXPRESS OR ALL-STOP?</p><h2 class="rv" style="color:#fff">Same route. Very different day.</h2>
+  <p class="lede rv" style="color:#DAD3F2">Two buses leave together. One makes 3 stops, the other makes 9. AnyStop tells you which is which before you board.</p>
+  <div class="track fast"><div class="t" style="color:#fff"><span style="color:#fff">⚡ Express · 3 stops</span><span style="color:var(--sun)">1h 30m</span></div><div class="rail"><i style="left:30%"></i><i style="left:60%"></i><b>🚌</b></div></div>
+  <div class="track slow"><div class="t" style="color:#fff"><span style="color:#fff">🐢 All-stop · 9 stops</span><span style="color:var(--sun)">2h 45m</span></div><div class="rail"><i style="left:12%"></i><i style="left:24%"></i><i style="left:36%"></i><i style="left:48%"></i><i style="left:60%"></i><i style="left:72%"></i><i style="left:84%"></i><b>🚌</b></div></div>
+</div></section>
+
+<section id="features"><div class="wrap">
+  <p class="kick rv">FEATURES</p><h2 class="rv">Built for the roadside, not the terminal.</h2><p class="lede rv">Made for buses that you pay for on board and can’t find on booking apps.</p>
+  <div class="feats">
+    <div class="f rv"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="var(--coral)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"/><circle cx="12" cy="10" r="3"/></svg></div><h3>Any stop to any stop</h3><p>Not just big bus stands. Search the stops, flyovers and chowks you really use.</p></div>
+    <div class="f rv" style="--d:1"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="var(--sunink)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 14a1 1 0 0 1-.78-1.63l9.9-10.2a.5.5 0 0 1 .86.46l-1.92 6.02A1 1 0 0 0 13 10h7a1 1 0 0 1 .78 1.63l-9.9 10.2a.5.5 0 0 1-.86-.46l1.92-6.02A1 1 0 0 0 11 14z"/></svg></div><h3>Express vs All-stop</h3><p>A clear badge and the number of stops between you and your destination.</p></div>
+    <div class="f rv" style="--d:2"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="var(--coral2)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" x2="21" y1="22" y2="22"/><line x1="6" x2="6" y1="18" y2="11"/><line x1="10" x2="10" y1="18" y2="11"/><line x1="14" x2="14" y1="18" y2="11"/><line x1="18" x2="18" y1="18" y2="11"/><polygon points="12 2 20 7 4 7"/></svg></div><h3>Government and private</h3><p>See who runs each bus and filter by operator type.</p></div>
+    <div class="f rv"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="var(--sunink)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="12" x="2" y="6" rx="2"/><circle cx="12" cy="12" r="2"/><path d="M6 12h.01M18 12h.01"/></svg></div><h3>Fare estimates</h3><p>Know how much cash to keep ready, or book online when the bus allows it.</p></div>
+    <div class="f soon rv" style="--d:1"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="var(--teal)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="2" x2="22" y1="2" y2="22"/><path d="M12 20h.01"/><path d="M8.5 16.429a5 5 0 0 1 7 0"/><path d="M5 12.859a10 10 0 0 1 5.17-2.69"/><path d="M19 12.859a10 10 0 0 0-2.007-1.523"/><path d="M2 8.82a15 15 0 0 1 4.177-2.643"/><path d="M22 8.82a15 15 0 0 0-11.288-3.764"/></svg></div><h3>Works offline <span class="soonb">SOON</span></h3><p>Save timetables on your phone for patchy signal on the highway.</p></div>
+    <div class="f soon rv" style="--d:2"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="var(--teal)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div><h3>Live spotted updates <span class="soonb">SOON</span></h3><p>Riders report “bus just passed” and how crowded the stop is.</p></div>
+  </div>
+</div></section>
+
+<section class="faq" id="faq"><div class="wrap" style="max-width:760px">
+  <p class="kick rv">FAQ</p><h2 class="rv">Quick answers</h2><br>
+  <details class="rv"><summary>Is the timetable live?</summary><p>Not yet. Today it shows planned timings. Live rider updates are on the roadmap.</p></details>
+  <details class="rv"><summary>Which cities and routes are covered?</summary><p>We’re starting with the Chandigarh, Ludhiana, Jalandhar and Ambala corridor and adding more stops over time.</p></details>
+  <details class="rv"><summary>Do I need an account?</summary><p>No. You can search as a guest. An account will let you save favourite routes.</p></details>
+  <details class="rv"><summary>Can I book tickets here?</summary><p>For buses that allow online booking, we link you to the booking site. Most government buses are paid on board.</p></details>
+</div></section>
+
+<section style="padding-top:0"><div class="wrap"><div class="final rv">
+  <h2>Your next bus is already on the road.</h2><p>Check it in ten seconds, then go.</p><a class="btn" href="/buses">Find my bus →</a>
+</div></div></section>
+
+<footer><div class="wrap"><span>© AnyStop · Timetable shown is sample data for design preview.</span><span><a href="/buses">Bus finder</a><a href="/login">Log in</a></span></div></footer>
+
+<script>
+const names=["Chandigarh","Kharar","Gharuan","Morinda","Samrala","Khamano","Ludhiana","Phillaur","Jalandhar","Zirakpur","Ambala Cantt","Cheema Chowk"];
+const row=names.map(n=>`<span>${n}</span>`).join("");document.getElementById("mq").innerHTML=row+row+row+row;
+const nav=document.getElementById("nav");const onS=()=>nav.classList.toggle("sc",scrollY>20);addEventListener("scroll",onS,{passive:true});onS();
+const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add("in");if(e.target.id==="race")e.target.classList.add("go");io.unobserve(e.target)}}),{threshold:.2});
+document.querySelectorAll(".rv,#race").forEach(el=>io.observe(el));
+</script>
+</body>
+</html>
