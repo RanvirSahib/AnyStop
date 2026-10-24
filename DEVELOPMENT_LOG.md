@@ -1513,6 +1513,21 @@ This document tracks all features, user requests, architectural decisions, and i
 
 ---
 
+### Step 80: Vercel SPA Rewrites & PWA Service Worker Cache Busting
+- **User Request**: *"https://anystop-two.vercel.app/ why it is not updating on vercel"*
+- **Root Cause Analysis**:
+  1. **Service Worker Cache-First Lock**: `public/sw.js` previously used a strict Cache-First strategy under cache key `anystop-v1`. Any visitor who previously opened the site had the old `index.html` permanently cached locally in their browser, ignoring fresh Vercel deployments on normal reload.
+  2. **Missing `vercel.json` SPA Rewrites**: Client-side React Router paths (`/buses`, `/login`) returned HTTP 404 on Vercel because Vercel was looking for static files on the server instead of redirecting all routes to `/index.html`.
+- **Implementation**:
+  - Created [`vercel.json`](file:///c:/AnyStop/vercel.json) with SPA rewrite rule `/(.*) -> /index.html`.
+  - Upgraded [`public/sw.js`](file:///c:/AnyStop/public/sw.js) to `anystop-v2` and switched navigation requests to **Network-First**, falling back to offline cache only when connectivity drops.
+  - Added proactive `reg.update()` in [`src/main.tsx`](file:///c:/AnyStop/src/main.tsx) to check for service worker updates immediately on page load.
+- **Verification**:
+  - `npm run build` compiled cleanly with exit code 0.
+  - Pushed to `https://github.com/RanvirSahib/AnyStop.git` to trigger fresh Vercel build with rewrites.
+
+---
+
 ## 🗂️ Key Files Reference
 | File | Role |
 | :--- | :--- |
