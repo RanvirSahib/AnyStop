@@ -19,13 +19,14 @@
   color-scheme: light;
   font: 400 17px/1.5 "Figtree", system-ui, sans-serif;
   color: var(--ink);
-  background: radial-gradient(700px 420px at 15% 0%, rgba(255,90,78,.38), transparent 60%),
-              radial-gradient(600px 400px at 100% 100%, rgba(255,176,32,.25), transparent 60%),
-              linear-gradient(160deg, #1F1A3F, #3B1D63);
+  background: radial-gradient(700px 420px at 15% 0%, rgba(255,90,78,.18), transparent 60%),
+              radial-gradient(600px 400px at 100% 100%, rgba(255,176,32,.22), transparent 60%),
+              linear-gradient(160deg, #FFF5EC, #FDE6D2);
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
   min-height: 100vh;
   position: relative;
+  transition: background 0.3s ease, color 0.3s ease;
 }
 
 /* Hardware-accelerated transit doodle layer */
@@ -34,27 +35,37 @@
   position: fixed;
   inset: 0;
   z-index: 1;
-  background-image: url('/transit-doodle-dark.svg');
+  background-image: url('/transit-doodle-light.svg');
   background-repeat: repeat;
   background-size: 500px 500px;
-  opacity: 0.65;
+  opacity: 0.55;
   pointer-events: none;
   transform: translateZ(0);
+  transition: opacity 0.3s ease;
 }
 
-@media (prefers-color-scheme: dark) {
-  .stopsense-login:not([data-theme="light"]) {
-    --paper: #241E45;
-    --ink: #F6F1FF;
-    --muted: #A9A2C8;
-    --line: #3C3566;
-    --field: #1A1535;
-    --teal: #4DE0CF;
-    color-scheme: dark;
-  }
+/* Light Theme explicit */
+[data-theme="light"] .stopsense-login {
+  --paper: #FFFFFF;
+  --ink: #231F3D;
+  --muted: #6B6585;
+  --line: #E4D3C3;
+  --field: #FFF8F1;
+  --teal: #0B8F82;
+  color-scheme: light;
+  background: radial-gradient(700px 420px at 15% 0%, rgba(255,90,78,.18), transparent 60%),
+              radial-gradient(600px 400px at 100% 100%, rgba(255,176,32,.22), transparent 60%),
+              linear-gradient(160deg, #FFF5EC, #FDE6D2);
+  color: var(--ink);
 }
 
-.stopsense-login[data-theme="dark"] {
+[data-theme="light"] .stopsense-login::before {
+  background-image: url('/transit-doodle-light.svg');
+  opacity: 0.55;
+}
+
+/* Dark Theme explicit */
+[data-theme="dark"] .stopsense-login {
   --paper: #241E45;
   --ink: #F6F1FF;
   --muted: #A9A2C8;
@@ -62,6 +73,36 @@
   --field: #1A1535;
   --teal: #4DE0CF;
   color-scheme: dark;
+  background: radial-gradient(700px 420px at 15% 0%, rgba(255,90,78,.38), transparent 60%),
+              radial-gradient(600px 400px at 100% 100%, rgba(255,176,32,.25), transparent 60%),
+              linear-gradient(160deg, #1F1A3F, #3B1D63);
+  color: var(--ink);
+}
+
+[data-theme="dark"] .stopsense-login::before {
+  background-image: url('/transit-doodle-dark.svg');
+  opacity: 0.65;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .stopsense-login {
+    --paper: #241E45;
+    --ink: #F6F1FF;
+    --muted: #A9A2C8;
+    --line: #3C3566;
+    --field: #1A1535;
+    --teal: #4DE0CF;
+    color-scheme: dark;
+    background: radial-gradient(700px 420px at 15% 0%, rgba(255,90,78,.38), transparent 60%),
+                radial-gradient(600px 400px at 100% 100%, rgba(255,176,32,.25), transparent 60%),
+                linear-gradient(160deg, #1F1A3F, #3B1D63);
+    color: var(--ink);
+  }
+
+  :root:not([data-theme="light"]) .stopsense-login::before {
+    background-image: url('/transit-doodle-dark.svg');
+    opacity: 0.65;
+  }
 }
 
 .stopsense-login button,
@@ -76,17 +117,16 @@
 }
 
 .stopsense-login .stage {
-  height: 100vh;
-  max-height: 100vh;
+  min-height: 100vh;
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 8px 16px 74px;
+  padding: 12px 16px 84px;
   position: relative;
   z-index: 2;
-  overflow: hidden;
+  overflow-x: hidden;
 }
 
 .stopsense-login .topbar {
@@ -96,9 +136,16 @@
   align-items: center;
   justify-content: space-between;
   width: 100%;
-  max-width: 390px;
-  margin: 0 auto 24px;
+  max-width: 410px;
+  margin: 0 auto 18px;
   gap: 12px;
+  padding: 8px 14px;
+  border-radius: 99px;
+  background: rgba(31, 26, 63, 0.96);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 4px 20px rgba(15, 12, 35, 0.25);
 }
 
 .stopsense-login .logo {
@@ -136,22 +183,90 @@
   }
 }
 
+.stopsense-login .topbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.stopsense-login .login-theme-toggle-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 32px;
+  padding: 0 10px;
+  border-radius: 99px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.25, 1, 0.5, 1);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  background: rgba(255, 255, 255, 0.1);
+  color: #DAD3F2;
+  backdrop-filter: blur(8px);
+}
+
+.stopsense-login .login-theme-toggle-btn:hover {
+  background: rgba(255, 255, 255, 0.18);
+  color: #fff;
+  border-color: rgba(255, 255, 255, 0.4);
+}
+
+.stopsense-login .login-theme-toggle-btn .theme-toggle-label {
+  display: none;
+}
+
+@media (min-width: 640px) {
+  .stopsense-login .login-theme-toggle-btn .theme-toggle-label {
+    display: inline-block;
+  }
+}
+
+[data-theme="light"] .stopsense-login .login-theme-toggle-btn {
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  background: rgba(255, 255, 255, 0.12);
+  color: #FFFFFF;
+}
+
+[data-theme="light"] .stopsense-login .login-theme-toggle-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.45);
+  color: #FFFFFF;
+}
+
 .stopsense-login .back {
   color: #DAD3F2;
   text-decoration: none;
-  font-weight: 500;
+  font-weight: 600;
   display: inline-flex;
   align-items: center;
   background: none;
   border: none;
   padding: 0;
-  font-size: 14px;
+  font-size: 13px;
   cursor: pointer;
   white-space: nowrap;
+  transition: color 0.2s ease;
 }
 
 .stopsense-login .back:hover {
   color: #fff;
+}
+
+[data-theme="light"] .stopsense-login .back {
+  color: #DAD3F2;
+}
+
+[data-theme="light"] .stopsense-login .back:hover {
+  color: #FFFFFF;
+}
+
+[data-theme="light"] .stopsense-login .ticket-stack .ticket {
+  filter: drop-shadow(0 18px 30px rgba(35, 31, 61, 0.12));
+}
+
+[data-theme="light"] .stopsense-login .ticket.ticket-front {
+  filter: drop-shadow(0 20px 32px rgba(35, 31, 61, 0.16));
 }
 
 .stopsense-login .ticket-stack {
@@ -186,7 +301,7 @@
   background: var(--paper);
   border-radius: 20px;
   position: relative;
-  --cut: 84px;
+  --cut: 104px;
   -webkit-mask: radial-gradient(circle 12px at 0 calc(100% - var(--cut)), #0000 97%, #000) left/51% 100% no-repeat,
                 radial-gradient(circle 12px at 100% calc(100% - var(--cut)), #0000 97%, #000) right/51% 100% no-repeat;
   mask: radial-gradient(circle 12px at 0 calc(100% - var(--cut)), #0000 97%, #000) left/51% 100% no-repeat,
@@ -588,6 +703,38 @@
   margin-top: 6px;
 }
 
+.stopsense-login .form.su .fld {
+  margin-top: 4px;
+}
+
+.stopsense-login .form.su h1 {
+  font-size: 20px;
+  margin: 2px 0 1px;
+}
+
+.stopsense-login .form.su .sub {
+  font-size: 12px;
+  margin-bottom: 5px;
+}
+
+.stopsense-login .form.su .seg {
+  margin-bottom: 5px;
+}
+
+.stopsense-login .form.su .inp input {
+  height: 35px;
+  font-size: 13.5px;
+}
+
+.stopsense-login .form.su .inp button {
+  min-height: 35px;
+}
+
+.stopsense-login .form.su .barcode {
+  height: 14px;
+  margin-top: 5px;
+}
+
 .stopsense-login .fld span {
   font-family: "DM Mono", monospace;
   font-size: 10px;
@@ -692,11 +839,11 @@
 .stopsense-login .stub {
   height: var(--cut);
   border-top: 2.5px dashed var(--line);
-  padding: 8px 18px;
+  padding: 10px 18px;
   display: flex;
   flex-direction: column;
   justify-content: center;
-  gap: 4px;
+  gap: 7px;
   transform-origin: 0 0;
   transition: transform .9s cubic-bezier(.5,0,.8,.4), opacity .9s;
 }
@@ -704,11 +851,11 @@
 .stopsense-login .go {
   border: 0;
   border-radius: 12px;
-  min-height: 42px;
+  min-height: 40px;
   background: var(--coral);
   color: #fff;
   font-weight: 700;
-  font-size: 16px;
+  font-size: 15px;
   cursor: pointer;
   position: relative;
   overflow: hidden;
@@ -737,21 +884,37 @@
   40%, 100% { transform: translateX(120%); }
 }
 
-.stopsense-login .guest {
-  background: none;
-  border: 0;
-  color: var(--muted);
+.stopsense-login .google-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 38px;
+  border-radius: 12px;
+  border: 1.5px solid var(--line);
+  background: var(--field);
+  color: var(--ink);
+  font-size: 13.5px;
+  font-weight: 700;
   cursor: pointer;
-  min-height: 28px;
-  font-size: 13px;
-  font-weight: 500;
-  text-decoration: underline;
-  text-underline-offset: 3px;
+  transition: all 0.2s ease;
   width: 100%;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
 }
 
-.stopsense-login .guest:hover {
-  color: var(--ink);
+.stopsense-login .google-btn:hover {
+  background: var(--paper);
+  border-color: var(--coral);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(255, 90, 78, 0.12);
+}
+
+.stopsense-login .google-btn:active {
+  transform: scale(0.98);
+}
+
+.stopsense-login .google-icon {
+  flex-shrink: 0;
 }
 
 .stopsense-login .ticket.tear .stub,
@@ -917,3 +1080,62 @@
     stroke-dashoffset: 0;
   }
 }
+
+/* Server error banner */
+.stopsense-login .login-server-error-banner {
+  background: rgba(232, 67, 58, 0.12);
+  border: 1px solid rgba(232, 67, 58, 0.35);
+  color: #c92c24;
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-size: 13px;
+  line-height: 1.4;
+  margin: 10px 0 6px;
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  animation: ss-error-pop 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+[data-theme="dark"] .stopsense-login .login-server-error-banner {
+  background: rgba(255, 90, 78, 0.16);
+  border-color: rgba(255, 90, 78, 0.4);
+  color: #ff9b93;
+}
+
+@keyframes ss-error-pop {
+  0% { opacity: 0; transform: translateY(-4px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+/* Supabase connection status pill */
+.stopsense-login .supabase-status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  border-radius: 9999px;
+  font-size: 11.5px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  border: 1px solid var(--line);
+  background: var(--paper);
+  color: var(--muted);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+}
+
+.stopsense-login .supabase-status-pill .status-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+}
+
+.stopsense-login .supabase-status-pill.connected .status-dot {
+  background-color: #10B981;
+  box-shadow: 0 0 6px rgba(16, 185, 129, 0.6);
+}
+
+.stopsense-login .supabase-status-pill.demo .status-dot {
+  background-color: #F59E0B;
+}
+

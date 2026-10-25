@@ -132,14 +132,20 @@
   right: 0;
   z-index: 20;
   padding-top: env(safe-area-inset-top, 0px);
-  transition: background .3s, box-shadow .3s;
+  background: rgba(31, 26, 63, 0.96);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 4px 20px rgba(15, 12, 35, 0.25);
+  transition: background .3s, box-shadow .3s, border-color .3s;
 }
 
 .stopsense-landing nav.sc {
-  background: rgba(31,26,63,.95);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  box-shadow: 0 6px 24px rgba(0,0,0,.25);
+  background: rgba(24, 20, 50, 0.98);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow: 0 6px 28px rgba(0, 0, 0, 0.35);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
   transform: translateZ(0);
 }
 
@@ -234,12 +240,92 @@
   animation: ss-shine 3.6s 1.5s infinite;
 }
 
+.stopsense-landing .landing-theme-toggle-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  min-height: 40px;
+  padding: 0 10px;
+  border-radius: 99px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.25, 1, 0.5, 1);
+  border: 1.5px solid rgba(255, 255, 255, 0.22);
+  background: rgba(255, 255, 255, 0.1);
+  color: #DAD3F2;
+  backdrop-filter: blur(8px);
+}
+
+@media (min-width: 640px) {
+  .stopsense-landing .landing-theme-toggle-btn {
+    padding: 0 14px;
+  }
+}
+
+.stopsense-landing .landing-theme-toggle-btn:hover {
+  transform: translateY(-1px);
+  background: rgba(255, 255, 255, 0.18);
+  color: #fff;
+  border-color: rgba(255, 255, 255, 0.38);
+}
+
+.stopsense-landing .landing-theme-toggle-btn .theme-mode-label {
+  display: none;
+}
+
+@media (min-width: 640px) {
+  .stopsense-landing .landing-theme-toggle-btn .theme-mode-label {
+    display: inline-block;
+    font-size: 12px;
+  }
+}
+
+[data-theme="light"] .stopsense-landing .landing-theme-toggle-btn {
+  border: 1.5px solid rgba(255, 255, 255, 0.22);
+  background: rgba(255, 255, 255, 0.12);
+  color: #FFFFFF;
+  backdrop-filter: blur(8px);
+}
+
+[data-theme="light"] .stopsense-landing .landing-theme-toggle-btn:hover {
+  background: rgba(255, 255, 255, 0.22);
+  border-color: rgba(255, 255, 255, 0.45);
+  color: #FFFFFF;
+}
+
+[data-theme="light"] .stopsense-landing nav {
+  background: rgba(31, 26, 63, 0.96);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 4px 20px rgba(15, 12, 35, 0.25);
+}
+
+[data-theme="light"] .stopsense-landing nav.sc {
+  background: rgba(24, 20, 50, 0.98);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow: 0 6px 28px rgba(0, 0, 0, 0.35);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+[data-theme="light"] .stopsense-landing .links a {
+  color: #DAD3F2;
+}
+
+[data-theme="light"] .stopsense-landing .links a:hover {
+  color: #FFFFFF;
+}
+
 .stopsense-landing .hero {
   background: radial-gradient(900px 500px at 90% 90%, rgba(255,90,78,.5), transparent 60%), radial-gradient(600px 400px at 0 0, rgba(255,176,32,.2), transparent 60%), linear-gradient(160deg, #1F1A3F, #3B1D63);
   color: #fff;
   padding: 130px 0 90px;
   position: relative;
   overflow: hidden;
+  transition: background 0.3s ease, color 0.3s ease;
 }
 
 .stopsense-landing .hero::before {
@@ -252,6 +338,50 @@
   opacity: 0.55;
   pointer-events: none;
   z-index: 0;
+  transition: opacity 0.3s ease;
+}
+
+[data-theme="light"] .stopsense-landing .hero {
+  background: radial-gradient(900px 500px at 90% 90%, rgba(255, 90, 78, 0.16), transparent 60%),
+              radial-gradient(600px 400px at 0 0, rgba(255, 176, 32, 0.2), transparent 60%),
+              linear-gradient(160deg, #FFF5EC, #FDE6D2);
+  color: #231F3D;
+}
+
+[data-theme="light"] .stopsense-landing .hero::before {
+  background-image: url('/transit-doodle-light.svg');
+  opacity: 0.55;
+}
+
+[data-theme="light"] .stopsense-landing .hero h1 {
+  color: #231F3D;
+}
+
+[data-theme="light"] .stopsense-landing .hero p.lead {
+  color: #554F70;
+}
+
+[data-theme="light"] .stopsense-landing .tag {
+  background: linear-gradient(#FFF0E2, #FFF0E2) padding-box, linear-gradient(90deg, var(--coral), var(--sun), var(--coral)) border-box;
+  color: #231F3D;
+  box-shadow: 0 8px 24px rgba(255, 90, 78, 0.16);
+}
+
+[data-theme="light"] .stopsense-landing .b2 {
+  border: 2px solid var(--line);
+  color: #231F3D;
+  background: var(--surface);
+  box-shadow: 0 4px 14px rgba(35, 31, 61, 0.06);
+}
+
+[data-theme="light"] .stopsense-landing .b2:hover {
+  background: #FCE8D5;
+}
+
+[data-theme="light"] .stopsense-landing .phone {
+  background: #FFFFFF;
+  border: 3px solid #EBDDD0;
+  box-shadow: 0 30px 60px rgba(35, 31, 61, 0.12);
 }
 
 .stopsense-landing .hero .wrap {

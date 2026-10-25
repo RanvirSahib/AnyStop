@@ -5,6 +5,7 @@ import { ThemeProvider } from './context/ThemeContext';
 import { LandingPage } from './pages/LandingPage';
 import { LoginPage } from './pages/LoginPage';
 import { BusFinderPage } from './pages/BusFinderPage';
+import { ProfilePage } from './pages/ProfilePage';
 
 const AnimatedRoutes: React.FC = () => {
   const location = useLocation();
@@ -17,19 +18,21 @@ const AnimatedRoutes: React.FC = () => {
       setIsNavigating(true);
       setTransitionStage('fade-out');
 
+      let enterTimer: ReturnType<typeof setTimeout>;
       const exitTimer = setTimeout(() => {
         setDisplayLocation(location);
         setTransitionStage('fade-in');
         window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
 
-        const enterTimer = setTimeout(() => {
+        enterTimer = setTimeout(() => {
           setIsNavigating(false);
-        }, 320);
+        }, 200);
+      }, 100);
 
-        return () => clearTimeout(enterTimer);
-      }, 160);
-
-      return () => clearTimeout(exitTimer);
+      return () => {
+        clearTimeout(exitTimer);
+        clearTimeout(enterTimer);
+      };
     }
   }, [location, displayLocation.pathname]);
 
@@ -48,6 +51,10 @@ const AnimatedRoutes: React.FC = () => {
           {/* 3. Punjab Bus Finder Page */}
           <Route path="/buses" element={<BusFinderPage />} />
           <Route path="/finder" element={<Navigate to="/buses" replace />} />
+
+          {/* 4. Passenger Profile Page */}
+          <Route path="/profile" element={<ProfilePage />} />
+          <Route path="/account" element={<Navigate to="/profile" replace />} />
 
           {/* Wildcard / Fallback */}
           <Route path="*" element={<Navigate to="/" replace />} />

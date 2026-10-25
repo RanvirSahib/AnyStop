@@ -1,4 +1,4 @@
-import { Radio, PhoneCall, Sun, Moon, Ticket, LogOut } from 'lucide-react';
+import { Radio, PhoneCall, Sun, Moon } from 'lucide-react';
 import { AnyStopLogo } from './AnyStopLogo';
 
 interface HeaderProps {
@@ -7,9 +7,10 @@ interface HeaderProps {
   onOpenInquiries: () => void;
   onOpenSpottedFeed: () => void;
   spottedCount: number;
-  currentUser?: { name: string; isGuest?: boolean } | null;
+  currentUser?: { name: string; isGuest?: boolean; avatarUrl?: string } | null;
   onNavigateLanding?: () => void;
   onNavigateLogin?: () => void;
+  onNavigateProfile?: () => void;
   onLogout?: () => void;
 }
 
@@ -22,7 +23,7 @@ export const Header: React.FC<HeaderProps> = ({
   currentUser,
   onNavigateLanding,
   onNavigateLogin,
-  onLogout
+  onNavigateProfile
 }) => {
   return (
     <header className="hero">
@@ -80,31 +81,28 @@ export const Header: React.FC<HeaderProps> = ({
               )}
             </button>
 
-            {/* Boarding Pass / Account Button */}
-            {onNavigateLogin && (
+            {/* User Profile Button */}
+            {(onNavigateProfile || onNavigateLogin) && (
               <button
-                onClick={onNavigateLogin}
+                onClick={onNavigateProfile || onNavigateLogin}
                 className="tbtn shrink-0"
-                title="Boarding Pass / Account"
-                aria-label="Boarding Pass / Account"
+                title="View Passenger Profile & Pass"
+                aria-label="View Passenger Profile"
               >
-                <Ticket style={{ width: '14px', height: '14px', color: 'var(--sun)' }} />
-                <span className="text-[11.5px] sm:text-sm font-semibold max-w-[80px] truncate">
-                  {currentUser ? currentUser.name : 'Pass'}
+                {currentUser?.avatarUrl ? (
+                  <img
+                    src={currentUser.avatarUrl}
+                    alt={currentUser.name}
+                    className="w-4 h-4 rounded-full object-cover shrink-0 ring-1 ring-white/60"
+                  />
+                ) : (
+                  <div className="w-4 h-4 rounded-full bg-[var(--coral)] text-white text-[10px] font-bold flex items-center justify-center shrink-0">
+                    {currentUser?.name ? currentUser.name.charAt(0).toUpperCase() : 'U'}
+                  </div>
+                )}
+                <span className="text-[11.5px] sm:text-sm font-semibold max-w-[80px] sm:max-w-[100px] truncate">
+                  {currentUser?.name || 'Profile'}
                 </span>
-              </button>
-            )}
-
-            {/* Logout button if authenticated */}
-            {currentUser && onLogout && (
-              <button
-                onClick={onLogout}
-                className="tbtn shrink-0 text-red-300 hover:text-red-200"
-                title="Log out and return to landing"
-                aria-label="Log out"
-              >
-                <LogOut style={{ width: '13.5px', height: '13.5px' }} />
-                <span className="hidden lg:inline text-xs font-semibold">Exit</span>
               </button>
             )}
 

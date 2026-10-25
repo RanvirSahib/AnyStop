@@ -1,718 +1,6886 @@
 import { BusService, InquiryContact, SpottedReport } from '../types/transit';
 
 /**
- * All-Punjab transit routes across all 23 districts in Majha, Doaba, and Malwa regions
+ * All-Punjab transit routes across all 23 districts in Majha, Doaba, and Malwa regions,
+ * and key interstate corridors running through or originating from Punjab.
  * Format: [Stop Name, minutes offset from route start]
  */
 export const ROUTES: Record<string, [string, number][]> = {
-  // 1. NH-5 Express Corridor (Chandigarh ⇄ Ludhiana via flyovers)
-  E: [
-    ["Chandigarh ISBT 43", 0],
-    ["Kharar", 20],
-    ["Gharuan (CU Gate 2)", 32],
-    ["Morinda", 48],
-    ["Samrala", 68],
-    ["Sherpur Chowk", 86],
-    ["Ludhiana Bus Stand", 98]
+  "E": [
+    [
+      "Chandigarh ISBT 43",
+      0
+    ],
+    [
+      "Kharar",
+      20
+    ],
+    [
+      "Gharuan (CU Gate 2)",
+      32
+    ],
+    [
+      "Morinda",
+      48
+    ],
+    [
+      "Samrala",
+      68
+    ],
+    [
+      "Sherpur Chowk",
+      86
+    ],
+    [
+      "Ludhiana Bus Stand",
+      98
+    ]
   ],
-
-  // 2. NH-5 Local / All-Stop Corridor (Chandigarh ⇄ Ludhiana via interior bypasses)
-  L: [
-    ["Chandigarh ISBT 43", 0],
-    ["Kharar", 25],
-    ["Gharuan (CU Gate 2)", 40],
-    ["Morinda", 60],
-    ["Khamano", 85],
-    ["Samrala", 105],
-    ["Kohara", 135],
-    ["Cheema Chowk", 155],
-    ["Ludhiana Bus Stand", 170]
+  "L": [
+    [
+      "Chandigarh ISBT 43",
+      0
+    ],
+    [
+      "Kharar",
+      25
+    ],
+    [
+      "Gharuan (CU Gate 2)",
+      40
+    ],
+    [
+      "Morinda",
+      60
+    ],
+    [
+      "Khamano",
+      85
+    ],
+    [
+      "Samrala",
+      105
+    ],
+    [
+      "Kohara",
+      135
+    ],
+    [
+      "Cheema Chowk",
+      155
+    ],
+    [
+      "Ludhiana Bus Stand",
+      170
+    ]
   ],
-
-  // 3. Chandigarh to Jalandhar via NH-5 & NH-44
-  J: [
-    ["Chandigarh ISBT 43", 0],
-    ["Kharar", 20],
-    ["Gharuan (CU Gate 2)", 32],
-    ["Morinda", 48],
-    ["Samrala", 68],
-    ["Ludhiana Bus Stand", 100],
-    ["Phillaur", 130],
-    ["Goraya Bus Stand", 140],
-    ["Phagwara", 150],
-    ["Jalandhar Central Bus Stand", 180]
+  "J": [
+    [
+      "Chandigarh ISBT 43",
+      0
+    ],
+    [
+      "Kharar",
+      20
+    ],
+    [
+      "Gharuan (CU Gate 2)",
+      32
+    ],
+    [
+      "Morinda",
+      48
+    ],
+    [
+      "Samrala",
+      68
+    ],
+    [
+      "Ludhiana Bus Stand",
+      100
+    ],
+    [
+      "Phillaur",
+      130
+    ],
+    [
+      "Goraya Bus Stand",
+      140
+    ],
+    [
+      "Phagwara",
+      150
+    ],
+    [
+      "Jalandhar Central Bus Stand",
+      180
+    ]
   ],
-
-  // 4. North-South Punjab Spine (Chandigarh ⇄ Ludhiana ⇄ Jalandhar ⇄ Amritsar)
-  CHD_ASR: [
-    ["Chandigarh ISBT 43", 0],
-    ["Kharar", 20],
-    ["Gharuan (CU Gate 2)", 32],
-    ["Morinda", 48],
-    ["Samrala", 68],
-    ["Ludhiana Bus Stand", 100],
-    ["Phillaur", 130],
-    ["Goraya Bus Stand", 140],
-    ["Phagwara", 150],
-    ["Jalandhar Central Bus Stand", 175],
-    ["Kartarpur", 195],
-    ["Beas", 215],
-    ["Rayya Bus Stand", 225],
-    ["Jandiala Guru", 235],
-    ["Amritsar ISBT", 255]
+  "CHD_ASR": [
+    [
+      "Chandigarh ISBT 43",
+      0
+    ],
+    [
+      "Kharar",
+      20
+    ],
+    [
+      "Gharuan (CU Gate 2)",
+      32
+    ],
+    [
+      "Morinda",
+      48
+    ],
+    [
+      "Samrala",
+      68
+    ],
+    [
+      "Ludhiana Bus Stand",
+      100
+    ],
+    [
+      "Phillaur",
+      130
+    ],
+    [
+      "Goraya Bus Stand",
+      140
+    ],
+    [
+      "Phagwara",
+      150
+    ],
+    [
+      "Jalandhar Central Bus Stand",
+      175
+    ],
+    [
+      "Kartarpur",
+      195
+    ],
+    [
+      "Beas",
+      215
+    ],
+    [
+      "Rayya Bus Stand",
+      225
+    ],
+    [
+      "Jandiala Guru",
+      235
+    ],
+    [
+      "Amritsar ISBT",
+      255
+    ]
   ],
-
-  // 5. Grand Trunk Road Corridor (Amritsar ⇄ Jalandhar ⇄ Ludhiana ⇄ Ambala)
-  GT_CORRIDOR: [
-    ["Amritsar ISBT", 0],
-    ["Jandiala Guru", 20],
-    ["Rayya Bus Stand", 30],
-    ["Beas", 42],
-    ["Kartarpur", 60],
-    ["Jalandhar Central Bus Stand", 80],
-    ["Phagwara", 100],
-    ["Goraya Bus Stand", 112],
-    ["Phillaur", 125],
-    ["Ludhiana Bus Stand", 155],
-    ["Sahnewal", 175],
-    ["Doraha Bus Stand", 185],
-    ["Khanna Bus Stand", 200],
-    ["Mandi Gobindgarh Bus Stand", 212],
-    ["Sirhind (Fatehgarh Sahib)", 225],
-    ["Rajpura Bypass", 250],
-    ["Ambala Cantt", 280]
+  "GT_CORRIDOR": [
+    [
+      "Amritsar ISBT",
+      0
+    ],
+    [
+      "Jandiala Guru",
+      20
+    ],
+    [
+      "Rayya Bus Stand",
+      30
+    ],
+    [
+      "Beas",
+      42
+    ],
+    [
+      "Kartarpur",
+      60
+    ],
+    [
+      "Jalandhar Central Bus Stand",
+      80
+    ],
+    [
+      "Phagwara",
+      100
+    ],
+    [
+      "Goraya Bus Stand",
+      112
+    ],
+    [
+      "Phillaur",
+      125
+    ],
+    [
+      "Ludhiana Bus Stand",
+      155
+    ],
+    [
+      "Sahnewal",
+      175
+    ],
+    [
+      "Doraha Bus Stand",
+      185
+    ],
+    [
+      "Khanna Bus Stand",
+      200
+    ],
+    [
+      "Mandi Gobindgarh Bus Stand",
+      212
+    ],
+    [
+      "Sirhind (Fatehgarh Sahib)",
+      225
+    ],
+    [
+      "Rajpura Bypass",
+      250
+    ],
+    [
+      "Ambala Cantt",
+      280
+    ]
   ],
-
-  // 6. Malwa South Corridor - NH-7 (Chandigarh ⇄ Patiala ⇄ Sangrur ⇄ Barnala ⇄ Bathinda)
-  MALWA_NH7: [
-    ["Chandigarh ISBT 43", 0],
-    ["Zirakpur", 18],
-    ["Banur Bus Stand", 32],
-    ["Rajpura Bypass", 45],
-    ["Patiala Central Bus Stand", 70],
-    ["Nabha Bypass", 100],
-    ["Bhawanigarh", 120],
-    ["Sangrur Bus Stand", 140],
-    ["Dhanaula", 160],
-    ["Barnala Bus Stand", 180],
-    ["Tapa", 200],
-    ["Rampura Phul", 220],
-    ["Bhucho Mandi Bus Stand", 235],
-    ["Bathinda Central Bus Stand", 255]
+  "MALWA_NH7": [
+    [
+      "Chandigarh ISBT 43",
+      0
+    ],
+    [
+      "Zirakpur",
+      18
+    ],
+    [
+      "Banur Bus Stand",
+      32
+    ],
+    [
+      "Rajpura Bypass",
+      45
+    ],
+    [
+      "Patiala Central Bus Stand",
+      70
+    ],
+    [
+      "Nabha Bypass",
+      100
+    ],
+    [
+      "Bhawanigarh",
+      120
+    ],
+    [
+      "Sangrur Bus Stand",
+      140
+    ],
+    [
+      "Dhanaula",
+      160
+    ],
+    [
+      "Barnala Bus Stand",
+      180
+    ],
+    [
+      "Tapa",
+      200
+    ],
+    [
+      "Rampura Phul",
+      220
+    ],
+    [
+      "Bhucho Mandi Bus Stand",
+      235
+    ],
+    [
+      "Bathinda Central Bus Stand",
+      255
+    ]
   ],
-
-  // 7. Western Malwa Corridor (Ludhiana ⇄ Moga ⇄ Firozpur)
-  WEST_PUNJAB: [
-    ["Ludhiana Bus Stand", 0],
-    ["Mullanpur Dakha", 22],
-    ["Jagraon Bus Stand", 45],
-    ["Ajitwal", 65],
-    ["Moga Central Bus Stand", 85],
-    ["Talwandi Bhai", 110],
-    ["Firozpur Cantt Bus Stand", 135],
-    ["Firozpur City Bus Stand", 145]
+  "WEST_PUNJAB": [
+    [
+      "Ludhiana Bus Stand",
+      0
+    ],
+    [
+      "Mullanpur Dakha",
+      22
+    ],
+    [
+      "Jagraon Bus Stand",
+      45
+    ],
+    [
+      "Ajitwal",
+      65
+    ],
+    [
+      "Moga Central Bus Stand",
+      85
+    ],
+    [
+      "Talwandi Bhai",
+      110
+    ],
+    [
+      "Firozpur Cantt Bus Stand",
+      135
+    ],
+    [
+      "Firozpur City Bus Stand",
+      145
+    ]
   ],
-
-  // 8. Majha to South Malwa Highway - NH-54 (Amritsar ⇄ Faridkot ⇄ Bathinda)
-  MAJHA_MALWA: [
-    ["Amritsar ISBT", 0],
-    ["Tarn Taran Bus Stand", 28],
-    ["Harike Pattan", 60],
-    ["Makhu Bus Stand", 75],
-    ["Zira", 95],
-    ["Kotkapura", 130],
-    ["Faridkot Bus Stand", 150],
-    ["Goniana Mandi", 175],
-    ["Bathinda Central Bus Stand", 200]
+  "MAJHA_MALWA": [
+    [
+      "Amritsar ISBT",
+      0
+    ],
+    [
+      "Tarn Taran Bus Stand",
+      28
+    ],
+    [
+      "Harike Pattan",
+      60
+    ],
+    [
+      "Makhu Bus Stand",
+      75
+    ],
+    [
+      "Zira",
+      95
+    ],
+    [
+      "Kotkapura",
+      130
+    ],
+    [
+      "Faridkot Bus Stand",
+      150
+    ],
+    [
+      "Goniana Mandi",
+      175
+    ],
+    [
+      "Bathinda Central Bus Stand",
+      200
+    ]
   ],
-
-  // 9. North Punjab & Doaba (Pathankot ⇄ Mukerian ⇄ Dasuya ⇄ Hoshiarpur ⇄ Jalandhar)
-  NORTH_DOABA: [
-    ["Pathankot Bus Stand", 0],
-    ["Sujanpur Bus Stand", 15],
-    ["Mukerian", 45],
-    ["Dasuya", 65],
-    ["Tanda Urmar Bus Stand", 85],
-    ["Bhogpur Bus Stand", 100],
-    ["Hoshiarpur Bus Stand", 125],
-    ["Adampur", 145],
-    ["Jalandhar Central Bus Stand", 170]
+  "NORTH_DOABA": [
+    [
+      "Pathankot Bus Stand",
+      0
+    ],
+    [
+      "Sujanpur Bus Stand",
+      15
+    ],
+    [
+      "Mukerian",
+      45
+    ],
+    [
+      "Dasuya",
+      65
+    ],
+    [
+      "Tanda Urmar Bus Stand",
+      85
+    ],
+    [
+      "Bhogpur Bus Stand",
+      100
+    ],
+    [
+      "Hoshiarpur Bus Stand",
+      125
+    ],
+    [
+      "Adampur",
+      145
+    ],
+    [
+      "Jalandhar Central Bus Stand",
+      170
+    ]
   ],
-
-  // 10. Shivalik Foothills / Anandpur Sahib Corridor (Chandigarh ⇄ Ropar ⇄ Anandpur Sahib ⇄ Nangal)
-  ROPAR_ANANDPUR: [
-    ["Chandigarh ISBT 43", 0],
-    ["Kharar", 20],
-    ["Kurali", 35],
-    ["Rupnagar (Ropar) Bus Stand", 55],
-    ["Ghanauli", 72],
-    ["Kiratpur Sahib", 90],
-    ["Anandpur Sahib Bus Stand", 105],
-    ["Nangal", 125]
+  "ROPAR_ANANDPUR": [
+    [
+      "Chandigarh ISBT 43",
+      0
+    ],
+    [
+      "Kharar",
+      20
+    ],
+    [
+      "Kurali",
+      35
+    ],
+    [
+      "Rupnagar (Ropar) Bus Stand",
+      55
+    ],
+    [
+      "Ghanauli",
+      72
+    ],
+    [
+      "Kiratpur Sahib",
+      90
+    ],
+    [
+      "Anandpur Sahib Bus Stand",
+      105
+    ],
+    [
+      "Nangal",
+      125
+    ]
   ],
-
-  // 11. Majha Northern Trunk (Amritsar ⇄ Batala ⇄ Gurdaspur ⇄ Dinanagar ⇄ Pathankot)
-  MAJHA_NORTH: [
-    ["Amritsar ISBT", 0],
-    ["Majitha Bus Stand", 22],
-    ["Fatehgarh Churian Bus Stand", 42],
-    ["Batala Bus Stand", 65],
-    ["Qadian Bus Stand", 85],
-    ["Gurdaspur Central Bus Stand", 110],
-    ["Dinanagar Bus Stand", 130],
-    ["Pathankot Bus Stand", 155]
+  "MAJHA_NORTH": [
+    [
+      "Amritsar ISBT",
+      0
+    ],
+    [
+      "Majitha Bus Stand",
+      22
+    ],
+    [
+      "Fatehgarh Churian Bus Stand",
+      42
+    ],
+    [
+      "Batala Bus Stand",
+      65
+    ],
+    [
+      "Qadian Bus Stand",
+      85
+    ],
+    [
+      "Gurdaspur Central Bus Stand",
+      110
+    ],
+    [
+      "Dinanagar Bus Stand",
+      130
+    ],
+    [
+      "Pathankot Bus Stand",
+      155
+    ]
   ],
-
-  // 12. Dera Baba Nanak & Sri Hargobindpur Link (Dera Baba Nanak ⇄ Batala ⇄ Tanda ⇄ Hoshiarpur)
-  BORDER_HERITAGE: [
-    ["Dera Baba Nanak Bus Stand", 0],
-    ["Kalanaur Bus Stand", 22],
-    ["Batala Bus Stand", 48],
-    ["Sri Hargobindpur Bus Stand", 78],
-    ["Tanda Urmar Bus Stand", 108],
-    ["Hoshiarpur Bus Stand", 138]
+  "BORDER_HERITAGE": [
+    [
+      "Dera Baba Nanak Bus Stand",
+      0
+    ],
+    [
+      "Kalanaur Bus Stand",
+      22
+    ],
+    [
+      "Batala Bus Stand",
+      48
+    ],
+    [
+      "Sri Hargobindpur Bus Stand",
+      78
+    ],
+    [
+      "Tanda Urmar Bus Stand",
+      108
+    ],
+    [
+      "Hoshiarpur Bus Stand",
+      138
+    ]
   ],
-
-  // 13. Border Majha Corridor (Amritsar ⇄ Tarn Taran ⇄ Patti ⇄ Bhikhiwind ⇄ Khemkaran)
-  TARN_TARAN_BORDER: [
-    ["Amritsar ISBT", 0],
-    ["Attari (Wagah Border)", 30],
-    ["Tarn Taran Bus Stand", 60],
-    ["Patti Bus Stand", 88],
-    ["Bhikhiwind Bus Stand", 112],
-    ["Khemkaran Bus Stand", 138]
+  "TARN_TARAN_BORDER": [
+    [
+      "Amritsar ISBT",
+      0
+    ],
+    [
+      "Attari (Wagah Border)",
+      30
+    ],
+    [
+      "Tarn Taran Bus Stand",
+      60
+    ],
+    [
+      "Patti Bus Stand",
+      88
+    ],
+    [
+      "Bhikhiwind Bus Stand",
+      112
+    ],
+    [
+      "Khemkaran Bus Stand",
+      138
+    ]
   ],
-
-  // 14. Historic Doaba Circuit (Jalandhar ⇄ Kapurthala ⇄ Sultanpur Lodhi ⇄ Goindwal ⇄ Tarn Taran)
-  DOABA_KAPURTHALA: [
-    ["Jalandhar Central Bus Stand", 0],
-    ["Kapurthala Central Bus Stand", 30],
-    ["Subhanpur Bus Stand", 48],
-    ["Bholath Bus Stand", 68],
-    ["Nadala Bus Stand", 80],
-    ["Sultanpur Lodhi Bus Stand", 110],
-    ["Goindwal Sahib Bus Stand", 135],
-    ["Khadoor Sahib Bus Stand", 150],
-    ["Tarn Taran Bus Stand", 175]
+  "DOABA_KAPURTHALA": [
+    [
+      "Jalandhar Central Bus Stand",
+      0
+    ],
+    [
+      "Kapurthala Central Bus Stand",
+      30
+    ],
+    [
+      "Subhanpur Bus Stand",
+      48
+    ],
+    [
+      "Bholath Bus Stand",
+      68
+    ],
+    [
+      "Nadala Bus Stand",
+      80
+    ],
+    [
+      "Sultanpur Lodhi Bus Stand",
+      110
+    ],
+    [
+      "Goindwal Sahib Bus Stand",
+      135
+    ],
+    [
+      "Khadoor Sahib Bus Stand",
+      150
+    ],
+    [
+      "Tarn Taran Bus Stand",
+      175
+    ]
   ],
-
-  // 15. Nawanshahr & Shivalik Link (Jalandhar ⇄ Phagwara ⇄ Banga ⇄ Nawanshahr ⇄ Balachaur ⇄ Ropar ⇄ Chandigarh)
-  DOABA_NAWANSHAHR: [
-    ["Jalandhar Central Bus Stand", 0],
-    ["Phagwara", 25],
-    ["Banga Bus Stand", 52],
-    ["Nawanshahr Central Bus Stand", 72],
-    ["Rahon Bus Stand", 85],
-    ["Balachaur Bus Stand", 110],
-    ["Rupnagar (Ropar) Bus Stand", 140],
-    ["Kurali", 165],
-    ["Kharar", 180],
-    ["Chandigarh ISBT 43", 205]
+  "DOABA_NAWANSHAHR": [
+    [
+      "Jalandhar Central Bus Stand",
+      0
+    ],
+    [
+      "Phagwara",
+      25
+    ],
+    [
+      "Banga Bus Stand",
+      52
+    ],
+    [
+      "Nawanshahr Central Bus Stand",
+      72
+    ],
+    [
+      "Rahon Bus Stand",
+      85
+    ],
+    [
+      "Balachaur Bus Stand",
+      110
+    ],
+    [
+      "Rupnagar (Ropar) Bus Stand",
+      140
+    ],
+    [
+      "Kurali",
+      165
+    ],
+    [
+      "Kharar",
+      180
+    ],
+    [
+      "Chandigarh ISBT 43",
+      205
+    ]
   ],
-
-  // 16. Hoshiarpur to Capital Corridor (Hoshiarpur ⇄ Mahilpur ⇄ Garhshankar ⇄ Balachaur ⇄ Ropar ⇄ Chandigarh)
-  HOSHIARPUR_CHANDIGARH: [
-    ["Hoshiarpur Bus Stand", 0],
-    ["Mahilpur Bus Stand", 25],
-    ["Garhshankar Bus Stand", 48],
-    ["Balachaur Bus Stand", 80],
-    ["Rupnagar (Ropar) Bus Stand", 110],
-    ["Kharar", 145],
-    ["Chandigarh ISBT 43", 165]
+  "HOSHIARPUR_CHANDIGARH": [
+    [
+      "Hoshiarpur Bus Stand",
+      0
+    ],
+    [
+      "Mahilpur Bus Stand",
+      25
+    ],
+    [
+      "Garhshankar Bus Stand",
+      48
+    ],
+    [
+      "Balachaur Bus Stand",
+      80
+    ],
+    [
+      "Rupnagar (Ropar) Bus Stand",
+      110
+    ],
+    [
+      "Kharar",
+      145
+    ],
+    [
+      "Chandigarh ISBT 43",
+      165
+    ]
   ],
-
-  // 17. South-West Border Highway (Firozpur ⇄ Guru Har Sahai ⇄ Jalalabad ⇄ Fazilka ⇄ Abohar)
-  SOUTH_WEST_BORDER: [
-    ["Firozpur Cantt Bus Stand", 0],
-    ["Firozpur City Bus Stand", 12],
-    ["Guru Har Sahai Bus Stand", 45],
-    ["Jalalabad Bus Stand", 75],
-    ["Arniwala Sheikh Subhan Bus Stand", 95],
-    ["Fazilka Central Bus Stand", 115],
-    ["Khuian Sarwar Bus Stand", 138],
-    ["Abohar Central Bus Stand", 168]
+  "SOUTH_WEST_BORDER": [
+    [
+      "Firozpur Cantt Bus Stand",
+      0
+    ],
+    [
+      "Firozpur City Bus Stand",
+      12
+    ],
+    [
+      "Guru Har Sahai Bus Stand",
+      45
+    ],
+    [
+      "Jalalabad Bus Stand",
+      75
+    ],
+    [
+      "Arniwala Sheikh Subhan Bus Stand",
+      95
+    ],
+    [
+      "Fazilka Central Bus Stand",
+      115
+    ],
+    [
+      "Khuian Sarwar Bus Stand",
+      138
+    ],
+    [
+      "Abohar Central Bus Stand",
+      168
+    ]
   ],
-
-  // 18. Cotton Belt Expressway (Bathinda ⇄ Gidderbaha ⇄ Malout ⇄ Abohar ⇄ Fazilka)
-  MUKTSAR_MALOUT_ABOHAR: [
-    ["Bathinda Central Bus Stand", 0],
-    ["Gidderbaha Bus Stand", 35],
-    ["Malout Central Bus Stand", 65],
-    ["Abohar Central Bus Stand", 100],
-    ["Fazilka Central Bus Stand", 135]
+  "MUKTSAR_MALOUT_ABOHAR": [
+    [
+      "Bathinda Central Bus Stand",
+      0
+    ],
+    [
+      "Gidderbaha Bus Stand",
+      35
+    ],
+    [
+      "Malout Central Bus Stand",
+      65
+    ],
+    [
+      "Abohar Central Bus Stand",
+      100
+    ],
+    [
+      "Fazilka Central Bus Stand",
+      135
+    ]
   ],
-
-  // 19. Historic Muktsar & Malwa Line (Faridkot ⇄ Kotkapura ⇄ Muktsar ⇄ Malout ⇄ Lambi)
-  MUKTSAR_FARIDKOT: [
-    ["Faridkot Bus Stand", 0],
-    ["Kotkapura", 20],
-    ["Bariwala Bus Stand", 45],
-    ["Sri Muktsar Sahib Central Bus Stand", 70],
-    ["Malout Central Bus Stand", 105],
-    ["Lambi Bus Stand", 130]
+  "MUKTSAR_FARIDKOT": [
+    [
+      "Faridkot Bus Stand",
+      0
+    ],
+    [
+      "Kotkapura",
+      20
+    ],
+    [
+      "Bariwala Bus Stand",
+      45
+    ],
+    [
+      "Sri Muktsar Sahib Central Bus Stand",
+      70
+    ],
+    [
+      "Malout Central Bus Stand",
+      105
+    ],
+    [
+      "Lambi Bus Stand",
+      130
+    ]
   ],
-
-  // 20. Central Malwa Link (Faridkot ⇄ Kotkapura ⇄ Baghapurana ⇄ Moga ⇄ Jagraon ⇄ Ludhiana)
-  MOGA_FARIDKOT_LUDHIANA: [
-    ["Faridkot Bus Stand", 0],
-    ["Kotkapura", 20],
-    ["Baghapurana Bus Stand", 50],
-    ["Nihal Singh Wala Bus Stand", 75],
-    ["Badhni Kalan Bus Stand", 95],
-    ["Moga Central Bus Stand", 120],
-    ["Jagraon Bus Stand", 155],
-    ["Mullanpur Dakha", 178],
-    ["Ludhiana Bus Stand", 200]
+  "MOGA_FARIDKOT_LUDHIANA": [
+    [
+      "Faridkot Bus Stand",
+      0
+    ],
+    [
+      "Kotkapura",
+      20
+    ],
+    [
+      "Baghapurana Bus Stand",
+      50
+    ],
+    [
+      "Nihal Singh Wala Bus Stand",
+      75
+    ],
+    [
+      "Badhni Kalan Bus Stand",
+      95
+    ],
+    [
+      "Moga Central Bus Stand",
+      120
+    ],
+    [
+      "Jagraon Bus Stand",
+      155
+    ],
+    [
+      "Mullanpur Dakha",
+      178
+    ],
+    [
+      "Ludhiana Bus Stand",
+      200
+    ]
   ],
-
-  // 21. South Malwa Spine (Patiala ⇄ Samana ⇄ Patran ⇄ Moonak ⇄ Sunam ⇄ Sangrur ⇄ Mansa ⇄ Bathinda)
-  PATIALA_MANSA_BATHINDA: [
-    ["Patiala Central Bus Stand", 0],
-    ["Sanaur Bus Stand", 15],
-    ["Samana Bus Stand", 40],
-    ["Patran Bus Stand", 70],
-    ["Moonak Bus Stand", 100],
-    ["Lehragaga Bus Stand", 125],
-    ["Sunam Udham Singh Wala Bus Stand", 150],
-    ["Sangrur Bus Stand", 175],
-    ["Mansa Central Bus Stand", 220],
-    ["Maur Mandi Bus Stand", 250],
-    ["Bathinda Central Bus Stand", 285]
+  "PATIALA_MANSA_BATHINDA": [
+    [
+      "Patiala Central Bus Stand",
+      0
+    ],
+    [
+      "Sanaur Bus Stand",
+      15
+    ],
+    [
+      "Samana Bus Stand",
+      40
+    ],
+    [
+      "Patran Bus Stand",
+      70
+    ],
+    [
+      "Moonak Bus Stand",
+      100
+    ],
+    [
+      "Lehragaga Bus Stand",
+      125
+    ],
+    [
+      "Sunam Udham Singh Wala Bus Stand",
+      150
+    ],
+    [
+      "Sangrur Bus Stand",
+      175
+    ],
+    [
+      "Mansa Central Bus Stand",
+      220
+    ],
+    [
+      "Maur Mandi Bus Stand",
+      250
+    ],
+    [
+      "Bathinda Central Bus Stand",
+      285
+    ]
   ],
-
-  // 22. Southern Border Corridor (Sangrur ⇄ Sunam ⇄ Bhikhi ⇄ Mansa ⇄ Budhlada ⇄ Bareta ⇄ Sardulgarh)
-  MANSA_SARDULGARH: [
-    ["Sangrur Bus Stand", 0],
-    ["Sunam Udham Singh Wala Bus Stand", 22],
-    ["Bhikhi Bus Stand", 55],
-    ["Mansa Central Bus Stand", 80],
-    ["Budhlada Bus Stand", 110],
-    ["Bareta Bus Stand", 130],
-    ["Jhunir Bus Stand", 155],
-    ["Sardulgarh Bus Stand", 185]
+  "MANSA_SARDULGARH": [
+    [
+      "Sangrur Bus Stand",
+      0
+    ],
+    [
+      "Sunam Udham Singh Wala Bus Stand",
+      22
+    ],
+    [
+      "Bhikhi Bus Stand",
+      55
+    ],
+    [
+      "Mansa Central Bus Stand",
+      80
+    ],
+    [
+      "Budhlada Bus Stand",
+      110
+    ],
+    [
+      "Bareta Bus Stand",
+      130
+    ],
+    [
+      "Jhunir Bus Stand",
+      155
+    ],
+    [
+      "Sardulgarh Bus Stand",
+      185
+    ]
   ],
-
-  // 23. Bathinda Sub-division Circuit (Bathinda ⇄ Bhucho ⇄ Rampura Phul ⇄ Maur ⇄ Talwandi Sabo ⇄ Raman)
-  TALWANDI_SABO_CIRCUIT: [
-    ["Bathinda Central Bus Stand", 0],
-    ["Bhucho Mandi Bus Stand", 20],
-    ["Rampura Phul", 45],
-    ["Maur Mandi Bus Stand", 75],
-    ["Talwandi Sabo Bus Stand", 100],
-    ["Raman Mandi Bus Stand", 125],
-    ["Sangat Mandi Bus Stand", 150]
+  "TALWANDI_SABO_CIRCUIT": [
+    [
+      "Bathinda Central Bus Stand",
+      0
+    ],
+    [
+      "Bhucho Mandi Bus Stand",
+      20
+    ],
+    [
+      "Rampura Phul",
+      45
+    ],
+    [
+      "Maur Mandi Bus Stand",
+      75
+    ],
+    [
+      "Talwandi Sabo Bus Stand",
+      100
+    ],
+    [
+      "Raman Mandi Bus Stand",
+      125
+    ],
+    [
+      "Sangat Mandi Bus Stand",
+      150
+    ]
   ],
-
-  // 24. Ludhiana to Barnala (Ludhiana ⇄ Raikot ⇄ Mehal Kalan ⇄ Barnala ⇄ Tapa ⇄ Bhadaur)
-  LUDHIANA_BARNALA: [
-    ["Ludhiana Bus Stand", 0],
-    ["Mullanpur Dakha", 22],
-    ["Raikot Bus Stand", 52],
-    ["Mehal Kalan Bus Stand", 80],
-    ["Barnala Bus Stand", 110],
-    ["Bhadaur Bus Stand", 135],
-    ["Tapa", 155]
+  "LUDHIANA_BARNALA": [
+    [
+      "Ludhiana Bus Stand",
+      0
+    ],
+    [
+      "Mullanpur Dakha",
+      22
+    ],
+    [
+      "Raikot Bus Stand",
+      52
+    ],
+    [
+      "Mehal Kalan Bus Stand",
+      80
+    ],
+    [
+      "Barnala Bus Stand",
+      110
+    ],
+    [
+      "Bhadaur Bus Stand",
+      135
+    ],
+    [
+      "Tapa",
+      155
+    ],
+    [
+      "Rampura Phul",
+      175
+    ],
+    [
+      "Bhucho Mandi Bus Stand",
+      190
+    ],
+    [
+      "Bathinda Central Bus Stand",
+      210
+    ]
   ],
-
-  // 25. Malerkotla Heart of Malwa (Ludhiana ⇄ Ahmedgarh ⇄ Malerkotla ⇄ Amargarh ⇄ Nabha ⇄ Patiala)
-  LUDHIANA_MALERKOTLA_PATIALA: [
-    ["Ludhiana Bus Stand", 0],
-    ["Ahmedgarh Bus Stand", 35],
-    ["Malerkotla Central Bus Stand", 60],
-    ["Amargarh Bus Stand", 80],
-    ["Nabha Bypass", 115],
-    ["Patiala Central Bus Stand", 150]
+  "LUDHIANA_MALERKOTLA_PATIALA": [
+    [
+      "Ludhiana Bus Stand",
+      0
+    ],
+    [
+      "Ahmedgarh Bus Stand",
+      35
+    ],
+    [
+      "Malerkotla Central Bus Stand",
+      60
+    ],
+    [
+      "Amargarh Bus Stand",
+      80
+    ],
+    [
+      "Nabha Bypass",
+      115
+    ],
+    [
+      "Patiala Central Bus Stand",
+      150
+    ]
   ],
-
-  // 26. Tricity & Shivalik Bypass (Chandigarh ⇄ Mohali ⇄ Kharar ⇄ Morinda ⇄ Chamkaur Sahib ⇄ Ropar)
-  MOHALI_ROPAR_SHIVALIK: [
-    ["Chandigarh ISBT 43", 0],
-    ["Mohali Phase 8 ISBT", 15],
-    ["New Chandigarh Bus Stand", 30],
-    ["Kharar", 45],
-    ["Morinda", 65],
-    ["Chamkaur Sahib Bus Stand", 85],
-    ["Rupnagar (Ropar) Bus Stand", 105],
-    ["Nurpur Bedi Bus Stand", 135],
-    ["Anandpur Sahib Bus Stand", 160]
+  "MOHALI_ROPAR_SHIVALIK": [
+    [
+      "Chandigarh ISBT 43",
+      0
+    ],
+    [
+      "Mohali Phase 8 ISBT",
+      15
+    ],
+    [
+      "New Chandigarh Bus Stand",
+      30
+    ],
+    [
+      "Kharar",
+      45
+    ],
+    [
+      "Morinda",
+      65
+    ],
+    [
+      "Chamkaur Sahib Bus Stand",
+      85
+    ],
+    [
+      "Rupnagar (Ropar) Bus Stand",
+      105
+    ],
+    [
+      "Nurpur Bedi Bus Stand",
+      135
+    ],
+    [
+      "Anandpur Sahib Bus Stand",
+      160
+    ]
   ],
-
-  // 27. Historic Sirhind & Mohali South (Chandigarh ⇄ Zirakpur ⇄ Dera Bassi ⇄ Lalru ⇄ Banur ⇄ Rajpura ⇄ Sirhind ⇄ Khanna)
-  FATEHGARH_PATIALA_CIRCUIT: [
-    ["Chandigarh ISBT 43", 0],
-    ["Zirakpur", 18],
-    ["Dera Bassi Bus Stand", 35],
-    ["Lalru Bus Stand", 55],
-    ["Banur Bus Stand", 80],
-    ["Rajpura Bypass", 105],
-    ["Sirhind (Fatehgarh Sahib)", 130],
-    ["Bassi Pathana Bus Stand", 145],
-    ["Mandi Gobindgarh Bus Stand", 165],
-    ["Amloh Bus Stand", 185],
-    ["Khanna Bus Stand", 205]
+  "FATEHGARH_PATIALA_CIRCUIT": [
+    [
+      "Chandigarh ISBT 43",
+      0
+    ],
+    [
+      "Zirakpur",
+      18
+    ],
+    [
+      "Dera Bassi Bus Stand",
+      35
+    ],
+    [
+      "Lalru Bus Stand",
+      55
+    ],
+    [
+      "Banur Bus Stand",
+      80
+    ],
+    [
+      "Rajpura Bypass",
+      105
+    ],
+    [
+      "Sirhind (Fatehgarh Sahib)",
+      130
+    ],
+    [
+      "Bassi Pathana Bus Stand",
+      145
+    ],
+    [
+      "Mandi Gobindgarh Bus Stand",
+      165
+    ],
+    [
+      "Amloh Bus Stand",
+      185
+    ],
+    [
+      "Khanna Bus Stand",
+      205
+    ]
   ],
-
-  // 28. Doaba to Malwa Cross-River (Jalandhar ⇄ Nakodar ⇄ Shahkot ⇄ Dharamkot ⇄ Moga ⇄ Baghapurana)
-  JALANDHAR_NAKODAR_MOGA: [
-    ["Jalandhar Central Bus Stand", 0],
-    ["Nakodar Bus Stand", 35],
-    ["Shahkot Bus Stand", 60],
-    ["Dharamkot Bus Stand", 90],
-    ["Moga Central Bus Stand", 115],
-    ["Baghapurana Bus Stand", 140]
+  "JALANDHAR_NAKODAR_MOGA": [
+    [
+      "Jalandhar Central Bus Stand",
+      0
+    ],
+    [
+      "Nakodar Bus Stand",
+      35
+    ],
+    [
+      "Shahkot Bus Stand",
+      60
+    ],
+    [
+      "Dharamkot Bus Stand",
+      90
+    ],
+    [
+      "Moga Central Bus Stand",
+      115
+    ],
+    [
+      "Baghapurana Bus Stand",
+      140
+    ]
   ],
-
-  // 29. Kandi Canal Belt (Hoshiarpur ⇄ Hariana ⇄ Dasuya ⇄ Mukerian ⇄ Hajipur ⇄ Talwara)
-  HOSHIARPUR_TALWARA: [
-    ["Hoshiarpur Bus Stand", 0],
-    ["Hariana Bus Stand", 20],
-    ["Dasuya", 55],
-    ["Mukerian", 80],
-    ["Hajipur Bus Stand", 105],
-    ["Talwara Bus Stand", 130]
+  "HOSHIARPUR_TALWARA": [
+    [
+      "Hoshiarpur Bus Stand",
+      0
+    ],
+    [
+      "Hariana Bus Stand",
+      20
+    ],
+    [
+      "Dasuya",
+      55
+    ],
+    [
+      "Mukerian",
+      80
+    ],
+    [
+      "Hajipur Bus Stand",
+      105
+    ],
+    [
+      "Talwara Bus Stand",
+      130
+    ]
   ],
-
-  // 30. Tricity & Ambala link
-  A: [
-    ["Ambala Cantt", 0],
-    ["Lalru Bus Stand", 25],
-    ["Dera Bassi Bus Stand", 42],
-    ["Zirakpur", 55],
-    ["Chandigarh ISBT 43", 75],
-    ["Chandigarh ISBT 17", 85]
+  "A": [
+    [
+      "Ambala Cantt",
+      0
+    ],
+    [
+      "Lalru Bus Stand",
+      25
+    ],
+    [
+      "Dera Bassi Bus Stand",
+      42
+    ],
+    [
+      "Zirakpur",
+      55
+    ],
+    [
+      "Chandigarh ISBT 43",
+      75
+    ],
+    [
+      "Chandigarh ISBT 17",
+      85
+    ]
+  ],
+  "DELHI_GT_EXPRESS": [
+    [
+      "Delhi ISBT Kashmiri Gate",
+      0
+    ],
+    [
+      "Panipat Bus Stand",
+      85
+    ],
+    [
+      "Karnal Bus Stand",
+      125
+    ],
+    [
+      "Kurukshetra Pipli Chowk",
+      160
+    ],
+    [
+      "Ambala Cantt",
+      200
+    ],
+    [
+      "Rajpura Bypass",
+      230
+    ],
+    [
+      "Sirhind (Fatehgarh Sahib)",
+      255
+    ],
+    [
+      "Khanna Bus Stand",
+      275
+    ],
+    [
+      "Ludhiana Bus Stand",
+      310
+    ],
+    [
+      "Phillaur",
+      335
+    ],
+    [
+      "Goraya Bus Stand",
+      348
+    ],
+    [
+      "Phagwara",
+      360
+    ],
+    [
+      "Jalandhar Central Bus Stand",
+      385
+    ],
+    [
+      "Kartarpur",
+      405
+    ],
+    [
+      "Beas",
+      425
+    ],
+    [
+      "Rayya Bus Stand",
+      435
+    ],
+    [
+      "Jandiala Guru",
+      448
+    ],
+    [
+      "Amritsar ISBT",
+      470
+    ]
+  ],
+  "DELHI_AIRPORT_EXPRESS": [
+    [
+      "Delhi Airport T3",
+      0
+    ],
+    [
+      "Delhi ISBT Kashmiri Gate",
+      45
+    ],
+    [
+      "Karnal Bus Stand",
+      165
+    ],
+    [
+      "Ambala Cantt",
+      235
+    ],
+    [
+      "Ludhiana Bus Stand",
+      345
+    ],
+    [
+      "Phagwara",
+      395
+    ],
+    [
+      "Jalandhar Central Bus Stand",
+      420
+    ],
+    [
+      "Beas",
+      460
+    ],
+    [
+      "Amritsar ISBT",
+      505
+    ]
+  ],
+  "DELHI_CHANDIGARH": [
+    [
+      "Delhi ISBT Kashmiri Gate",
+      0
+    ],
+    [
+      "Panipat Bus Stand",
+      80
+    ],
+    [
+      "Karnal Bus Stand",
+      120
+    ],
+    [
+      "Kurukshetra Pipli Chowk",
+      155
+    ],
+    [
+      "Ambala Cantt",
+      195
+    ],
+    [
+      "Dera Bassi Bus Stand",
+      225
+    ],
+    [
+      "Zirakpur",
+      240
+    ],
+    [
+      "Chandigarh ISBT 17",
+      255
+    ],
+    [
+      "Chandigarh ISBT 43",
+      265
+    ]
+  ],
+  "DELHI_BATHINDA_MALWA": [
+    [
+      "Delhi ISBT Kashmiri Gate",
+      0
+    ],
+    [
+      "Panipat Bus Stand",
+      85
+    ],
+    [
+      "Karnal Bus Stand",
+      125
+    ],
+    [
+      "Ambala Cantt",
+      195
+    ],
+    [
+      "Rajpura Bypass",
+      225
+    ],
+    [
+      "Patiala Central Bus Stand",
+      255
+    ],
+    [
+      "Bhawanigarh",
+      305
+    ],
+    [
+      "Sangrur Bus Stand",
+      325
+    ],
+    [
+      "Barnala Bus Stand",
+      365
+    ],
+    [
+      "Rampura Phul",
+      405
+    ],
+    [
+      "Bathinda Central Bus Stand",
+      435
+    ]
+  ],
+  "MANALI_SHIVALIK": [
+    [
+      "Chandigarh ISBT 43",
+      0
+    ],
+    [
+      "Kharar",
+      20
+    ],
+    [
+      "Kurali",
+      35
+    ],
+    [
+      "Rupnagar (Ropar) Bus Stand",
+      55
+    ],
+    [
+      "Kiratpur Sahib",
+      90
+    ],
+    [
+      "Swarghat Bus Stand",
+      125
+    ],
+    [
+      "Bilaspur Bus Stand",
+      175
+    ],
+    [
+      "Sundernagar Bus Stand",
+      225
+    ],
+    [
+      "Mandi Bus Stand",
+      260
+    ],
+    [
+      "Kullu Bus Stand",
+      370
+    ],
+    [
+      "Manali Bus Stand",
+      430
+    ]
+  ],
+  "SHIMLA_TRICITY": [
+    [
+      "Chandigarh ISBT 43",
+      0
+    ],
+    [
+      "Chandigarh ISBT 17",
+      15
+    ],
+    [
+      "Zirakpur",
+      30
+    ],
+    [
+      "Panchkula Bus Stand",
+      45
+    ],
+    [
+      "Kalka",
+      75
+    ],
+    [
+      "Dharampur Bus Stand",
+      115
+    ],
+    [
+      "Solan Bus Stand",
+      140
+    ],
+    [
+      "Kandaghat Bus Stand",
+      165
+    ],
+    [
+      "Shimla ISBT",
+      210
+    ]
+  ],
+  "DHARAMSHALA_KANGRA": [
+    [
+      "Amritsar ISBT",
+      0
+    ],
+    [
+      "Beas",
+      45
+    ],
+    [
+      "Jalandhar Central Bus Stand",
+      80
+    ],
+    [
+      "Adampur",
+      105
+    ],
+    [
+      "Hoshiarpur Bus Stand",
+      130
+    ],
+    [
+      "Gagret Bus Stand",
+      165
+    ],
+    [
+      "Mubarakpur Bus Stand",
+      185
+    ],
+    [
+      "Dehra Gopipur Bus Stand",
+      225
+    ],
+    [
+      "Kangra Bus Stand",
+      260
+    ],
+    [
+      "Dharamshala Bus Stand",
+      295
+    ],
+    [
+      "McLeod Ganj Bus Stand",
+      325
+    ]
+  ],
+  "JAMMU_KATRA_TRUNK": [
+    [
+      "Ludhiana Bus Stand",
+      0
+    ],
+    [
+      "Phagwara",
+      30
+    ],
+    [
+      "Jalandhar Central Bus Stand",
+      55
+    ],
+    [
+      "Dasuya",
+      110
+    ],
+    [
+      "Mukerian",
+      130
+    ],
+    [
+      "Pathankot Bus Stand",
+      165
+    ],
+    [
+      "Lakhanpur Border",
+      185
+    ],
+    [
+      "Kathua Bus Stand",
+      205
+    ],
+    [
+      "Samba Bus Stand",
+      240
+    ],
+    [
+      "Jammu Tawi Bus Stand",
+      275
+    ],
+    [
+      "Katra ISBT",
+      335
+    ]
+  ],
+  "AMRITSAR_JAMMU_KATRA": [
+    [
+      "Amritsar ISBT",
+      0
+    ],
+    [
+      "Batala Bus Stand",
+      40
+    ],
+    [
+      "Gurdaspur Central Bus Stand",
+      75
+    ],
+    [
+      "Dinanagar Bus Stand",
+      95
+    ],
+    [
+      "Pathankot Bus Stand",
+      125
+    ],
+    [
+      "Lakhanpur Border",
+      145
+    ],
+    [
+      "Kathua Bus Stand",
+      165
+    ],
+    [
+      "Jammu Tawi Bus Stand",
+      235
+    ],
+    [
+      "Katra ISBT",
+      295
+    ]
+  ],
+  "DALHOUSIE_CHAMBA": [
+    [
+      "Pathankot Bus Stand",
+      0
+    ],
+    [
+      "Dunera Bus Stand",
+      45
+    ],
+    [
+      "Banikhet Bus Stand",
+      95
+    ],
+    [
+      "Dalhousie Bus Stand",
+      125
+    ],
+    [
+      "Chamba Bus Stand",
+      200
+    ]
+  ],
+  "UNA_HIMACHAL": [
+    [
+      "Chandigarh ISBT 43",
+      0
+    ],
+    [
+      "Kharar",
+      20
+    ],
+    [
+      "Rupnagar (Ropar) Bus Stand",
+      55
+    ],
+    [
+      "Kiratpur Sahib",
+      90
+    ],
+    [
+      "Anandpur Sahib Bus Stand",
+      105
+    ],
+    [
+      "Nangal",
+      125
+    ],
+    [
+      "Mehatpur Bus Stand",
+      138
+    ],
+    [
+      "Una Bus Stand",
+      155
+    ],
+    [
+      "Amb Bus Stand",
+      190
+    ]
+  ],
+  "RAJASTHAN_GANGANAGAR": [
+    [
+      "Bathinda Central Bus Stand",
+      0
+    ],
+    [
+      "Gidderbaha Bus Stand",
+      35
+    ],
+    [
+      "Malout Central Bus Stand",
+      65
+    ],
+    [
+      "Abohar Central Bus Stand",
+      100
+    ],
+    [
+      "Khuian Sarwar Bus Stand",
+      120
+    ],
+    [
+      "Sadulshahar Bus Stand",
+      145
+    ],
+    [
+      "Sri Ganganagar Central Bus Stand",
+      175
+    ]
+  ],
+  "RAJASTHAN_BIKANER_JAIPUR": [
+    [
+      "Fazilka Central Bus Stand",
+      0
+    ],
+    [
+      "Khuian Sarwar Bus Stand",
+      25
+    ],
+    [
+      "Abohar Central Bus Stand",
+      55
+    ],
+    [
+      "Hanumangarh Central Bus Stand",
+      115
+    ],
+    [
+      "Suratgarh Bus Stand",
+      165
+    ],
+    [
+      "Bikaner Central Bus Stand",
+      285
+    ],
+    [
+      "Jaipur Sindhi Camp ISBT",
+      480
+    ]
+  ],
+  "HARYANA_SIRSA_HISAR": [
+    [
+      "Bathinda Central Bus Stand",
+      0
+    ],
+    [
+      "Sangat Mandi Bus Stand",
+      25
+    ],
+    [
+      "Mandi Dabwali Bus Stand",
+      45
+    ],
+    [
+      "Odhan Bus Stand",
+      70
+    ],
+    [
+      "Sirsa Bus Stand",
+      105
+    ],
+    [
+      "Fatehabad Bus Stand",
+      145
+    ],
+    [
+      "Hisar Bus Stand",
+      195
+    ],
+    [
+      "Hansi Bus Stand",
+      225
+    ],
+    [
+      "Rohtak Bus Stand",
+      295
+    ]
+  ],
+  "HARIDWAR_RISHIKESH_DEHRADUN": [
+    [
+      "Amritsar ISBT",
+      0
+    ],
+    [
+      "Jalandhar Central Bus Stand",
+      75
+    ],
+    [
+      "Ludhiana Bus Stand",
+      145
+    ],
+    [
+      "Chandigarh ISBT 43",
+      240
+    ],
+    [
+      "Ambala Cantt",
+      280
+    ],
+    [
+      "Yamunanagar Bus Stand",
+      335
+    ],
+    [
+      "Saharanpur Bus Stand",
+      380
+    ],
+    [
+      "Roorkee Bus Stand",
+      425
+    ],
+    [
+      "Haridwar Central Bus Stand",
+      465
+    ],
+    [
+      "Rishikesh Bus Stand",
+      510
+    ]
+  ],
+  "LUDHIANA_DHURI_SANGRUR": [
+    [
+      "Ludhiana Bus Stand",
+      0
+    ],
+    [
+      "Dehlon Bus Stand",
+      25
+    ],
+    [
+      "Ahmedgarh Bus Stand",
+      45
+    ],
+    [
+      "Malerkotla Central Bus Stand",
+      70
+    ],
+    [
+      "Dhuri Bus Stand",
+      95
+    ],
+    [
+      "Sangrur Bus Stand",
+      120
+    ],
+    [
+      "Sunam Udham Singh Wala Bus Stand",
+      145
+    ]
+  ],
+  "BATHINDA_MUKTSAR_FIROZPUR": [
+    [
+      "Bathinda Central Bus Stand",
+      0
+    ],
+    [
+      "Gidderbaha Bus Stand",
+      35
+    ],
+    [
+      "Sri Muktsar Sahib Central Bus Stand",
+      70
+    ],
+    [
+      "Guru Har Sahai Bus Stand",
+      110
+    ],
+    [
+      "Jalalabad Bus Stand",
+      135
+    ],
+    [
+      "Firozpur Cantt Bus Stand",
+      175
+    ]
+  ],
+  "AMRITSAR_AJNALA_DERA": [
+    [
+      "Amritsar ISBT",
+      0
+    ],
+    [
+      "Raja Sansi Airport Road",
+      20
+    ],
+    [
+      "Ajnala Bus Stand",
+      45
+    ],
+    [
+      "Ramdas Bus Stand",
+      70
+    ],
+    [
+      "Dera Baba Nanak Bus Stand",
+      95
+    ]
   ]
 };
 
 /**
- * Raw Bus Services Across Punjab
+ * Raw Bus Services Across Punjab & Connecting Interstate Corridors
  * [Operator, Class, SpeedType (E/L), RouteKey, DepartureTime, Direction (+1/-1)]
  */
 export const RAW_BUS_DEFINITIONS: [string, string, 'E' | 'L', string, string, number][] = [
-  // --- 1. NH-5 Corridor (Chandigarh ⇄ Ludhiana) ---
-  ["PRTC PEPSU", "Ordinary", "E", "E", "06:00", 1],
-  ["Punbus", "Ordinary", "L", "L", "07:15", 1],
-  ["Orbit Aviators", "Volvo AC", "E", "E", "08:15", 1],
-  ["PRTC PEPSU", "Ordinary", "E", "E", "08:45", 1],
-  ["Local Mini Bus", "Mini Bus", "L", "L", "09:10", 1],
-  ["Punbus", "Ordinary", "E", "E", "10:15", 1],
-  ["Libra", "HVAC Semi-Deluxe", "L", "L", "12:40", 1],
-  ["Orbit Aviators", "Volvo AC", "E", "E", "14:15", 1],
-  ["PRTC PEPSU", "Ordinary", "E", "E", "15:30", 1],
-  ["PRTC PEPSU", "HVAC Semi-Deluxe", "E", "E", "16:30", 1],
-  ["Jujhar", "HVAC Semi-Deluxe", "E", "E", "17:10", 1],
-  ["Punbus", "Ordinary", "L", "L", "19:20", 1],
-  ["Punbus", "Ordinary", "L", "L", "20:45", 1],
-
-  // NH-5 Reverse (Ludhiana to Chandigarh)
-  ["PRTC PEPSU", "Ordinary", "E", "E", "06:50", -1],
-  ["PRTC PEPSU", "Ordinary", "E", "E", "08:15", -1],
-  ["Punbus", "Ordinary", "E", "E", "11:00", -1],
-  ["Punbus", "Ordinary", "L", "L", "13:00", -1],
-  ["Orbit Aviators", "Volvo AC", "E", "E", "15:00", -1],
-  ["Local Mini Bus", "Mini Bus", "L", "L", "16:40", -1],
-  ["Jujhar", "HVAC Semi-Deluxe", "E", "E", "16:20", -1],
-  ["PRTC PEPSU", "Ordinary", "E", "E", "18:30", -1],
-  ["PRTC PEPSU", "Ordinary", "E", "E", "20:15", -1],
-
-  // --- 2. Chandigarh ⇄ Jalandhar ---
-  ["Punbus", "Ordinary", "E", "J", "06:30", 1],
-  ["Orbit Aviators", "Volvo AC", "E", "J", "09:30", 1],
-  ["PRTC PEPSU", "HVAC Semi-Deluxe", "E", "J", "13:30", 1],
-  ["Punbus", "Ordinary", "E", "J", "16:45", 1],
-  ["Orbit Aviators", "Volvo AC", "E", "J", "10:45", -1],
-  ["PRTC PEPSU", "Ordinary", "E", "J", "14:15", -1],
-  ["Punbus", "HVAC Semi-Deluxe", "E", "J", "18:00", -1],
-
-  // --- 3. North-South Spine (Chandigarh ⇄ Amritsar via Ludhiana & Jalandhar) ---
-  ["Punbus", "Ordinary", "E", "CHD_ASR", "05:30", 1],
-  ["Punbus", "HVAC Semi-Deluxe", "E", "CHD_ASR", "07:30", 1],
-  ["Orbit Aviators", "Volvo AC", "E", "CHD_ASR", "09:00", 1],
-  ["PRTC PEPSU", "Ordinary", "E", "CHD_ASR", "11:45", 1],
-  ["Orbit Aviators", "Volvo AC", "E", "CHD_ASR", "14:30", 1],
-  ["Punbus", "Ordinary", "E", "CHD_ASR", "16:00", 1],
-  ["PRTC PEPSU", "HVAC Semi-Deluxe", "E", "CHD_ASR", "18:30", 1],
-
-  // Amritsar to Chandigarh Reverse
-  ["Punbus", "Ordinary", "E", "CHD_ASR", "06:00", -1],
-  ["Orbit Aviators", "Volvo AC", "E", "CHD_ASR", "08:30", -1],
-  ["Punbus", "HVAC Semi-Deluxe", "E", "CHD_ASR", "10:30", -1],
-  ["PRTC PEPSU", "Ordinary", "E", "CHD_ASR", "13:00", -1],
-  ["Orbit Aviators", "Volvo AC", "E", "CHD_ASR", "15:30", -1],
-  ["Punbus", "Ordinary", "E", "CHD_ASR", "17:45", -1],
-
-  // --- 4. Grand Trunk Road Corridor (Amritsar ⇄ Jalandhar ⇄ Ludhiana ⇄ Ambala) ---
-  ["Punbus", "Ordinary", "E", "GT_CORRIDOR", "06:15", 1],
-  ["PRTC PEPSU", "Ordinary", "L", "GT_CORRIDOR", "08:00", 1],
-  ["Libra", "HVAC Semi-Deluxe", "E", "GT_CORRIDOR", "10:00", 1],
-  ["Punbus", "Ordinary", "E", "GT_CORRIDOR", "12:30", 1],
-  ["PRTC PEPSU", "HVAC Semi-Deluxe", "E", "GT_CORRIDOR", "15:15", 1],
-  ["Haryana Roadways", "Ordinary", "E", "GT_CORRIDOR", "17:30", 1],
-
-  // GT Corridor Reverse (Ambala to Amritsar)
-  ["Haryana Roadways", "Ordinary", "E", "GT_CORRIDOR", "07:00", -1],
-  ["Punbus", "Ordinary", "E", "GT_CORRIDOR", "09:15", -1],
-  ["PRTC PEPSU", "Ordinary", "L", "GT_CORRIDOR", "11:30", -1],
-  ["Libra", "HVAC Semi-Deluxe", "E", "GT_CORRIDOR", "14:00", -1],
-  ["Punbus", "HVAC Semi-Deluxe", "E", "GT_CORRIDOR", "16:45", -1],
-
-  // --- 5. Malwa South Corridor - NH-7 (Chandigarh ⇄ Patiala ⇄ Sangrur ⇄ Bathinda) ---
-  ["PRTC PEPSU", "Ordinary", "E", "MALWA_NH7", "05:45", 1],
-  ["PRTC PEPSU", "HVAC Semi-Deluxe", "E", "MALWA_NH7", "07:15", 1],
-  ["PRTC PEPSU", "Ordinary", "L", "MALWA_NH7", "08:30", 1],
-  ["Orbit Aviators", "Volvo AC", "E", "MALWA_NH7", "10:15", 1],
-  ["New Deep", "Ordinary", "L", "MALWA_NH7", "12:00", 1],
-  ["PRTC PEPSU", "Ordinary", "E", "MALWA_NH7", "14:00", 1],
-  ["PRTC PEPSU", "HVAC Semi-Deluxe", "E", "MALWA_NH7", "16:15", 1],
-  ["New Deep", "Ordinary", "L", "MALWA_NH7", "18:30", 1],
-
-  // Bathinda to Chandigarh Reverse
-  ["PRTC PEPSU", "Ordinary", "E", "MALWA_NH7", "06:15", -1],
-  ["PRTC PEPSU", "HVAC Semi-Deluxe", "E", "MALWA_NH7", "08:00", -1],
-  ["New Deep", "Ordinary", "L", "MALWA_NH7", "10:30", -1],
-  ["Orbit Aviators", "Volvo AC", "E", "MALWA_NH7", "13:15", -1],
-  ["PRTC PEPSU", "Ordinary", "E", "MALWA_NH7", "15:45", -1],
-  ["PRTC PEPSU", "Ordinary", "E", "MALWA_NH7", "18:00", -1],
-
-  // --- 6. Western Punjab Corridor (Ludhiana ⇄ Moga ⇄ Firozpur) ---
-  ["Punbus", "Ordinary", "E", "WEST_PUNJAB", "06:45", 1],
-  ["PRTC PEPSU", "Ordinary", "L", "WEST_PUNJAB", "08:15", 1],
-  ["Jujhar", "HVAC Semi-Deluxe", "E", "WEST_PUNJAB", "10:45", 1],
-  ["Punbus", "Ordinary", "L", "WEST_PUNJAB", "13:30", 1],
-  ["New Deep", "Ordinary", "E", "WEST_PUNJAB", "16:00", 1],
-  ["PRTC PEPSU", "Ordinary", "L", "WEST_PUNJAB", "18:15", 1],
-
-  // Firozpur to Ludhiana Reverse
-  ["Punbus", "Ordinary", "E", "WEST_PUNJAB", "07:30", -1],
-  ["New Deep", "Ordinary", "E", "WEST_PUNJAB", "09:45", -1],
-  ["PRTC PEPSU", "Ordinary", "L", "WEST_PUNJAB", "12:15", -1],
-  ["Jujhar", "HVAC Semi-Deluxe", "E", "WEST_PUNJAB", "15:00", -1],
-  ["Punbus", "Ordinary", "L", "WEST_PUNJAB", "17:30", -1],
-
-  // --- 7. Majha to South Malwa (Amritsar ⇄ Faridkot ⇄ Bathinda) ---
-  ["PRTC PEPSU", "Ordinary", "E", "MAJHA_MALWA", "06:30", 1],
-  ["Punbus", "Ordinary", "L", "MAJHA_MALWA", "09:00", 1],
-  ["New Deep", "Ordinary", "E", "MAJHA_MALWA", "12:15", 1],
-  ["PRTC PEPSU", "HVAC Semi-Deluxe", "E", "MAJHA_MALWA", "15:00", 1],
-  ["PRTC PEPSU", "Ordinary", "E", "MAJHA_MALWA", "07:15", -1],
-  ["New Deep", "Ordinary", "E", "MAJHA_MALWA", "10:45", -1],
-  ["Punbus", "Ordinary", "L", "MAJHA_MALWA", "14:00", -1],
-  ["PRTC PEPSU", "Ordinary", "E", "MAJHA_MALWA", "17:15", -1],
-
-  // --- 8. North Punjab & Doaba (Pathankot ⇄ Hoshiarpur ⇄ Jalandhar) ---
-  ["Punbus", "Ordinary", "E", "NORTH_DOABA", "06:15", 1],
-  ["Punbus", "Ordinary", "L", "NORTH_DOABA", "09:30", 1],
-  ["PRTC PEPSU", "Ordinary", "E", "NORTH_DOABA", "13:15", 1],
-  ["Punbus", "HVAC Semi-Deluxe", "E", "NORTH_DOABA", "16:30", 1],
-  ["Punbus", "Ordinary", "E", "NORTH_DOABA", "07:45", -1],
-  ["PRTC PEPSU", "Ordinary", "E", "NORTH_DOABA", "11:00", -1],
-  ["Punbus", "Ordinary", "L", "NORTH_DOABA", "14:45", -1],
-  ["Punbus", "HVAC Semi-Deluxe", "E", "NORTH_DOABA", "18:15", -1],
-
-  // --- 9. Ropar & Anandpur Sahib Corridor (Chandigarh ⇄ Ropar ⇄ Anandpur Sahib ⇄ Nangal) ---
-  ["Punbus", "Ordinary", "E", "ROPAR_ANANDPUR", "06:30", 1],
-  ["PRTC PEPSU", "Ordinary", "L", "ROPAR_ANANDPUR", "08:45", 1],
-  ["Punbus", "HVAC Semi-Deluxe", "E", "ROPAR_ANANDPUR", "11:15", 1],
-  ["Local Mini Bus", "Mini Bus", "L", "ROPAR_ANANDPUR", "14:00", 1],
-  ["Punbus", "Ordinary", "E", "ROPAR_ANANDPUR", "16:30", 1],
-  ["Punbus", "Ordinary", "E", "ROPAR_ANANDPUR", "08:00", -1],
-  ["PRTC PEPSU", "Ordinary", "L", "ROPAR_ANANDPUR", "11:30", -1],
-  ["Punbus", "HVAC Semi-Deluxe", "E", "ROPAR_ANANDPUR", "15:15", -1],
-
-  // --- 10. Majha Northern Trunk (Amritsar ⇄ Batala ⇄ Gurdaspur ⇄ Pathankot) ---
-  ["Punbus", "Ordinary", "E", "MAJHA_NORTH", "06:00", 1],
-  ["PRTC PEPSU", "Ordinary", "L", "MAJHA_NORTH", "08:30", 1],
-  ["Punbus", "HVAC Semi-Deluxe", "E", "MAJHA_NORTH", "11:00", 1],
-  ["Local Mini Bus", "Mini Bus", "L", "MAJHA_NORTH", "13:45", 1],
-  ["Punbus", "Ordinary", "E", "MAJHA_NORTH", "16:15", 1],
-  ["Punbus", "Ordinary", "E", "MAJHA_NORTH", "07:15", -1],
-  ["PRTC PEPSU", "Ordinary", "E", "MAJHA_NORTH", "10:30", -1],
-  ["Punbus", "HVAC Semi-Deluxe", "E", "MAJHA_NORTH", "14:00", -1],
-  ["Punbus", "Ordinary", "L", "MAJHA_NORTH", "17:30", -1],
-
-  // --- 11. Dera Baba Nanak & Sri Hargobindpur Link ---
-  ["Punbus", "Ordinary", "L", "BORDER_HERITAGE", "06:45", 1],
-  ["PRTC PEPSU", "Ordinary", "E", "BORDER_HERITAGE", "10:15", 1],
-  ["Local Mini Bus", "Mini Bus", "L", "BORDER_HERITAGE", "14:30", 1],
-  ["Punbus", "Ordinary", "E", "BORDER_HERITAGE", "17:45", 1],
-  ["PRTC PEPSU", "Ordinary", "L", "BORDER_HERITAGE", "08:00", -1],
-  ["Punbus", "Ordinary", "E", "BORDER_HERITAGE", "12:30", -1],
-  ["PRTC PEPSU", "Ordinary", "L", "BORDER_HERITAGE", "16:15", -1],
-
-  // --- 12. Border Majha Corridor (Amritsar ⇄ Tarn Taran ⇄ Patti ⇄ Khemkaran) ---
-  ["PRTC PEPSU", "Ordinary", "L", "TARN_TARAN_BORDER", "06:30", 1],
-  ["Punbus", "Ordinary", "E", "TARN_TARAN_BORDER", "09:45", 1],
-  ["Local Mini Bus", "Mini Bus", "L", "TARN_TARAN_BORDER", "13:15", 1],
-  ["PRTC PEPSU", "Ordinary", "E", "TARN_TARAN_BORDER", "17:00", 1],
-  ["Punbus", "Ordinary", "L", "TARN_TARAN_BORDER", "08:15", -1],
-  ["PRTC PEPSU", "Ordinary", "E", "TARN_TARAN_BORDER", "11:30", -1],
-  ["Punbus", "Ordinary", "L", "TARN_TARAN_BORDER", "15:45", -1],
-
-  // --- 13. Historic Doaba Circuit (Jalandhar ⇄ Kapurthala ⇄ Sultanpur Lodhi ⇄ Tarn Taran) ---
-  ["Punbus", "Ordinary", "E", "DOABA_KAPURTHALA", "06:15", 1],
-  ["PRTC PEPSU", "Ordinary", "L", "DOABA_KAPURTHALA", "09:30", 1],
-  ["Punbus", "HVAC Semi-Deluxe", "E", "DOABA_KAPURTHALA", "13:00", 1],
-  ["Local Mini Bus", "Mini Bus", "L", "DOABA_KAPURTHALA", "16:30", 1],
-  ["Punbus", "Ordinary", "E", "DOABA_KAPURTHALA", "07:30", -1],
-  ["PRTC PEPSU", "Ordinary", "E", "DOABA_KAPURTHALA", "11:15", -1],
-  ["Punbus", "Ordinary", "L", "DOABA_KAPURTHALA", "15:00", -1],
-
-  // --- 14. Nawanshahr & Shivalik Link (Jalandhar ⇄ Nawanshahr ⇄ Balachaur ⇄ Chandigarh) ---
-  ["Punbus", "Ordinary", "E", "DOABA_NAWANSHAHR", "06:00", 1],
-  ["PRTC PEPSU", "Ordinary", "L", "DOABA_NAWANSHAHR", "08:45", 1],
-  ["Orbit Aviators", "Volvo AC", "E", "DOABA_NAWANSHAHR", "11:30", 1],
-  ["Punbus", "HVAC Semi-Deluxe", "E", "DOABA_NAWANSHAHR", "14:45", 1],
-  ["PRTC PEPSU", "Ordinary", "E", "DOABA_NAWANSHAHR", "17:30", 1],
-  ["Punbus", "Ordinary", "E", "DOABA_NAWANSHAHR", "07:00", -1],
-  ["Orbit Aviators", "Volvo AC", "E", "DOABA_NAWANSHAHR", "10:15", -1],
-  ["PRTC PEPSU", "Ordinary", "L", "DOABA_NAWANSHAHR", "13:30", -1],
-  ["Punbus", "HVAC Semi-Deluxe", "E", "DOABA_NAWANSHAHR", "16:45", -1],
-
-  // --- 15. Hoshiarpur to Capital (Hoshiarpur ⇄ Garhshankar ⇄ Balachaur ⇄ Chandigarh) ---
-  ["PRTC PEPSU", "Ordinary", "E", "HOSHIARPUR_CHANDIGARH", "06:30", 1],
-  ["Punbus", "HVAC Semi-Deluxe", "E", "HOSHIARPUR_CHANDIGARH", "09:15", 1],
-  ["Punbus", "Ordinary", "L", "HOSHIARPUR_CHANDIGARH", "13:30", 1],
-  ["PRTC PEPSU", "Ordinary", "E", "HOSHIARPUR_CHANDIGARH", "16:45", 1],
-  ["Punbus", "Ordinary", "E", "HOSHIARPUR_CHANDIGARH", "08:00", -1],
-  ["PRTC PEPSU", "HVAC Semi-Deluxe", "E", "HOSHIARPUR_CHANDIGARH", "11:45", -1],
-  ["Punbus", "Ordinary", "L", "HOSHIARPUR_CHANDIGARH", "15:15", -1],
-
-  // --- 16. South-West Border Highway (Firozpur ⇄ Jalalabad ⇄ Fazilka ⇄ Abohar) ---
-  ["PRTC PEPSU", "Ordinary", "E", "SOUTH_WEST_BORDER", "06:15", 1],
-  ["New Deep", "Ordinary", "L", "SOUTH_WEST_BORDER", "08:45", 1],
-  ["Punbus", "Ordinary", "E", "SOUTH_WEST_BORDER", "11:30", 1],
-  ["New Deep", "Ordinary", "E", "SOUTH_WEST_BORDER", "14:15", 1],
-  ["PRTC PEPSU", "HVAC Semi-Deluxe", "E", "SOUTH_WEST_BORDER", "17:00", 1],
-  ["New Deep", "Ordinary", "E", "SOUTH_WEST_BORDER", "07:00", -1],
-  ["Punbus", "Ordinary", "L", "SOUTH_WEST_BORDER", "09:30", -1],
-  ["PRTC PEPSU", "Ordinary", "E", "SOUTH_WEST_BORDER", "13:00", -1],
-  ["New Deep", "Ordinary", "L", "SOUTH_WEST_BORDER", "16:15", -1],
-
-  // --- 17. Cotton Belt Expressway (Bathinda ⇄ Gidderbaha ⇄ Malout ⇄ Abohar ⇄ Fazilka) ---
-  ["PRTC PEPSU", "Ordinary", "E", "MUKTSAR_MALOUT_ABOHAR", "06:30", 1],
-  ["Orbit Aviators", "Volvo AC", "E", "MUKTSAR_MALOUT_ABOHAR", "09:00", 1],
-  ["New Deep", "Ordinary", "L", "MUKTSAR_MALOUT_ABOHAR", "11:45", 1],
-  ["PRTC PEPSU", "HVAC Semi-Deluxe", "E", "MUKTSAR_MALOUT_ABOHAR", "14:30", 1],
-  ["Punbus", "Ordinary", "E", "MUKTSAR_MALOUT_ABOHAR", "17:15", 1],
-  ["New Deep", "Ordinary", "E", "MUKTSAR_MALOUT_ABOHAR", "07:30", -1],
-  ["Orbit Aviators", "Volvo AC", "E", "MUKTSAR_MALOUT_ABOHAR", "10:15", -1],
-  ["PRTC PEPSU", "Ordinary", "L", "MUKTSAR_MALOUT_ABOHAR", "13:30", -1],
-  ["PRTC PEPSU", "Ordinary", "E", "MUKTSAR_MALOUT_ABOHAR", "16:45", -1],
-
-  // --- 18. Historic Muktsar Line (Faridkot ⇄ Kotkapura ⇄ Muktsar ⇄ Malout ⇄ Lambi) ---
-  ["PRTC PEPSU", "Ordinary", "E", "MUKTSAR_FARIDKOT", "06:00", 1],
-  ["New Deep", "Ordinary", "L", "MUKTSAR_FARIDKOT", "08:30", 1],
-  ["Punbus", "Ordinary", "E", "MUKTSAR_FARIDKOT", "11:15", 1],
-  ["New Deep", "Ordinary", "E", "MUKTSAR_FARIDKOT", "14:45", 1],
-  ["PRTC PEPSU", "Ordinary", "L", "MUKTSAR_FARIDKOT", "17:30", 1],
-  ["New Deep", "Ordinary", "E", "MUKTSAR_FARIDKOT", "07:15", -1],
-  ["PRTC PEPSU", "Ordinary", "E", "MUKTSAR_FARIDKOT", "10:00", -1],
-  ["Punbus", "Ordinary", "L", "MUKTSAR_FARIDKOT", "13:15", -1],
-  ["New Deep", "Ordinary", "E", "MUKTSAR_FARIDKOT", "16:30", -1],
-
-  // --- 19. Central Malwa Link (Faridkot ⇄ Baghapurana ⇄ Moga ⇄ Jagraon ⇄ Ludhiana) ---
-  ["PRTC PEPSU", "Ordinary", "E", "MOGA_FARIDKOT_LUDHIANA", "06:30", 1],
-  ["Jujhar", "HVAC Semi-Deluxe", "E", "MOGA_FARIDKOT_LUDHIANA", "09:00", 1],
-  ["Punbus", "Ordinary", "L", "MOGA_FARIDKOT_LUDHIANA", "12:15", 1],
-  ["New Deep", "Ordinary", "E", "MOGA_FARIDKOT_LUDHIANA", "15:30", 1],
-  ["PRTC PEPSU", "Ordinary", "L", "MOGA_FARIDKOT_LUDHIANA", "18:00", 1],
-  ["Jujhar", "HVAC Semi-Deluxe", "E", "MOGA_FARIDKOT_LUDHIANA", "07:45", -1],
-  ["PRTC PEPSU", "Ordinary", "E", "MOGA_FARIDKOT_LUDHIANA", "10:30", -1],
-  ["Punbus", "Ordinary", "L", "MOGA_FARIDKOT_LUDHIANA", "14:00", -1],
-  ["New Deep", "Ordinary", "E", "MOGA_FARIDKOT_LUDHIANA", "16:45", -1],
-
-  // --- 20. South Malwa Spine (Patiala ⇄ Samana ⇄ Patran ⇄ Sunam ⇄ Sangrur ⇄ Mansa ⇄ Bathinda) ---
-  ["PRTC PEPSU", "Ordinary", "E", "PATIALA_MANSA_BATHINDA", "05:30", 1],
-  ["PRTC PEPSU", "Ordinary", "L", "PATIALA_MANSA_BATHINDA", "08:00", 1],
-  ["Orbit Aviators", "Volvo AC", "E", "PATIALA_MANSA_BATHINDA", "10:45", 1],
-  ["New Deep", "Ordinary", "L", "PATIALA_MANSA_BATHINDA", "13:15", 1],
-  ["PRTC PEPSU", "HVAC Semi-Deluxe", "E", "PATIALA_MANSA_BATHINDA", "16:00", 1],
-  ["PRTC PEPSU", "Ordinary", "E", "PATIALA_MANSA_BATHINDA", "06:45", -1],
-  ["Orbit Aviators", "Volvo AC", "E", "PATIALA_MANSA_BATHINDA", "09:30", -1],
-  ["New Deep", "Ordinary", "L", "PATIALA_MANSA_BATHINDA", "12:45", -1],
-  ["PRTC PEPSU", "Ordinary", "E", "PATIALA_MANSA_BATHINDA", "15:30", -1],
-
-  // --- 21. Southern Border Corridor (Sangrur ⇄ Sunam ⇄ Mansa ⇄ Budhlada ⇄ Sardulgarh) ---
-  ["PRTC PEPSU", "Ordinary", "L", "MANSA_SARDULGARH", "06:15", 1],
-  ["Punbus", "Ordinary", "E", "MANSA_SARDULGARH", "09:30", 1],
-  ["New Deep", "Ordinary", "L", "MANSA_SARDULGARH", "13:00", 1],
-  ["PRTC PEPSU", "Ordinary", "E", "MANSA_SARDULGARH", "16:30", 1],
-  ["Punbus", "Ordinary", "L", "MANSA_SARDULGARH", "07:30", -1],
-  ["PRTC PEPSU", "Ordinary", "E", "MANSA_SARDULGARH", "11:15", -1],
-  ["New Deep", "Ordinary", "L", "MANSA_SARDULGARH", "15:00", -1],
-
-  // --- 22. Bathinda Sub-division Circuit (Bathinda ⇄ Rampura ⇄ Talwandi Sabo ⇄ Raman) ---
-  ["PRTC PEPSU", "Ordinary", "L", "TALWANDI_SABO_CIRCUIT", "06:30", 1],
-  ["Local Mini Bus", "Mini Bus", "L", "TALWANDI_SABO_CIRCUIT", "09:15", 1],
-  ["PRTC PEPSU", "Ordinary", "E", "TALWANDI_SABO_CIRCUIT", "12:45", 1],
-  ["Local Mini Bus", "Mini Bus", "L", "TALWANDI_SABO_CIRCUIT", "15:30", 1],
-  ["PRTC PEPSU", "Ordinary", "L", "TALWANDI_SABO_CIRCUIT", "18:15", 1],
-  ["Local Mini Bus", "Mini Bus", "L", "TALWANDI_SABO_CIRCUIT", "07:45", -1],
-  ["PRTC PEPSU", "Ordinary", "E", "TALWANDI_SABO_CIRCUIT", "10:30", -1],
-  ["PRTC PEPSU", "Ordinary", "L", "TALWANDI_SABO_CIRCUIT", "14:15", -1],
-
-  // --- 23. Ludhiana to Barnala (Ludhiana ⇄ Raikot ⇄ Barnala ⇄ Tapa) ---
-  ["PRTC PEPSU", "Ordinary", "E", "LUDHIANA_BARNALA", "06:45", 1],
-  ["Libra", "HVAC Semi-Deluxe", "E", "LUDHIANA_BARNALA", "09:15", 1],
-  ["Local Mini Bus", "Mini Bus", "L", "LUDHIANA_BARNALA", "12:30", 1],
-  ["PRTC PEPSU", "Ordinary", "L", "LUDHIANA_BARNALA", "15:15", 1],
-  ["New Deep", "Ordinary", "E", "LUDHIANA_BARNALA", "18:00", 1],
-  ["Libra", "HVAC Semi-Deluxe", "E", "LUDHIANA_BARNALA", "08:00", -1],
-  ["PRTC PEPSU", "Ordinary", "E", "LUDHIANA_BARNALA", "10:45", -1],
-  ["Local Mini Bus", "Mini Bus", "L", "LUDHIANA_BARNALA", "14:00", -1],
-  ["PRTC PEPSU", "Ordinary", "L", "LUDHIANA_BARNALA", "16:45", -1],
-
-  // --- 24. Malerkotla Heart of Malwa (Ludhiana ⇄ Ahmedgarh ⇄ Malerkotla ⇄ Nabha ⇄ Patiala) ---
-  ["PRTC PEPSU", "Ordinary", "E", "LUDHIANA_MALERKOTLA_PATIALA", "06:15", 1],
-  ["Libra", "HVAC Semi-Deluxe", "E", "LUDHIANA_MALERKOTLA_PATIALA", "08:45", 1],
-  ["PRTC PEPSU", "Ordinary", "L", "LUDHIANA_MALERKOTLA_PATIALA", "11:30", 1],
-  ["Local Mini Bus", "Mini Bus", "L", "LUDHIANA_MALERKOTLA_PATIALA", "14:15", 1],
-  ["PRTC PEPSU", "Ordinary", "E", "LUDHIANA_MALERKOTLA_PATIALA", "17:00", 1],
-  ["PRTC PEPSU", "Ordinary", "E", "LUDHIANA_MALERKOTLA_PATIALA", "07:30", -1],
-  ["Libra", "HVAC Semi-Deluxe", "E", "LUDHIANA_MALERKOTLA_PATIALA", "10:00", -1],
-  ["PRTC PEPSU", "Ordinary", "L", "LUDHIANA_MALERKOTLA_PATIALA", "13:00", -1],
-  ["PRTC PEPSU", "Ordinary", "E", "LUDHIANA_MALERKOTLA_PATIALA", "15:45", -1],
-
-  // --- 25. Tricity & Shivalik Bypass (Chandigarh ⇄ Mohali ⇄ Kharar ⇄ Chamkaur ⇄ Ropar) ---
-  ["CTU", "Ordinary", "L", "MOHALI_ROPAR_SHIVALIK", "06:45", 1],
-  ["Punbus", "Ordinary", "E", "MOHALI_ROPAR_SHIVALIK", "09:30", 1],
-  ["Local Mini Bus", "Mini Bus", "L", "MOHALI_ROPAR_SHIVALIK", "13:00", 1],
-  ["Punbus", "HVAC Semi-Deluxe", "E", "MOHALI_ROPAR_SHIVALIK", "16:15", 1],
-  ["Punbus", "Ordinary", "E", "MOHALI_ROPAR_SHIVALIK", "08:15", -1],
-  ["CTU", "Ordinary", "L", "MOHALI_ROPAR_SHIVALIK", "11:00", -1],
-  ["Punbus", "Ordinary", "L", "MOHALI_ROPAR_SHIVALIK", "14:45", -1],
-
-  // --- 26. Historic Sirhind Circuit (Chandigarh ⇄ Zirakpur ⇄ Rajpura ⇄ Sirhind ⇄ Khanna) ---
-  ["PRTC PEPSU", "Ordinary", "L", "FATEHGARH_PATIALA_CIRCUIT", "06:30", 1],
-  ["Punbus", "Ordinary", "E", "FATEHGARH_PATIALA_CIRCUIT", "09:15", 1],
-  ["Local Mini Bus", "Mini Bus", "L", "FATEHGARH_PATIALA_CIRCUIT", "12:45", 1],
-  ["PRTC PEPSU", "Ordinary", "E", "FATEHGARH_PATIALA_CIRCUIT", "15:30", 1],
-  ["Punbus", "Ordinary", "L", "FATEHGARH_PATIALA_CIRCUIT", "08:00", -1],
-  ["PRTC PEPSU", "Ordinary", "E", "FATEHGARH_PATIALA_CIRCUIT", "11:00", -1],
-  ["PRTC PEPSU", "Ordinary", "L", "FATEHGARH_PATIALA_CIRCUIT", "14:15", -1],
-
-  // --- 27. Doaba to Malwa Cross-River (Jalandhar ⇄ Nakodar ⇄ Shahkot ⇄ Moga) ---
-  ["Punbus", "Ordinary", "E", "JALANDHAR_NAKODAR_MOGA", "06:45", 1],
-  ["PRTC PEPSU", "Ordinary", "L", "JALANDHAR_NAKODAR_MOGA", "10:00", 1],
-  ["Local Mini Bus", "Mini Bus", "L", "JALANDHAR_NAKODAR_MOGA", "13:30", 1],
-  ["Punbus", "Ordinary", "E", "JALANDHAR_NAKODAR_MOGA", "16:45", 1],
-  ["PRTC PEPSU", "Ordinary", "E", "JALANDHAR_NAKODAR_MOGA", "08:15", -1],
-  ["Punbus", "Ordinary", "L", "JALANDHAR_NAKODAR_MOGA", "11:45", -1],
-  ["PRTC PEPSU", "Ordinary", "E", "JALANDHAR_NAKODAR_MOGA", "15:15", -1],
-
-  // --- 28. Kandi Canal Belt (Hoshiarpur ⇄ Dasuya ⇄ Mukerian ⇄ Talwara) ---
-  ["Punbus", "Ordinary", "L", "HOSHIARPUR_TALWARA", "06:30", 1],
-  ["PRTC PEPSU", "Ordinary", "E", "HOSHIARPUR_TALWARA", "10:15", 1],
-  ["Local Mini Bus", "Mini Bus", "L", "HOSHIARPUR_TALWARA", "14:00", 1],
-  ["Punbus", "Ordinary", "E", "HOSHIARPUR_TALWARA", "17:15", 1],
-  ["PRTC PEPSU", "Ordinary", "L", "HOSHIARPUR_TALWARA", "08:00", -1],
-  ["Punbus", "Ordinary", "E", "HOSHIARPUR_TALWARA", "12:00", -1],
-  ["Local Mini Bus", "Mini Bus", "L", "HOSHIARPUR_TALWARA", "15:45", -1],
-
-  // --- 29. Ambala to Chandigarh Link ---
-  ["Haryana Roadways", "Ordinary", "E", "A", "08:10", 1],
-  ["CTU", "Ordinary", "L", "A", "11:30", 1],
-  ["Haryana Roadways", "Ordinary", "E", "A", "14:10", -1],
-  ["CTU", "Ordinary", "L", "A", "17:15", -1]
+  [
+    "PRTC PEPSU",
+    "Ordinary",
+    "E",
+    "E",
+    "05:15",
+    1
+  ],
+  [
+    "Punbus",
+    "Ordinary",
+    "E",
+    "E",
+    "05:45",
+    1
+  ],
+  [
+    "PRTC PEPSU",
+    "Ordinary",
+    "E",
+    "E",
+    "06:15",
+    1
+  ],
+  [
+    "Punbus",
+    "Ordinary",
+    "L",
+    "L",
+    "06:45",
+    1
+  ],
+  [
+    "Orbit Aviators",
+    "Volvo AC",
+    "E",
+    "E",
+    "07:15",
+    1
+  ],
+  [
+    "PRTC PEPSU",
+    "HVAC Semi-Deluxe",
+    "E",
+    "E",
+    "07:45",
+    1
+  ],
+  [
+    "Punbus",
+    "Ordinary",
+    "E",
+    "E",
+    "08:15",
+    1
+  ],
+  [
+    "Orbit Aviators",
+    "Volvo AC",
+    "E",
+    "E",
+    "08:45",
+    1
+  ],
+  [
+    "Local Mini Bus",
+    "Mini Bus",
+    "L",
+    "L",
+    "09:10",
+    1
+  ],
+  [
+    "PRTC PEPSU",
+    "Ordinary",
+    "E",
+    "E",
+    "09:30",
+    1
+  ],
+  [
+    "Punbus",
+    "Ordinary",
+    "E",
+    "E",
+    "10:15",
+    1
+  ],
+  [
+    "Jujhar",
+    "HVAC Semi-Deluxe",
+    "E",
+    "E",
+    "11:00",
+    1
+  ],
+  [
+    "PRTC PEPSU",
+    "Ordinary",
+    "L",
+    "L",
+    "11:45",
+    1
+  ],
+  [
+    "Libra",
+    "HVAC Semi-Deluxe",
+    "L",
+    "L",
+    "12:30",
+    1
+  ],
+  [
+    "Punbus",
+    "Ordinary",
+    "E",
+    "E",
+    "13:15",
+    1
+  ],
+  [
+    "Orbit Aviators",
+    "Volvo AC",
+    "E",
+    "E",
+    "14:15",
+    1
+  ],
+  [
+    "PRTC PEPSU",
+    "Ordinary",
+    "E",
+    "E",
+    "15:00",
+    1
+  ],
+  [
+    "Punbus",
+    "Ordinary",
+    "L",
+    "L",
+    "15:45",
+    1
+  ],
+  [
+    "PRTC PEPSU",
+    "HVAC Semi-Deluxe",
+    "E",
+    "E",
+    "16:30",
+    1
+  ],
+  [
+    "Jujhar",
+    "HVAC Semi-Deluxe",
+    "E",
+    "E",
+    "17:15",
+    1
+  ],
+  [
+    "Orbit Aviators",
+    "Volvo AC",
+    "E",
+    "E",
+    "18:00",
+    1
+  ],
+  [
+    "PRTC PEPSU",
+    "Ordinary",
+    "E",
+    "E",
+    "18:45",
+    1
+  ],
+  [
+    "Punbus",
+    "Ordinary",
+    "L",
+    "L",
+    "19:30",
+    1
+  ],
+  [
+    "PRTC PEPSU",
+    "Ordinary",
+    "E",
+    "E",
+    "20:15",
+    1
+  ],
+  [
+    "Punbus",
+    "Ordinary",
+    "L",
+    "L",
+    "21:00",
+    1
+  ],
+  [
+    "Orbit Aviators",
+    "Volvo AC",
+    "E",
+    "E",
+    "22:15",
+    1
+  ],
+  [
+    "PRTC PEPSU",
+    "Ordinary",
+    "E",
+    "E",
+    "23:30",
+    1
+  ],
+  [
+    "PRTC PEPSU",
+    "Ordinary",
+    "E",
+    "E",
+    "05:30",
+    -1
+  ],
+  [
+    "Punbus",
+    "Ordinary",
+    "E",
+    "E",
+    "06:15",
+    -1
+  ],
+  [
+    "PRTC PEPSU",
+    "Ordinary",
+    "E",
+    "E",
+    "06:50",
+    -1
+  ],
+  [
+    "Orbit Aviators",
+    "Volvo AC",
+    "E",
+    "E",
+    "07:30",
+    -1
+  ],
+  [
+    "Punbus",
+    "Ordinary",
+    "L",
+    "L",
+    "08:15",
+    -1
+  ],
+  [
+    "PRTC PEPSU",
+    "HVAC Semi-Deluxe",
+    "E",
+    "E",
+    "08:45",
+    -1
+  ],
+  [
+    "Local Mini Bus",
+    "Mini Bus",
+    "L",
+    "L",
+    "09:30",
+    -1
+  ],
+  [
+    "Punbus",
+    "Ordinary",
+    "E",
+    "E",
+    "10:15",
+    -1
+  ],
+  [
+    "Jujhar",
+    "HVAC Semi-Deluxe",
+    "E",
+    "E",
+    "11:00",
+    -1
+  ],
+  [
+    "PRTC PEPSU",
+    "Ordinary",
+    "E",
+    "E",
+    "11:45",
+    -1
+  ],
+  [
+    "Libra",
+    "HVAC Semi-Deluxe",
+    "L",
+    "L",
+    "12:30",
+    -1
+  ],
+  [
+    "Punbus",
+    "Ordinary",
+    "L",
+    "L",
+    "13:15",
+    -1
+  ],
+  [
+    "Orbit Aviators",
+    "Volvo AC",
+    "E",
+    "E",
+    "14:00",
+    -1
+  ],
+  [
+    "PRTC PEPSU",
+    "Ordinary",
+    "E",
+    "E",
+    "14:45",
+    -1
+  ],
+  [
+    "Punbus",
+    "Ordinary",
+    "E",
+    "E",
+    "15:30",
+    -1
+  ],
+  [
+    "Jujhar",
+    "HVAC Semi-Deluxe",
+    "E",
+    "E",
+    "16:20",
+    -1
+  ],
+  [
+    "PRTC PEPSU",
+    "HVAC Semi-Deluxe",
+    "E",
+    "E",
+    "17:00",
+    -1
+  ],
+  [
+    "Orbit Aviators",
+    "Volvo AC",
+    "E",
+    "E",
+    "17:45",
+    -1
+  ],
+  [
+    "PRTC PEPSU",
+    "Ordinary",
+    "E",
+    "E",
+    "18:30",
+    -1
+  ],
+  [
+    "Punbus",
+    "Ordinary",
+    "L",
+    "L",
+    "19:15",
+    -1
+  ],
+  [
+    "PRTC PEPSU",
+    "Ordinary",
+    "E",
+    "E",
+    "20:15",
+    -1
+  ],
+  [
+    "Orbit Aviators",
+    "Volvo AC",
+    "E",
+    "E",
+    "21:30",
+    -1
+  ],
+  [
+    "Punbus",
+    "Ordinary",
+    "E",
+    "E",
+    "22:45",
+    -1
+  ],
+  [
+    "Punbus",
+    "Ordinary",
+    "E",
+    "J",
+    "05:30",
+    1
+  ],
+  [
+    "PRTC PEPSU",
+    "Ordinary",
+    "E",
+    "J",
+    "06:30",
+    1
+  ],
+  [
+    "Orbit Aviators",
+    "Volvo AC",
+    "E",
+    "J",
+    "07:45",
+    1
+  ],
+  [
+    "Punbus",
+    "HVAC Semi-Deluxe",
+    "E",
+    "J",
+    "09:15",
+    1
+  ],
+  [
+    "Orbit Aviators",
+    "Volvo AC",
+    "E",
+    "J",
+    "10:45",
+    1
+  ],
+  [
+    "PRTC PEPSU",
+    "Ordinary",
+    "E",
+    "J",
+    "12:00",
+    1
+  ],
+  [
+    "PRTC PEPSU",
+    "HVAC Semi-Deluxe",
+    "E",
+    "J",
+    "13:30",
+    1
+  ],
+  [
+    "Punbus",
+    "Ordinary",
+    "E",
+    "J",
+    "15:00",
+    1
+  ],
+  [
+    "Orbit Aviators",
+    "Volvo AC",
+    "E",
+    "J",
+    "16:15",
+    1
+  ],
+  [
+    "Punbus",
+    "Ordinary",
+    "E",
+    "J",
+    "17:30",
+    1
+  ],
+  [
+    "PRTC PEPSU",
+    "Ordinary",
+    "E",
+    "J",
+    "19:00",
+    1
+  ],
+  [
+    "Orbit Aviators",
+    "Volvo AC",
+    "E",
+    "J",
+    "20:30",
+    1
+  ],
+  [
+    "Punbus",
+    "Ordinary",
+    "E",
+    "J",
+    "06:00",
+    -1
+  ],
+  [
+    "Orbit Aviators",
+    "Volvo AC",
+    "E",
+    "J",
+    "07:15",
+    -1
+  ],
+  [
+    "PRTC PEPSU",
+    "Ordinary",
+    "E",
+    "J",
+    "08:45",
+    -1
+  ],
+  [
+    "Orbit Aviators",
+    "Volvo AC",
+    "E",
+    "J",
+    "10:15",
+    -1
+  ],
+  [
+    "Punbus",
+    "HVAC Semi-Deluxe",
+    "E",
+    "J",
+    "11:45",
+    -1
+  ],
+  [
+    "PRTC PEPSU",
+    "Ordinary",
+    "E",
+    "J",
+    "13:15",
+    -1
+  ],
+  [
+    "PRTC PEPSU",
+    "HVAC Semi-Deluxe",
+    "E",
+    "J",
+    "14:45",
+    -1
+  ],
+  [
+    "Punbus",
+    "Ordinary",
+    "E",
+    "J",
+    "16:15",
+    -1
+  ],
+  [
+    "Orbit Aviators",
+    "Volvo AC",
+    "E",
+    "J",
+    "17:45",
+    -1
+  ],
+  [
+    "Punbus",
+    "HVAC Semi-Deluxe",
+    "E",
+    "J",
+    "19:15",
+    -1
+  ],
+  [
+    "PRTC PEPSU",
+    "Ordinary",
+    "E",
+    "J",
+    "21:00",
+    -1
+  ],
+  [
+    "Punbus",
+    "Ordinary",
+    "E",
+    "CHD_ASR",
+    "05:00",
+    1
+  ],
+  [
+    "Punbus",
+    "HVAC Semi-Deluxe",
+    "E",
+    "CHD_ASR",
+    "06:15",
+    1
+  ],
+  [
+    "Orbit Aviators",
+    "Volvo AC",
+    "E",
+    "CHD_ASR",
+    "07:30",
+    1
+  ],
+  [
+    "PRTC PEPSU",
+    "Ordinary",
+    "E",
+    "CHD_ASR",
+    "08:45",
+    1
+  ],
+  [
+    "Orbit Aviators",
+    "Volvo AC",
+    "E",
+    "CHD_ASR",
+    "10:00",
+    1
+  ],
+  [
+    "Punbus",
+    "Ordinary",
+    "E",
+    "CHD_ASR",
+    "11:15",
+    1
+  ],
+  [
+    "PRTC PEPSU",
+    "HVAC Semi-Deluxe",
+    "E",
+    "CHD_ASR",
+    "12:30",
+    1
+  ],
+  [
+    "Orbit Aviators",
+    "Volvo AC",
+    "E",
+    "CHD_ASR",
+    "13:45",
+    1
+  ],
+  [
+    "Punbus",
+    "Ordinary",
+    "E",
+    "CHD_ASR",
+    "15:00",
+    1
+  ],
+  [
+    "PRTC PEPSU",
+    "Ordinary",
+    "E",
+    "CHD_ASR",
+    "16:15",
+    1
+  ],
+  [
+    "Orbit Aviators",
+    "Volvo AC",
+    "E",
+    "CHD_ASR",
+    "17:30",
+    1
+  ],
+  [
+    "Punbus",
+    "HVAC Semi-Deluxe",
+    "E",
+    "CHD_ASR",
+    "18:45",
+    1
+  ],
+  [
+    "PRTC PEPSU",
+    "Ordinary",
+    "E",
+    "CHD_ASR",
+    "20:00",
+    1
+  ],
+  [
+    "Orbit Aviators",
+    "Volvo AC",
+    "E",
+    "CHD_ASR",
+    "21:30",
+    1
+  ],
+  [
+    "Punbus",
+    "Ordinary",
+    "E",
+    "CHD_ASR",
+    "23:00",
+    1
+  ],
+  [
+    "Punbus",
+    "Ordinary",
+    "E",
+    "CHD_ASR",
+    "05:15",
+    -1
+  ],
+  [
+    "Orbit Aviators",
+    "Volvo AC",
+    "E",
+    "CHD_ASR",
+    "06:30",
+    -1
+  ],
+  [
+    "PRTC PEPSU",
+    "Ordinary",
+    "E",
+    "CHD_ASR",
+    "07:45",
+    -1
+  ],
+  [
+    "Punbus",
+    "HVAC Semi-Deluxe",
+    "E",
+    "CHD_ASR",
+    "09:00",
+    -1
+  ],
+  [
+    "Orbit Aviators",
+    "Volvo AC",
+    "E",
+    "CHD_ASR",
+    "10:15",
+    -1
+  ],
+  [
+    "PRTC PEPSU",
+    "Ordinary",
+    "E",
+    "CHD_ASR",
+    "11:30",
+    -1
+  ],
+  [
+    "Punbus",
+    "Ordinary",
+    "E",
+    "CHD_ASR",
+    "12:45",
+    -1
+  ],
+  [
+    "Orbit Aviators",
+    "Volvo AC",
+    "E",
+    "CHD_ASR",
+    "14:00",
+    -1
+  ],
+  [
+    "PRTC PEPSU",
+    "HVAC Semi-Deluxe",
+    "E",
+    "CHD_ASR",
+    "15:15",
+    -1
+  ],
+  [
+    "Punbus",
+    "Ordinary",
+    "E",
+    "CHD_ASR",
+    "16:30",
+    -1
+  ],
+  [
+    "Orbit Aviators",
+    "Volvo AC",
+    "E",
+    "CHD_ASR",
+    "17:45",
+    -1
+  ],
+  [
+    "PRTC PEPSU",
+    "Ordinary",
+    "E",
+    "CHD_ASR",
+    "19:00",
+    -1
+  ],
+  [
+    "Punbus",
+    "HVAC Semi-Deluxe",
+    "E",
+    "CHD_ASR",
+    "20:15",
+    -1
+  ],
+  [
+    "Orbit Aviators",
+    "Volvo AC",
+    "E",
+    "CHD_ASR",
+    "22:00",
+    -1
+  ],
+  [
+    "Punbus",
+    "Ordinary",
+    "E",
+    "GT_CORRIDOR",
+    "05:30",
+    1
+  ],
+  [
+    "PRTC PEPSU",
+    "Ordinary",
+    "L",
+    "GT_CORRIDOR",
+    "07:00",
+    1
+  ],
+  [
+    "Libra",
+    "HVAC Semi-Deluxe",
+    "E",
+    "GT_CORRIDOR",
+    "08:30",
+    1
+  ],
+  [
+    "Punbus",
+    "Ordinary",
+    "E",
+    "GT_CORRIDOR",
+    "10:00",
+    1
+  ],
+  [
+    "Haryana Roadways",
+    "Ordinary",
+    "E",
+    "GT_CORRIDOR",
+    "11:30",
+    1
+  ],
+  [
+    "PRTC PEPSU",
+    "HVAC Semi-Deluxe",
+    "E",
+    "GT_CORRIDOR",
+    "13:00",
+    1
+  ],
+  [
+    "Punbus",
+    "Ordinary",
+    "E",
+    "GT_CORRIDOR",
+    "14:30",
+    1
+  ],
+  [
+    "Libra",
+    "HVAC Semi-Deluxe",
+    "E",
+    "GT_CORRIDOR",
+    "16:00",
+    1
+  ],
+  [
+    "Haryana Roadways",
+    "Ordinary",
+    "E",
+    "GT_CORRIDOR",
+    "17:30",
+    1
+  ],
+  [
+    "PRTC PEPSU",
+    "Ordinary",
+    "E",
+    "GT_CORRIDOR",
+    "19:00",
+    1
+  ],
+  [
+    "Punbus",
+    "Ordinary",
+    "L",
+    "GT_CORRIDOR",
+    "20:30",
+    1
+  ],
+  [
+    "Haryana Roadways",
+    "Ordinary",
+    "E",
+    "GT_CORRIDOR",
+    "06:00",
+    -1
+  ],
+  [
+    "PRTC PEPSU",
+    "Ordinary",
+    "E",
+    "GT_CORRIDOR",
+    "07:30",
+    -1
+  ],
+  [
+    "Punbus",
+    "Ordinary",
+    "E",
+    "GT_CORRIDOR",
+    "09:00",
+    -1
+  ],
+  [
+    "Libra",
+    "HVAC Semi-Deluxe",
+    "E",
+    "GT_CORRIDOR",
+    "10:30",
+    -1
+  ],
+  [
+    "PRTC PEPSU",
+    "Ordinary",
+    "L",
+    "GT_CORRIDOR",
+    "12:00",
+    -1
+  ],
+  [
+    "Haryana Roadways",
+    "Ordinary",
+    "E",
+    "GT_CORRIDOR",
+    "13:30",
+    -1
+  ],
+  [
+    "Punbus",
+    "HVAC Semi-Deluxe",
+    "E",
+    "GT_CORRIDOR",
+    "15:00",
+    -1
+  ],
+  [
+    "Libra",
+    "HVAC Semi-Deluxe",
+    "E",
+    "GT_CORRIDOR",
+    "16:30",
+    -1
+  ],
+  [
+    "PRTC PEPSU",
+    "Ordinary",
+    "E",
+    "GT_CORRIDOR",
+    "18:00",
+    -1
+  ],
+  [
+    "Punbus",
+    "Ordinary",
+    "E",
+    "GT_CORRIDOR",
+    "19:45",
+    -1
+  ],
+  [
+    "PRTC PEPSU",
+    "Ordinary",
+    "E",
+    "MALWA_NH7",
+    "05:15",
+    1
+  ],
+  [
+    "PRTC PEPSU",
+    "HVAC Semi-Deluxe",
+    "E",
+    "MALWA_NH7",
+    "06:30",
+    1
+  ],
+  [
+    "PRTC PEPSU",
+    "Ordinary",
+    "L",
+    "MALWA_NH7",
+    "07:45",
+    1
+  ],
+  [
+    "Orbit Aviators",
+    "Volvo AC",
+    "E",
+    "MALWA_NH7",
+    "09:00",
+    1
+  ],
+  [
+    "New Deep",
+    "Ordinary",
+    "L",
+    "MALWA_NH7",
+    "10:15",
+    1
+  ],
+  [
+    "PRTC PEPSU",
+    "Ordinary",
+    "E",
+    "MALWA_NH7",
+    "11:30",
+    1
+  ],
+  [
+    "Orbit Aviators",
+    "Volvo AC",
+    "E",
+    "MALWA_NH7",
+    "13:00",
+    1
+  ],
+  [
+    "PRTC PEPSU",
+    "HVAC Semi-Deluxe",
+    "E",
+    "MALWA_NH7",
+    "14:15",
+    1
+  ],
+  [
+    "New Deep",
+    "Ordinary",
+    "E",
+    "MALWA_NH7",
+    "15:30",
+    1
+  ],
+  [
+    "PRTC PEPSU",
+    "Ordinary",
+    "E",
+    "MALWA_NH7",
+    "16:45",
+    1
+  ],
+  [
+    "Orbit Aviators",
+    "Volvo AC",
+    "E",
+    "MALWA_NH7",
+    "18:00",
+    1
+  ],
+  [
+    "PRTC PEPSU",
+    "Ordinary",
+    "L",
+    "MALWA_NH7",
+    "19:15",
+    1
+  ],
+  [
+    "New Deep",
+    "Ordinary",
+    "L",
+    "MALWA_NH7",
+    "20:30",
+    1
+  ],
+  [
+    "PRTC PEPSU",
+    "Ordinary",
+    "E",
+    "MALWA_NH7",
+    "05:30",
+    -1
+  ],
+  [
+    "Orbit Aviators",
+    "Volvo AC",
+    "E",
+    "MALWA_NH7",
+    "06:45",
+    -1
+  ],
+  [
+    "PRTC PEPSU",
+    "HVAC Semi-Deluxe",
+    "E",
+    "MALWA_NH7",
+    "08:00",
+    -1
+  ],
+  [
+    "New Deep",
+    "Ordinary",
+    "L",
+    "MALWA_NH7",
+    "09:15",
+    -1
+  ],
+  [
+    "PRTC PEPSU",
+    "Ordinary",
+    "E",
+    "MALWA_NH7",
+    "10:30",
+    -1
+  ],
+  [
+    "Orbit Aviators",
+    "Volvo AC",
+    "E",
+    "MALWA_NH7",
+    "12:00",
+    -1
+  ],
+  [
+    "New Deep",
+    "Ordinary",
+    "E",
+    "MALWA_NH7",
+    "13:15",
+    -1
+  ],
+  [
+    "PRTC PEPSU",
+    "Ordinary",
+    "E",
+    "MALWA_NH7",
+    "14:30",
+    -1
+  ],
+  [
+    "PRTC PEPSU",
+    "HVAC Semi-Deluxe",
+    "E",
+    "MALWA_NH7",
+    "15:45",
+    -1
+  ],
+  [
+    "Orbit Aviators",
+    "Volvo AC",
+    "E",
+    "MALWA_NH7",
+    "17:00",
+    -1
+  ],
+  [
+    "PRTC PEPSU",
+    "Ordinary",
+    "E",
+    "MALWA_NH7",
+    "18:15",
+    -1
+  ],
+  [
+    "New Deep",
+    "Ordinary",
+    "L",
+    "MALWA_NH7",
+    "19:30",
+    -1
+  ],
+  [
+    "Punbus",
+    "Ordinary",
+    "E",
+    "WEST_PUNJAB",
+    "06:00",
+    1
+  ],
+  [
+    "PRTC PEPSU",
+    "Ordinary",
+    "L",
+    "WEST_PUNJAB",
+    "07:30",
+    1
+  ],
+  [
+    "Jujhar",
+    "HVAC Semi-Deluxe",
+    "E",
+    "WEST_PUNJAB",
+    "09:00",
+    1
+  ],
+  [
+    "New Deep",
+    "Ordinary",
+    "E",
+    "WEST_PUNJAB",
+    "10:30",
+    1
+  ],
+  [
+    "Punbus",
+    "Ordinary",
+    "L",
+    "WEST_PUNJAB",
+    "12:00",
+    1
+  ],
+  [
+    "PRTC PEPSU",
+    "Ordinary",
+    "E",
+    "WEST_PUNJAB",
+    "13:30",
+    1
+  ],
+  [
+    "Jujhar",
+    "HVAC Semi-Deluxe",
+    "E",
+    "WEST_PUNJAB",
+    "15:00",
+    1
+  ],
+  [
+    "New Deep",
+    "Ordinary",
+    "E",
+    "WEST_PUNJAB",
+    "16:30",
+    1
+  ],
+  [
+    "Punbus",
+    "Ordinary",
+    "E",
+    "WEST_PUNJAB",
+    "18:00",
+    1
+  ],
+  [
+    "PRTC PEPSU",
+    "Ordinary",
+    "L",
+    "WEST_PUNJAB",
+    "19:30",
+    1
+  ],
+  [
+    "Punbus",
+    "Ordinary",
+    "E",
+    "WEST_PUNJAB",
+    "06:15",
+    -1
+  ],
+  [
+    "New Deep",
+    "Ordinary",
+    "E",
+    "WEST_PUNJAB",
+    "07:45",
+    -1
+  ],
+  [
+    "PRTC PEPSU",
+    "Ordinary",
+    "L",
+    "WEST_PUNJAB",
+    "09:15",
+    -1
+  ],
+  [
+    "Jujhar",
+    "HVAC Semi-Deluxe",
+    "E",
+    "WEST_PUNJAB",
+    "10:45",
+    -1
+  ],
+  [
+    "Punbus",
+    "Ordinary",
+    "E",
+    "WEST_PUNJAB",
+    "12:15",
+    -1
+  ],
+  [
+    "PRTC PEPSU",
+    "Ordinary",
+    "E",
+    "WEST_PUNJAB",
+    "13:45",
+    -1
+  ],
+  [
+    "New Deep",
+    "Ordinary",
+    "E",
+    "WEST_PUNJAB",
+    "15:15",
+    -1
+  ],
+  [
+    "Jujhar",
+    "HVAC Semi-Deluxe",
+    "E",
+    "WEST_PUNJAB",
+    "16:45",
+    -1
+  ],
+  [
+    "Punbus",
+    "Ordinary",
+    "L",
+    "WEST_PUNJAB",
+    "18:15",
+    -1
+  ],
+  [
+    "PRTC PEPSU",
+    "Ordinary",
+    "E",
+    "MAJHA_MALWA",
+    "05:45",
+    1
+  ],
+  [
+    "Punbus",
+    "Ordinary",
+    "L",
+    "MAJHA_MALWA",
+    "07:30",
+    1
+  ],
+  [
+    "New Deep",
+    "Ordinary",
+    "E",
+    "MAJHA_MALWA",
+    "09:15",
+    1
+  ],
+  [
+    "PRTC PEPSU",
+    "HVAC Semi-Deluxe",
+    "E",
+    "MAJHA_MALWA",
+    "11:00",
+    1
+  ],
+  [
+    "Punbus",
+    "Ordinary",
+    "E",
+    "MAJHA_MALWA",
+    "13:00",
+    1
+  ],
+  [
+    "New Deep",
+    "Ordinary",
+    "E",
+    "MAJHA_MALWA",
+    "14:45",
+    1
+  ],
+  [
+    "PRTC PEPSU",
+    "Ordinary",
+    "E",
+    "MAJHA_MALWA",
+    "16:30",
+    1
+  ],
+  [
+    "Punbus",
+    "Ordinary",
+    "L",
+    "MAJHA_MALWA",
+    "18:15",
+    1
+  ],
+  [
+    "PRTC PEPSU",
+    "Ordinary",
+    "E",
+    "MAJHA_MALWA",
+    "06:00",
+    -1
+  ],
+  [
+    "New Deep",
+    "Ordinary",
+    "E",
+    "MAJHA_MALWA",
+    "07:45",
+    -1
+  ],
+  [
+    "Punbus",
+    "Ordinary",
+    "L",
+    "MAJHA_MALWA",
+    "09:30",
+    -1
+  ],
+  [
+    "PRTC PEPSU",
+    "HVAC Semi-Deluxe",
+    "E",
+    "MAJHA_MALWA",
+    "11:30",
+    -1
+  ],
+  [
+    "New Deep",
+    "Ordinary",
+    "E",
+    "MAJHA_MALWA",
+    "13:30",
+    -1
+  ],
+  [
+    "PRTC PEPSU",
+    "Ordinary",
+    "E",
+    "MAJHA_MALWA",
+    "15:15",
+    -1
+  ],
+  [
+    "Punbus",
+    "Ordinary",
+    "E",
+    "MAJHA_MALWA",
+    "17:00",
+    -1
+  ],
+  [
+    "Punbus",
+    "Ordinary",
+    "E",
+    "NORTH_DOABA",
+    "06:00",
+    1
+  ],
+  [
+    "PRTC PEPSU",
+    "Ordinary",
+    "L",
+    "NORTH_DOABA",
+    "07:45",
+    1
+  ],
+  [
+    "Punbus",
+    "HVAC Semi-Deluxe",
+    "E",
+    "NORTH_DOABA",
+    "09:30",
+    1
+  ],
+  [
+    "PRTC PEPSU",
+    "Ordinary",
+    "E",
+    "NORTH_DOABA",
+    "11:15",
+    1
+  ],
+  [
+    "Punbus",
+    "Ordinary",
+    "L",
+    "NORTH_DOABA",
+    "13:00",
+    1
+  ],
+  [
+    "Punbus",
+    "Ordinary",
+    "E",
+    "NORTH_DOABA",
+    "14:45",
+    1
+  ],
+  [
+    "PRTC PEPSU",
+    "HVAC Semi-Deluxe",
+    "E",
+    "NORTH_DOABA",
+    "16:30",
+    1
+  ],
+  [
+    "Punbus",
+    "Ordinary",
+    "E",
+    "NORTH_DOABA",
+    "18:15",
+    1
+  ],
+  [
+    "Punbus",
+    "Ordinary",
+    "E",
+    "NORTH_DOABA",
+    "06:30",
+    -1
+  ],
+  [
+    "PRTC PEPSU",
+    "Ordinary",
+    "E",
+    "NORTH_DOABA",
+    "08:15",
+    -1
+  ],
+  [
+    "Punbus",
+    "HVAC Semi-Deluxe",
+    "E",
+    "NORTH_DOABA",
+    "10:00",
+    -1
+  ],
+  [
+    "PRTC PEPSU",
+    "Ordinary",
+    "L",
+    "NORTH_DOABA",
+    "11:45",
+    -1
+  ],
+  [
+    "Punbus",
+    "Ordinary",
+    "E",
+    "NORTH_DOABA",
+    "13:30",
+    -1
+  ],
+  [
+    "Punbus",
+    "Ordinary",
+    "E",
+    "NORTH_DOABA",
+    "15:15",
+    -1
+  ],
+  [
+    "PRTC PEPSU",
+    "Ordinary",
+    "E",
+    "NORTH_DOABA",
+    "17:00",
+    -1
+  ],
+  [
+    "Punbus",
+    "HVAC Semi-Deluxe",
+    "E",
+    "NORTH_DOABA",
+    "18:45",
+    -1
+  ],
+  [
+    "Punbus",
+    "Ordinary",
+    "E",
+    "ROPAR_ANANDPUR",
+    "06:00",
+    1
+  ],
+  [
+    "PRTC PEPSU",
+    "Ordinary",
+    "L",
+    "ROPAR_ANANDPUR",
+    "07:30",
+    1
+  ],
+  [
+    "Punbus",
+    "HVAC Semi-Deluxe",
+    "E",
+    "ROPAR_ANANDPUR",
+    "09:15",
+    1
+  ],
+  [
+    "Local Mini Bus",
+    "Mini Bus",
+    "L",
+    "ROPAR_ANANDPUR",
+    "11:00",
+    1
+  ],
+  [
+    "Punbus",
+    "Ordinary",
+    "E",
+    "ROPAR_ANANDPUR",
+    "13:00",
+    1
+  ],
+  [
+    "PRTC PEPSU",
+    "Ordinary",
+    "E",
+    "ROPAR_ANANDPUR",
+    "15:00",
+    1
+  ],
+  [
+    "Punbus",
+    "HVAC Semi-Deluxe",
+    "E",
+    "ROPAR_ANANDPUR",
+    "16:45",
+    1
+  ],
+  [
+    "Local Mini Bus",
+    "Mini Bus",
+    "L",
+    "ROPAR_ANANDPUR",
+    "18:30",
+    1
+  ],
+  [
+    "Punbus",
+    "Ordinary",
+    "E",
+    "ROPAR_ANANDPUR",
+    "06:45",
+    -1
+  ],
+  [
+    "PRTC PEPSU",
+    "Ordinary",
+    "L",
+    "ROPAR_ANANDPUR",
+    "08:30",
+    -1
+  ],
+  [
+    "Punbus",
+    "HVAC Semi-Deluxe",
+    "E",
+    "ROPAR_ANANDPUR",
+    "10:15",
+    -1
+  ],
+  [
+    "Local Mini Bus",
+    "Mini Bus",
+    "L",
+    "ROPAR_ANANDPUR",
+    "12:00",
+    -1
+  ],
+  [
+    "Punbus",
+    "Ordinary",
+    "E",
+    "ROPAR_ANANDPUR",
+    "14:15",
+    -1
+  ],
+  [
+    "PRTC PEPSU",
+    "Ordinary",
+    "E",
+    "ROPAR_ANANDPUR",
+    "16:00",
+    -1
+  ],
+  [
+    "Punbus",
+    "Ordinary",
+    "L",
+    "ROPAR_ANANDPUR",
+    "17:45",
+    -1
+  ],
+  [
+    "Punbus",
+    "Ordinary",
+    "E",
+    "MAJHA_NORTH",
+    "06:00",
+    1
+  ],
+  [
+    "PRTC PEPSU",
+    "Ordinary",
+    "L",
+    "MAJHA_NORTH",
+    "07:45",
+    1
+  ],
+  [
+    "Punbus",
+    "HVAC Semi-Deluxe",
+    "E",
+    "MAJHA_NORTH",
+    "09:30",
+    1
+  ],
+  [
+    "Local Mini Bus",
+    "Mini Bus",
+    "L",
+    "MAJHA_NORTH",
+    "11:15",
+    1
+  ],
+  [
+    "Punbus",
+    "Ordinary",
+    "E",
+    "MAJHA_NORTH",
+    "13:15",
+    1
+  ],
+  [
+    "PRTC PEPSU",
+    "Ordinary",
+    "E",
+    "MAJHA_NORTH",
+    "15:00",
+    1
+  ],
+  [
+    "Punbus",
+    "HVAC Semi-Deluxe",
+    "E",
+    "MAJHA_NORTH",
+    "16:45",
+    1
+  ],
+  [
+    "Punbus",
+    "Ordinary",
+    "E",
+    "MAJHA_NORTH",
+    "18:30",
+    1
+  ],
+  [
+    "Punbus",
+    "Ordinary",
+    "E",
+    "MAJHA_NORTH",
+    "06:30",
+    -1
+  ],
+  [
+    "PRTC PEPSU",
+    "Ordinary",
+    "E",
+    "MAJHA_NORTH",
+    "08:15",
+    -1
+  ],
+  [
+    "Local Mini Bus",
+    "Mini Bus",
+    "L",
+    "MAJHA_NORTH",
+    "10:00",
+    -1
+  ],
+  [
+    "Punbus",
+    "HVAC Semi-Deluxe",
+    "E",
+    "MAJHA_NORTH",
+    "12:00",
+    -1
+  ],
+  [
+    "PRTC PEPSU",
+    "Ordinary",
+    "L",
+    "MAJHA_NORTH",
+    "13:45",
+    -1
+  ],
+  [
+    "Punbus",
+    "Ordinary",
+    "E",
+    "MAJHA_NORTH",
+    "15:30",
+    -1
+  ],
+  [
+    "PRTC PEPSU",
+    "Ordinary",
+    "E",
+    "MAJHA_NORTH",
+    "17:15",
+    -1
+  ],
+  [
+    "Punbus",
+    "HVAC Semi-Deluxe",
+    "E",
+    "MAJHA_NORTH",
+    "19:00",
+    -1
+  ],
+  [
+    "Punbus",
+    "Ordinary",
+    "L",
+    "BORDER_HERITAGE",
+    "06:45",
+    1
+  ],
+  [
+    "PRTC PEPSU",
+    "Ordinary",
+    "E",
+    "BORDER_HERITAGE",
+    "10:15",
+    1
+  ],
+  [
+    "Local Mini Bus",
+    "Mini Bus",
+    "L",
+    "BORDER_HERITAGE",
+    "14:30",
+    1
+  ],
+  [
+    "Punbus",
+    "Ordinary",
+    "E",
+    "BORDER_HERITAGE",
+    "17:45",
+    1
+  ],
+  [
+    "PRTC PEPSU",
+    "Ordinary",
+    "L",
+    "BORDER_HERITAGE",
+    "08:00",
+    -1
+  ],
+  [
+    "Punbus",
+    "Ordinary",
+    "E",
+    "BORDER_HERITAGE",
+    "12:30",
+    -1
+  ],
+  [
+    "Local Mini Bus",
+    "Mini Bus",
+    "L",
+    "BORDER_HERITAGE",
+    "16:15",
+    -1
+  ],
+  [
+    "PRTC PEPSU",
+    "Ordinary",
+    "L",
+    "TARN_TARAN_BORDER",
+    "06:30",
+    1
+  ],
+  [
+    "Punbus",
+    "Ordinary",
+    "E",
+    "TARN_TARAN_BORDER",
+    "09:45",
+    1
+  ],
+  [
+    "Local Mini Bus",
+    "Mini Bus",
+    "L",
+    "TARN_TARAN_BORDER",
+    "13:15",
+    1
+  ],
+  [
+    "PRTC PEPSU",
+    "Ordinary",
+    "E",
+    "TARN_TARAN_BORDER",
+    "17:00",
+    1
+  ],
+  [
+    "Punbus",
+    "Ordinary",
+    "L",
+    "TARN_TARAN_BORDER",
+    "08:15",
+    -1
+  ],
+  [
+    "PRTC PEPSU",
+    "Ordinary",
+    "E",
+    "TARN_TARAN_BORDER",
+    "11:30",
+    -1
+  ],
+  [
+    "Local Mini Bus",
+    "Mini Bus",
+    "L",
+    "TARN_TARAN_BORDER",
+    "15:45",
+    -1
+  ],
+  [
+    "Punbus",
+    "Ordinary",
+    "E",
+    "DOABA_KAPURTHALA",
+    "06:15",
+    1
+  ],
+  [
+    "PRTC PEPSU",
+    "Ordinary",
+    "L",
+    "DOABA_KAPURTHALA",
+    "09:30",
+    1
+  ],
+  [
+    "Punbus",
+    "HVAC Semi-Deluxe",
+    "E",
+    "DOABA_KAPURTHALA",
+    "13:00",
+    1
+  ],
+  [
+    "Local Mini Bus",
+    "Mini Bus",
+    "L",
+    "DOABA_KAPURTHALA",
+    "16:30",
+    1
+  ],
+  [
+    "Punbus",
+    "Ordinary",
+    "E",
+    "DOABA_KAPURTHALA",
+    "07:30",
+    -1
+  ],
+  [
+    "PRTC PEPSU",
+    "Ordinary",
+    "E",
+    "DOABA_KAPURTHALA",
+    "11:15",
+    -1
+  ],
+  [
+    "Punbus",
+    "Ordinary",
+    "L",
+    "DOABA_KAPURTHALA",
+    "15:00",
+    -1
+  ],
+  [
+    "Punbus",
+    "Ordinary",
+    "E",
+    "DOABA_NAWANSHAHR",
+    "06:00",
+    1
+  ],
+  [
+    "PRTC PEPSU",
+    "Ordinary",
+    "L",
+    "DOABA_NAWANSHAHR",
+    "08:45",
+    1
+  ],
+  [
+    "Orbit Aviators",
+    "Volvo AC",
+    "E",
+    "DOABA_NAWANSHAHR",
+    "11:30",
+    1
+  ],
+  [
+    "Punbus",
+    "HVAC Semi-Deluxe",
+    "E",
+    "DOABA_NAWANSHAHR",
+    "14:45",
+    1
+  ],
+  [
+    "PRTC PEPSU",
+    "Ordinary",
+    "E",
+    "DOABA_NAWANSHAHR",
+    "17:30",
+    1
+  ],
+  [
+    "Punbus",
+    "Ordinary",
+    "E",
+    "DOABA_NAWANSHAHR",
+    "07:00",
+    -1
+  ],
+  [
+    "Orbit Aviators",
+    "Volvo AC",
+    "E",
+    "DOABA_NAWANSHAHR",
+    "10:15",
+    -1
+  ],
+  [
+    "PRTC PEPSU",
+    "Ordinary",
+    "L",
+    "DOABA_NAWANSHAHR",
+    "13:30",
+    -1
+  ],
+  [
+    "Punbus",
+    "HVAC Semi-Deluxe",
+    "E",
+    "DOABA_NAWANSHAHR",
+    "16:45",
+    -1
+  ],
+  [
+    "PRTC PEPSU",
+    "Ordinary",
+    "E",
+    "HOSHIARPUR_CHANDIGARH",
+    "06:30",
+    1
+  ],
+  [
+    "Punbus",
+    "HVAC Semi-Deluxe",
+    "E",
+    "HOSHIARPUR_CHANDIGARH",
+    "09:15",
+    1
+  ],
+  [
+    "Punbus",
+    "Ordinary",
+    "L",
+    "HOSHIARPUR_CHANDIGARH",
+    "13:30",
+    1
+  ],
+  [
+    "PRTC PEPSU",
+    "Ordinary",
+    "E",
+    "HOSHIARPUR_CHANDIGARH",
+    "16:45",
+    1
+  ],
+  [
+    "Punbus",
+    "Ordinary",
+    "E",
+    "HOSHIARPUR_CHANDIGARH",
+    "08:00",
+    -1
+  ],
+  [
+    "PRTC PEPSU",
+    "HVAC Semi-Deluxe",
+    "E",
+    "HOSHIARPUR_CHANDIGARH",
+    "11:45",
+    -1
+  ],
+  [
+    "Punbus",
+    "Ordinary",
+    "L",
+    "HOSHIARPUR_CHANDIGARH",
+    "15:15",
+    -1
+  ],
+  [
+    "PRTC PEPSU",
+    "Ordinary",
+    "E",
+    "SOUTH_WEST_BORDER",
+    "06:15",
+    1
+  ],
+  [
+    "New Deep",
+    "Ordinary",
+    "L",
+    "SOUTH_WEST_BORDER",
+    "08:45",
+    1
+  ],
+  [
+    "Punbus",
+    "Ordinary",
+    "E",
+    "SOUTH_WEST_BORDER",
+    "11:30",
+    1
+  ],
+  [
+    "New Deep",
+    "Ordinary",
+    "E",
+    "SOUTH_WEST_BORDER",
+    "14:15",
+    1
+  ],
+  [
+    "PRTC PEPSU",
+    "HVAC Semi-Deluxe",
+    "E",
+    "SOUTH_WEST_BORDER",
+    "17:00",
+    1
+  ],
+  [
+    "New Deep",
+    "Ordinary",
+    "E",
+    "SOUTH_WEST_BORDER",
+    "07:00",
+    -1
+  ],
+  [
+    "Punbus",
+    "Ordinary",
+    "L",
+    "SOUTH_WEST_BORDER",
+    "09:30",
+    -1
+  ],
+  [
+    "PRTC PEPSU",
+    "Ordinary",
+    "E",
+    "SOUTH_WEST_BORDER",
+    "13:00",
+    -1
+  ],
+  [
+    "New Deep",
+    "Ordinary",
+    "L",
+    "SOUTH_WEST_BORDER",
+    "16:15",
+    -1
+  ],
+  [
+    "PRTC PEPSU",
+    "Ordinary",
+    "E",
+    "MUKTSAR_MALOUT_ABOHAR",
+    "06:30",
+    1
+  ],
+  [
+    "Orbit Aviators",
+    "Volvo AC",
+    "E",
+    "MUKTSAR_MALOUT_ABOHAR",
+    "09:00",
+    1
+  ],
+  [
+    "New Deep",
+    "Ordinary",
+    "L",
+    "MUKTSAR_MALOUT_ABOHAR",
+    "11:45",
+    1
+  ],
+  [
+    "PRTC PEPSU",
+    "HVAC Semi-Deluxe",
+    "E",
+    "MUKTSAR_MALOUT_ABOHAR",
+    "14:30",
+    1
+  ],
+  [
+    "Punbus",
+    "Ordinary",
+    "E",
+    "MUKTSAR_MALOUT_ABOHAR",
+    "17:15",
+    1
+  ],
+  [
+    "New Deep",
+    "Ordinary",
+    "E",
+    "MUKTSAR_MALOUT_ABOHAR",
+    "07:30",
+    -1
+  ],
+  [
+    "Orbit Aviators",
+    "Volvo AC",
+    "E",
+    "MUKTSAR_MALOUT_ABOHAR",
+    "10:15",
+    -1
+  ],
+  [
+    "PRTC PEPSU",
+    "Ordinary",
+    "L",
+    "MUKTSAR_MALOUT_ABOHAR",
+    "13:30",
+    -1
+  ],
+  [
+    "PRTC PEPSU",
+    "Ordinary",
+    "E",
+    "MUKTSAR_MALOUT_ABOHAR",
+    "16:45",
+    -1
+  ],
+  [
+    "PRTC PEPSU",
+    "Ordinary",
+    "E",
+    "MUKTSAR_FARIDKOT",
+    "06:00",
+    1
+  ],
+  [
+    "New Deep",
+    "Ordinary",
+    "L",
+    "MUKTSAR_FARIDKOT",
+    "08:30",
+    1
+  ],
+  [
+    "Punbus",
+    "Ordinary",
+    "E",
+    "MUKTSAR_FARIDKOT",
+    "11:15",
+    1
+  ],
+  [
+    "New Deep",
+    "Ordinary",
+    "E",
+    "MUKTSAR_FARIDKOT",
+    "14:45",
+    1
+  ],
+  [
+    "PRTC PEPSU",
+    "Ordinary",
+    "L",
+    "MUKTSAR_FARIDKOT",
+    "17:30",
+    1
+  ],
+  [
+    "New Deep",
+    "Ordinary",
+    "E",
+    "MUKTSAR_FARIDKOT",
+    "07:15",
+    -1
+  ],
+  [
+    "PRTC PEPSU",
+    "Ordinary",
+    "E",
+    "MUKTSAR_FARIDKOT",
+    "10:00",
+    -1
+  ],
+  [
+    "Punbus",
+    "Ordinary",
+    "L",
+    "MUKTSAR_FARIDKOT",
+    "13:15",
+    -1
+  ],
+  [
+    "New Deep",
+    "Ordinary",
+    "E",
+    "MUKTSAR_FARIDKOT",
+    "16:30",
+    -1
+  ],
+  [
+    "PRTC PEPSU",
+    "Ordinary",
+    "E",
+    "MOGA_FARIDKOT_LUDHIANA",
+    "06:30",
+    1
+  ],
+  [
+    "Jujhar",
+    "HVAC Semi-Deluxe",
+    "E",
+    "MOGA_FARIDKOT_LUDHIANA",
+    "09:00",
+    1
+  ],
+  [
+    "Punbus",
+    "Ordinary",
+    "L",
+    "MOGA_FARIDKOT_LUDHIANA",
+    "12:15",
+    1
+  ],
+  [
+    "New Deep",
+    "Ordinary",
+    "E",
+    "MOGA_FARIDKOT_LUDHIANA",
+    "15:30",
+    1
+  ],
+  [
+    "PRTC PEPSU",
+    "Ordinary",
+    "L",
+    "MOGA_FARIDKOT_LUDHIANA",
+    "18:00",
+    1
+  ],
+  [
+    "Jujhar",
+    "HVAC Semi-Deluxe",
+    "E",
+    "MOGA_FARIDKOT_LUDHIANA",
+    "07:45",
+    -1
+  ],
+  [
+    "PRTC PEPSU",
+    "Ordinary",
+    "E",
+    "MOGA_FARIDKOT_LUDHIANA",
+    "10:30",
+    -1
+  ],
+  [
+    "Punbus",
+    "Ordinary",
+    "L",
+    "MOGA_FARIDKOT_LUDHIANA",
+    "14:00",
+    -1
+  ],
+  [
+    "New Deep",
+    "Ordinary",
+    "E",
+    "MOGA_FARIDKOT_LUDHIANA",
+    "16:45",
+    -1
+  ],
+  [
+    "PRTC PEPSU",
+    "Ordinary",
+    "E",
+    "PATIALA_MANSA_BATHINDA",
+    "05:30",
+    1
+  ],
+  [
+    "PRTC PEPSU",
+    "Ordinary",
+    "L",
+    "PATIALA_MANSA_BATHINDA",
+    "08:00",
+    1
+  ],
+  [
+    "Orbit Aviators",
+    "Volvo AC",
+    "E",
+    "PATIALA_MANSA_BATHINDA",
+    "10:45",
+    1
+  ],
+  [
+    "New Deep",
+    "Ordinary",
+    "L",
+    "PATIALA_MANSA_BATHINDA",
+    "13:15",
+    1
+  ],
+  [
+    "PRTC PEPSU",
+    "HVAC Semi-Deluxe",
+    "E",
+    "PATIALA_MANSA_BATHINDA",
+    "16:00",
+    1
+  ],
+  [
+    "PRTC PEPSU",
+    "Ordinary",
+    "E",
+    "PATIALA_MANSA_BATHINDA",
+    "06:45",
+    -1
+  ],
+  [
+    "Orbit Aviators",
+    "Volvo AC",
+    "E",
+    "PATIALA_MANSA_BATHINDA",
+    "09:30",
+    -1
+  ],
+  [
+    "New Deep",
+    "Ordinary",
+    "L",
+    "PATIALA_MANSA_BATHINDA",
+    "12:45",
+    -1
+  ],
+  [
+    "PRTC PEPSU",
+    "Ordinary",
+    "E",
+    "PATIALA_MANSA_BATHINDA",
+    "15:30",
+    -1
+  ],
+  [
+    "PRTC PEPSU",
+    "Ordinary",
+    "L",
+    "MANSA_SARDULGARH",
+    "06:15",
+    1
+  ],
+  [
+    "Punbus",
+    "Ordinary",
+    "E",
+    "MANSA_SARDULGARH",
+    "09:30",
+    1
+  ],
+  [
+    "New Deep",
+    "Ordinary",
+    "L",
+    "MANSA_SARDULGARH",
+    "13:00",
+    1
+  ],
+  [
+    "PRTC PEPSU",
+    "Ordinary",
+    "E",
+    "MANSA_SARDULGARH",
+    "16:30",
+    1
+  ],
+  [
+    "Punbus",
+    "Ordinary",
+    "L",
+    "MANSA_SARDULGARH",
+    "07:30",
+    -1
+  ],
+  [
+    "PRTC PEPSU",
+    "Ordinary",
+    "E",
+    "MANSA_SARDULGARH",
+    "11:15",
+    -1
+  ],
+  [
+    "New Deep",
+    "Ordinary",
+    "L",
+    "MANSA_SARDULGARH",
+    "15:00",
+    -1
+  ],
+  [
+    "PRTC PEPSU",
+    "Ordinary",
+    "L",
+    "TALWANDI_SABO_CIRCUIT",
+    "06:30",
+    1
+  ],
+  [
+    "Local Mini Bus",
+    "Mini Bus",
+    "L",
+    "TALWANDI_SABO_CIRCUIT",
+    "09:15",
+    1
+  ],
+  [
+    "PRTC PEPSU",
+    "Ordinary",
+    "E",
+    "TALWANDI_SABO_CIRCUIT",
+    "12:45",
+    1
+  ],
+  [
+    "Local Mini Bus",
+    "Mini Bus",
+    "L",
+    "TALWANDI_SABO_CIRCUIT",
+    "15:30",
+    1
+  ],
+  [
+    "PRTC PEPSU",
+    "Ordinary",
+    "L",
+    "TALWANDI_SABO_CIRCUIT",
+    "18:15",
+    1
+  ],
+  [
+    "Local Mini Bus",
+    "Mini Bus",
+    "L",
+    "TALWANDI_SABO_CIRCUIT",
+    "07:45",
+    -1
+  ],
+  [
+    "PRTC PEPSU",
+    "Ordinary",
+    "E",
+    "TALWANDI_SABO_CIRCUIT",
+    "10:30",
+    -1
+  ],
+  [
+    "PRTC PEPSU",
+    "Ordinary",
+    "L",
+    "TALWANDI_SABO_CIRCUIT",
+    "14:15",
+    -1
+  ],
+  [
+    "PRTC PEPSU",
+    "Ordinary",
+    "E",
+    "LUDHIANA_BARNALA",
+    "06:45",
+    1
+  ],
+  [
+    "Libra",
+    "HVAC Semi-Deluxe",
+    "E",
+    "LUDHIANA_BARNALA",
+    "09:15",
+    1
+  ],
+  [
+    "Local Mini Bus",
+    "Mini Bus",
+    "L",
+    "LUDHIANA_BARNALA",
+    "12:30",
+    1
+  ],
+  [
+    "PRTC PEPSU",
+    "Ordinary",
+    "L",
+    "LUDHIANA_BARNALA",
+    "15:15",
+    1
+  ],
+  [
+    "New Deep",
+    "Ordinary",
+    "E",
+    "LUDHIANA_BARNALA",
+    "18:00",
+    1
+  ],
+  [
+    "Libra",
+    "HVAC Semi-Deluxe",
+    "E",
+    "LUDHIANA_BARNALA",
+    "08:00",
+    -1
+  ],
+  [
+    "PRTC PEPSU",
+    "Ordinary",
+    "E",
+    "LUDHIANA_BARNALA",
+    "10:45",
+    -1
+  ],
+  [
+    "Local Mini Bus",
+    "Mini Bus",
+    "L",
+    "LUDHIANA_BARNALA",
+    "14:00",
+    -1
+  ],
+  [
+    "PRTC PEPSU",
+    "Ordinary",
+    "L",
+    "LUDHIANA_BARNALA",
+    "16:45",
+    -1
+  ],
+  [
+    "PRTC PEPSU",
+    "Ordinary",
+    "E",
+    "LUDHIANA_MALERKOTLA_PATIALA",
+    "06:15",
+    1
+  ],
+  [
+    "Libra",
+    "HVAC Semi-Deluxe",
+    "E",
+    "LUDHIANA_MALERKOTLA_PATIALA",
+    "08:45",
+    1
+  ],
+  [
+    "PRTC PEPSU",
+    "Ordinary",
+    "L",
+    "LUDHIANA_MALERKOTLA_PATIALA",
+    "11:30",
+    1
+  ],
+  [
+    "Local Mini Bus",
+    "Mini Bus",
+    "L",
+    "LUDHIANA_MALERKOTLA_PATIALA",
+    "14:15",
+    1
+  ],
+  [
+    "PRTC PEPSU",
+    "Ordinary",
+    "E",
+    "LUDHIANA_MALERKOTLA_PATIALA",
+    "17:00",
+    1
+  ],
+  [
+    "PRTC PEPSU",
+    "Ordinary",
+    "E",
+    "LUDHIANA_MALERKOTLA_PATIALA",
+    "07:30",
+    -1
+  ],
+  [
+    "Libra",
+    "HVAC Semi-Deluxe",
+    "E",
+    "LUDHIANA_MALERKOTLA_PATIALA",
+    "10:00",
+    -1
+  ],
+  [
+    "PRTC PEPSU",
+    "Ordinary",
+    "L",
+    "LUDHIANA_MALERKOTLA_PATIALA",
+    "13:00",
+    -1
+  ],
+  [
+    "PRTC PEPSU",
+    "Ordinary",
+    "E",
+    "LUDHIANA_MALERKOTLA_PATIALA",
+    "15:45",
+    -1
+  ],
+  [
+    "CTU",
+    "Ordinary",
+    "L",
+    "MOHALI_ROPAR_SHIVALIK",
+    "06:45",
+    1
+  ],
+  [
+    "Punbus",
+    "Ordinary",
+    "E",
+    "MOHALI_ROPAR_SHIVALIK",
+    "09:30",
+    1
+  ],
+  [
+    "Local Mini Bus",
+    "Mini Bus",
+    "L",
+    "MOHALI_ROPAR_SHIVALIK",
+    "13:00",
+    1
+  ],
+  [
+    "Punbus",
+    "HVAC Semi-Deluxe",
+    "E",
+    "MOHALI_ROPAR_SHIVALIK",
+    "16:15",
+    1
+  ],
+  [
+    "Punbus",
+    "Ordinary",
+    "E",
+    "MOHALI_ROPAR_SHIVALIK",
+    "08:15",
+    -1
+  ],
+  [
+    "CTU",
+    "Ordinary",
+    "L",
+    "MOHALI_ROPAR_SHIVALIK",
+    "11:00",
+    -1
+  ],
+  [
+    "Punbus",
+    "Ordinary",
+    "L",
+    "MOHALI_ROPAR_SHIVALIK",
+    "14:45",
+    -1
+  ],
+  [
+    "PRTC PEPSU",
+    "Ordinary",
+    "L",
+    "FATEHGARH_PATIALA_CIRCUIT",
+    "06:30",
+    1
+  ],
+  [
+    "Punbus",
+    "Ordinary",
+    "E",
+    "FATEHGARH_PATIALA_CIRCUIT",
+    "09:15",
+    1
+  ],
+  [
+    "Local Mini Bus",
+    "Mini Bus",
+    "L",
+    "FATEHGARH_PATIALA_CIRCUIT",
+    "12:45",
+    1
+  ],
+  [
+    "PRTC PEPSU",
+    "Ordinary",
+    "E",
+    "FATEHGARH_PATIALA_CIRCUIT",
+    "15:30",
+    1
+  ],
+  [
+    "Punbus",
+    "Ordinary",
+    "L",
+    "FATEHGARH_PATIALA_CIRCUIT",
+    "08:00",
+    -1
+  ],
+  [
+    "PRTC PEPSU",
+    "Ordinary",
+    "E",
+    "FATEHGARH_PATIALA_CIRCUIT",
+    "11:00",
+    -1
+  ],
+  [
+    "PRTC PEPSU",
+    "Ordinary",
+    "L",
+    "FATEHGARH_PATIALA_CIRCUIT",
+    "14:15",
+    -1
+  ],
+  [
+    "Punbus",
+    "Ordinary",
+    "E",
+    "JALANDHAR_NAKODAR_MOGA",
+    "06:45",
+    1
+  ],
+  [
+    "PRTC PEPSU",
+    "Ordinary",
+    "L",
+    "JALANDHAR_NAKODAR_MOGA",
+    "10:00",
+    1
+  ],
+  [
+    "Local Mini Bus",
+    "Mini Bus",
+    "L",
+    "JALANDHAR_NAKODAR_MOGA",
+    "13:30",
+    1
+  ],
+  [
+    "Punbus",
+    "Ordinary",
+    "E",
+    "JALANDHAR_NAKODAR_MOGA",
+    "16:45",
+    1
+  ],
+  [
+    "PRTC PEPSU",
+    "Ordinary",
+    "E",
+    "JALANDHAR_NAKODAR_MOGA",
+    "08:15",
+    -1
+  ],
+  [
+    "Punbus",
+    "Ordinary",
+    "L",
+    "JALANDHAR_NAKODAR_MOGA",
+    "11:45",
+    -1
+  ],
+  [
+    "PRTC PEPSU",
+    "Ordinary",
+    "E",
+    "JALANDHAR_NAKODAR_MOGA",
+    "15:15",
+    -1
+  ],
+  [
+    "Punbus",
+    "Ordinary",
+    "L",
+    "HOSHIARPUR_TALWARA",
+    "06:30",
+    1
+  ],
+  [
+    "PRTC PEPSU",
+    "Ordinary",
+    "E",
+    "HOSHIARPUR_TALWARA",
+    "10:15",
+    1
+  ],
+  [
+    "Local Mini Bus",
+    "Mini Bus",
+    "L",
+    "HOSHIARPUR_TALWARA",
+    "14:00",
+    1
+  ],
+  [
+    "Punbus",
+    "Ordinary",
+    "E",
+    "HOSHIARPUR_TALWARA",
+    "17:15",
+    1
+  ],
+  [
+    "PRTC PEPSU",
+    "Ordinary",
+    "L",
+    "HOSHIARPUR_TALWARA",
+    "08:00",
+    -1
+  ],
+  [
+    "Punbus",
+    "Ordinary",
+    "E",
+    "HOSHIARPUR_TALWARA",
+    "12:00",
+    -1
+  ],
+  [
+    "Local Mini Bus",
+    "Mini Bus",
+    "L",
+    "HOSHIARPUR_TALWARA",
+    "15:45",
+    -1
+  ],
+  [
+    "Haryana Roadways",
+    "Ordinary",
+    "E",
+    "A",
+    "06:30",
+    1
+  ],
+  [
+    "CTU",
+    "Ordinary",
+    "L",
+    "A",
+    "08:15",
+    1
+  ],
+  [
+    "Haryana Roadways",
+    "Ordinary",
+    "E",
+    "A",
+    "10:30",
+    1
+  ],
+  [
+    "CTU",
+    "Ordinary",
+    "L",
+    "A",
+    "12:45",
+    1
+  ],
+  [
+    "Haryana Roadways",
+    "Ordinary",
+    "E",
+    "A",
+    "15:15",
+    1
+  ],
+  [
+    "CTU",
+    "Ordinary",
+    "L",
+    "A",
+    "17:30",
+    1
+  ],
+  [
+    "Haryana Roadways",
+    "Ordinary",
+    "E",
+    "A",
+    "19:45",
+    1
+  ],
+  [
+    "Haryana Roadways",
+    "Ordinary",
+    "E",
+    "A",
+    "07:15",
+    -1
+  ],
+  [
+    "CTU",
+    "Ordinary",
+    "L",
+    "A",
+    "09:30",
+    -1
+  ],
+  [
+    "Haryana Roadways",
+    "Ordinary",
+    "E",
+    "A",
+    "11:45",
+    -1
+  ],
+  [
+    "CTU",
+    "Ordinary",
+    "L",
+    "A",
+    "14:15",
+    -1
+  ],
+  [
+    "Haryana Roadways",
+    "Ordinary",
+    "E",
+    "A",
+    "16:30",
+    -1
+  ],
+  [
+    "CTU",
+    "Ordinary",
+    "L",
+    "A",
+    "18:45",
+    -1
+  ],
+  [
+    "Punbus",
+    "Ordinary",
+    "E",
+    "DELHI_GT_EXPRESS",
+    "05:00",
+    1
+  ],
+  [
+    "PRTC PEPSU",
+    "Ordinary",
+    "E",
+    "DELHI_GT_EXPRESS",
+    "06:30",
+    1
+  ],
+  [
+    "Haryana Roadways",
+    "Ordinary",
+    "E",
+    "DELHI_GT_EXPRESS",
+    "08:00",
+    1
+  ],
+  [
+    "Orbit Aviators",
+    "Volvo AC",
+    "E",
+    "DELHI_GT_EXPRESS",
+    "09:30",
+    1
+  ],
+  [
+    "Punbus",
+    "HVAC Semi-Deluxe",
+    "E",
+    "DELHI_GT_EXPRESS",
+    "11:15",
+    1
+  ],
+  [
+    "Indo-Canadian",
+    "Volvo AC",
+    "E",
+    "DELHI_GT_EXPRESS",
+    "13:00",
+    1
+  ],
+  [
+    "PRTC PEPSU",
+    "Ordinary",
+    "E",
+    "DELHI_GT_EXPRESS",
+    "14:45",
+    1
+  ],
+  [
+    "Haryana Roadways",
+    "Ordinary",
+    "E",
+    "DELHI_GT_EXPRESS",
+    "16:30",
+    1
+  ],
+  [
+    "Orbit Aviators",
+    "Volvo AC",
+    "E",
+    "DELHI_GT_EXPRESS",
+    "18:15",
+    1
+  ],
+  [
+    "Punbus",
+    "Volvo AC",
+    "E",
+    "DELHI_GT_EXPRESS",
+    "20:00",
+    1
+  ],
+  [
+    "Indo-Canadian",
+    "Volvo AC",
+    "E",
+    "DELHI_GT_EXPRESS",
+    "21:30",
+    1
+  ],
+  [
+    "PRTC PEPSU",
+    "HVAC Semi-Deluxe",
+    "E",
+    "DELHI_GT_EXPRESS",
+    "22:45",
+    1
+  ],
+  [
+    "Punbus",
+    "Ordinary",
+    "E",
+    "DELHI_GT_EXPRESS",
+    "23:55",
+    1
+  ],
+  [
+    "Punbus",
+    "Ordinary",
+    "E",
+    "DELHI_GT_EXPRESS",
+    "05:15",
+    -1
+  ],
+  [
+    "Orbit Aviators",
+    "Volvo AC",
+    "E",
+    "DELHI_GT_EXPRESS",
+    "06:45",
+    -1
+  ],
+  [
+    "PRTC PEPSU",
+    "Ordinary",
+    "E",
+    "DELHI_GT_EXPRESS",
+    "08:15",
+    -1
+  ],
+  [
+    "Haryana Roadways",
+    "Ordinary",
+    "E",
+    "DELHI_GT_EXPRESS",
+    "10:00",
+    -1
+  ],
+  [
+    "Indo-Canadian",
+    "Volvo AC",
+    "E",
+    "DELHI_GT_EXPRESS",
+    "11:45",
+    -1
+  ],
+  [
+    "Punbus",
+    "HVAC Semi-Deluxe",
+    "E",
+    "DELHI_GT_EXPRESS",
+    "13:30",
+    -1
+  ],
+  [
+    "PRTC PEPSU",
+    "Ordinary",
+    "E",
+    "DELHI_GT_EXPRESS",
+    "15:15",
+    -1
+  ],
+  [
+    "Haryana Roadways",
+    "Ordinary",
+    "E",
+    "DELHI_GT_EXPRESS",
+    "17:00",
+    -1
+  ],
+  [
+    "Orbit Aviators",
+    "Volvo AC",
+    "E",
+    "DELHI_GT_EXPRESS",
+    "18:45",
+    -1
+  ],
+  [
+    "Indo-Canadian",
+    "Volvo AC",
+    "E",
+    "DELHI_GT_EXPRESS",
+    "20:15",
+    -1
+  ],
+  [
+    "Punbus",
+    "Volvo AC",
+    "E",
+    "DELHI_GT_EXPRESS",
+    "21:45",
+    -1
+  ],
+  [
+    "PRTC PEPSU",
+    "HVAC Semi-Deluxe",
+    "E",
+    "DELHI_GT_EXPRESS",
+    "23:15",
+    -1
+  ],
+  [
+    "Indo-Canadian",
+    "Volvo AC",
+    "E",
+    "DELHI_AIRPORT_EXPRESS",
+    "06:00",
+    1
+  ],
+  [
+    "Punbus",
+    "Volvo AC",
+    "E",
+    "DELHI_AIRPORT_EXPRESS",
+    "09:15",
+    1
+  ],
+  [
+    "Indo-Canadian",
+    "Volvo AC",
+    "E",
+    "DELHI_AIRPORT_EXPRESS",
+    "13:30",
+    1
+  ],
+  [
+    "PRTC PEPSU",
+    "HVAC Semi-Deluxe",
+    "E",
+    "DELHI_AIRPORT_EXPRESS",
+    "17:15",
+    1
+  ],
+  [
+    "Indo-Canadian",
+    "Volvo AC",
+    "E",
+    "DELHI_AIRPORT_EXPRESS",
+    "21:00",
+    1
+  ],
+  [
+    "Punbus",
+    "Volvo AC",
+    "E",
+    "DELHI_AIRPORT_EXPRESS",
+    "23:30",
+    1
+  ],
+  [
+    "Indo-Canadian",
+    "Volvo AC",
+    "E",
+    "DELHI_AIRPORT_EXPRESS",
+    "05:30",
+    -1
+  ],
+  [
+    "Punbus",
+    "Volvo AC",
+    "E",
+    "DELHI_AIRPORT_EXPRESS",
+    "08:45",
+    -1
+  ],
+  [
+    "Indo-Canadian",
+    "Volvo AC",
+    "E",
+    "DELHI_AIRPORT_EXPRESS",
+    "12:15",
+    -1
+  ],
+  [
+    "PRTC PEPSU",
+    "HVAC Semi-Deluxe",
+    "E",
+    "DELHI_AIRPORT_EXPRESS",
+    "16:00",
+    -1
+  ],
+  [
+    "Indo-Canadian",
+    "Volvo AC",
+    "E",
+    "DELHI_AIRPORT_EXPRESS",
+    "19:45",
+    -1
+  ],
+  [
+    "Punbus",
+    "Volvo AC",
+    "E",
+    "DELHI_AIRPORT_EXPRESS",
+    "22:15",
+    -1
+  ],
+  [
+    "CTU",
+    "HVAC",
+    "E",
+    "DELHI_CHANDIGARH",
+    "05:00",
+    1
+  ],
+  [
+    "Haryana Roadways",
+    "Ordinary",
+    "E",
+    "DELHI_CHANDIGARH",
+    "06:00",
+    1
+  ],
+  [
+    "Punbus",
+    "Volvo AC",
+    "E",
+    "DELHI_CHANDIGARH",
+    "07:00",
+    1
+  ],
+  [
+    "CTU",
+    "Ordinary",
+    "E",
+    "DELHI_CHANDIGARH",
+    "08:00",
+    1
+  ],
+  [
+    "Haryana Roadways",
+    "Volvo AC",
+    "E",
+    "DELHI_CHANDIGARH",
+    "09:00",
+    1
+  ],
+  [
+    "PRTC PEPSU",
+    "HVAC Semi-Deluxe",
+    "E",
+    "DELHI_CHANDIGARH",
+    "10:15",
+    1
+  ],
+  [
+    "CTU",
+    "HVAC",
+    "E",
+    "DELHI_CHANDIGARH",
+    "11:30",
+    1
+  ],
+  [
+    "Haryana Roadways",
+    "Ordinary",
+    "E",
+    "DELHI_CHANDIGARH",
+    "12:45",
+    1
+  ],
+  [
+    "Punbus",
+    "Volvo AC",
+    "E",
+    "DELHI_CHANDIGARH",
+    "14:00",
+    1
+  ],
+  [
+    "CTU",
+    "Ordinary",
+    "E",
+    "DELHI_CHANDIGARH",
+    "15:15",
+    1
+  ],
+  [
+    "Haryana Roadways",
+    "Volvo AC",
+    "E",
+    "DELHI_CHANDIGARH",
+    "16:30",
+    1
+  ],
+  [
+    "PRTC PEPSU",
+    "Ordinary",
+    "E",
+    "DELHI_CHANDIGARH",
+    "17:45",
+    1
+  ],
+  [
+    "CTU",
+    "HVAC",
+    "E",
+    "DELHI_CHANDIGARH",
+    "19:00",
+    1
+  ],
+  [
+    "Haryana Roadways",
+    "Ordinary",
+    "E",
+    "DELHI_CHANDIGARH",
+    "20:15",
+    1
+  ],
+  [
+    "Punbus",
+    "Volvo AC",
+    "E",
+    "DELHI_CHANDIGARH",
+    "21:30",
+    1
+  ],
+  [
+    "CTU",
+    "Volvo AC",
+    "E",
+    "DELHI_CHANDIGARH",
+    "23:00",
+    1
+  ],
+  [
+    "CTU",
+    "HVAC",
+    "E",
+    "DELHI_CHANDIGARH",
+    "05:15",
+    -1
+  ],
+  [
+    "Haryana Roadways",
+    "Ordinary",
+    "E",
+    "DELHI_CHANDIGARH",
+    "06:15",
+    -1
+  ],
+  [
+    "Punbus",
+    "Volvo AC",
+    "E",
+    "DELHI_CHANDIGARH",
+    "07:15",
+    -1
+  ],
+  [
+    "CTU",
+    "Ordinary",
+    "E",
+    "DELHI_CHANDIGARH",
+    "08:15",
+    -1
+  ],
+  [
+    "Haryana Roadways",
+    "Volvo AC",
+    "E",
+    "DELHI_CHANDIGARH",
+    "09:15",
+    -1
+  ],
+  [
+    "PRTC PEPSU",
+    "HVAC Semi-Deluxe",
+    "E",
+    "DELHI_CHANDIGARH",
+    "10:30",
+    -1
+  ],
+  [
+    "CTU",
+    "HVAC",
+    "E",
+    "DELHI_CHANDIGARH",
+    "11:45",
+    -1
+  ],
+  [
+    "Haryana Roadways",
+    "Ordinary",
+    "E",
+    "DELHI_CHANDIGARH",
+    "13:00",
+    -1
+  ],
+  [
+    "Punbus",
+    "Volvo AC",
+    "E",
+    "DELHI_CHANDIGARH",
+    "14:15",
+    -1
+  ],
+  [
+    "CTU",
+    "Ordinary",
+    "E",
+    "DELHI_CHANDIGARH",
+    "15:30",
+    -1
+  ],
+  [
+    "Haryana Roadways",
+    "Volvo AC",
+    "E",
+    "DELHI_CHANDIGARH",
+    "16:45",
+    -1
+  ],
+  [
+    "PRTC PEPSU",
+    "Ordinary",
+    "E",
+    "DELHI_CHANDIGARH",
+    "18:00",
+    -1
+  ],
+  [
+    "CTU",
+    "HVAC",
+    "E",
+    "DELHI_CHANDIGARH",
+    "19:15",
+    -1
+  ],
+  [
+    "Haryana Roadways",
+    "Ordinary",
+    "E",
+    "DELHI_CHANDIGARH",
+    "20:30",
+    -1
+  ],
+  [
+    "Punbus",
+    "Volvo AC",
+    "E",
+    "DELHI_CHANDIGARH",
+    "21:45",
+    -1
+  ],
+  [
+    "CTU",
+    "Volvo AC",
+    "E",
+    "DELHI_CHANDIGARH",
+    "23:15",
+    -1
+  ],
+  [
+    "PRTC PEPSU",
+    "Ordinary",
+    "E",
+    "DELHI_BATHINDA_MALWA",
+    "05:30",
+    1
+  ],
+  [
+    "Haryana Roadways",
+    "Ordinary",
+    "E",
+    "DELHI_BATHINDA_MALWA",
+    "07:45",
+    1
+  ],
+  [
+    "PRTC PEPSU",
+    "HVAC Semi-Deluxe",
+    "E",
+    "DELHI_BATHINDA_MALWA",
+    "10:15",
+    1
+  ],
+  [
+    "PRTC PEPSU",
+    "Ordinary",
+    "E",
+    "DELHI_BATHINDA_MALWA",
+    "13:30",
+    1
+  ],
+  [
+    "Haryana Roadways",
+    "Ordinary",
+    "E",
+    "DELHI_BATHINDA_MALWA",
+    "16:00",
+    1
+  ],
+  [
+    "PRTC PEPSU",
+    "HVAC Semi-Deluxe",
+    "E",
+    "DELHI_BATHINDA_MALWA",
+    "18:45",
+    1
+  ],
+  [
+    "PRTC PEPSU",
+    "Ordinary",
+    "E",
+    "DELHI_BATHINDA_MALWA",
+    "21:30",
+    1
+  ],
+  [
+    "PRTC PEPSU",
+    "Ordinary",
+    "E",
+    "DELHI_BATHINDA_MALWA",
+    "05:00",
+    -1
+  ],
+  [
+    "PRTC PEPSU",
+    "HVAC Semi-Deluxe",
+    "E",
+    "DELHI_BATHINDA_MALWA",
+    "07:15",
+    -1
+  ],
+  [
+    "Haryana Roadways",
+    "Ordinary",
+    "E",
+    "DELHI_BATHINDA_MALWA",
+    "09:30",
+    -1
+  ],
+  [
+    "PRTC PEPSU",
+    "Ordinary",
+    "E",
+    "DELHI_BATHINDA_MALWA",
+    "12:45",
+    -1
+  ],
+  [
+    "PRTC PEPSU",
+    "HVAC Semi-Deluxe",
+    "E",
+    "DELHI_BATHINDA_MALWA",
+    "15:15",
+    -1
+  ],
+  [
+    "Haryana Roadways",
+    "Ordinary",
+    "E",
+    "DELHI_BATHINDA_MALWA",
+    "18:00",
+    -1
+  ],
+  [
+    "PRTC PEPSU",
+    "Ordinary",
+    "E",
+    "DELHI_BATHINDA_MALWA",
+    "21:00",
+    -1
+  ],
+  [
+    "HRTC",
+    "Ordinary",
+    "E",
+    "MANALI_SHIVALIK",
+    "05:00",
+    1
+  ],
+  [
+    "Punbus",
+    "Ordinary",
+    "E",
+    "MANALI_SHIVALIK",
+    "06:45",
+    1
+  ],
+  [
+    "HRTC",
+    "Volvo AC",
+    "E",
+    "MANALI_SHIVALIK",
+    "08:30",
+    1
+  ],
+  [
+    "PRTC PEPSU",
+    "HVAC Semi-Deluxe",
+    "E",
+    "MANALI_SHIVALIK",
+    "10:15",
+    1
+  ],
+  [
+    "HRTC",
+    "Ordinary",
+    "E",
+    "MANALI_SHIVALIK",
+    "13:00",
+    1
+  ],
+  [
+    "HRTC",
+    "Volvo AC",
+    "E",
+    "MANALI_SHIVALIK",
+    "16:30",
+    1
+  ],
+  [
+    "Punbus",
+    "Volvo AC",
+    "E",
+    "MANALI_SHIVALIK",
+    "20:30",
+    1
+  ],
+  [
+    "HRTC",
+    "Volvo AC",
+    "E",
+    "MANALI_SHIVALIK",
+    "22:00",
+    1
+  ],
+  [
+    "HRTC",
+    "Ordinary",
+    "E",
+    "MANALI_SHIVALIK",
+    "06:00",
+    -1
+  ],
+  [
+    "Punbus",
+    "Ordinary",
+    "E",
+    "MANALI_SHIVALIK",
+    "07:45",
+    -1
+  ],
+  [
+    "HRTC",
+    "Volvo AC",
+    "E",
+    "MANALI_SHIVALIK",
+    "09:30",
+    -1
+  ],
+  [
+    "PRTC PEPSU",
+    "HVAC Semi-Deluxe",
+    "E",
+    "MANALI_SHIVALIK",
+    "12:15",
+    -1
+  ],
+  [
+    "HRTC",
+    "Ordinary",
+    "E",
+    "MANALI_SHIVALIK",
+    "15:00",
+    -1
+  ],
+  [
+    "HRTC",
+    "Volvo AC",
+    "E",
+    "MANALI_SHIVALIK",
+    "18:30",
+    -1
+  ],
+  [
+    "Punbus",
+    "Volvo AC",
+    "E",
+    "MANALI_SHIVALIK",
+    "21:00",
+    -1
+  ],
+  [
+    "HRTC",
+    "Volvo AC",
+    "E",
+    "MANALI_SHIVALIK",
+    "22:30",
+    -1
+  ],
+  [
+    "CTU",
+    "Ordinary",
+    "E",
+    "SHIMLA_TRICITY",
+    "05:30",
+    1
+  ],
+  [
+    "HRTC",
+    "Ordinary",
+    "E",
+    "SHIMLA_TRICITY",
+    "07:00",
+    1
+  ],
+  [
+    "CTU",
+    "HVAC",
+    "E",
+    "SHIMLA_TRICITY",
+    "08:45",
+    1
+  ],
+  [
+    "HRTC",
+    "Volvo AC",
+    "E",
+    "SHIMLA_TRICITY",
+    "10:30",
+    1
+  ],
+  [
+    "CTU",
+    "Ordinary",
+    "E",
+    "SHIMLA_TRICITY",
+    "12:15",
+    1
+  ],
+  [
+    "HRTC",
+    "Ordinary",
+    "E",
+    "SHIMLA_TRICITY",
+    "14:00",
+    1
+  ],
+  [
+    "CTU",
+    "HVAC",
+    "E",
+    "SHIMLA_TRICITY",
+    "16:00",
+    1
+  ],
+  [
+    "HRTC",
+    "Volvo AC",
+    "E",
+    "SHIMLA_TRICITY",
+    "18:15",
+    1
+  ],
+  [
+    "HRTC",
+    "Ordinary",
+    "E",
+    "SHIMLA_TRICITY",
+    "20:30",
+    1
+  ],
+  [
+    "HRTC",
+    "Ordinary",
+    "E",
+    "SHIMLA_TRICITY",
+    "06:00",
+    -1
+  ],
+  [
+    "CTU",
+    "Ordinary",
+    "E",
+    "SHIMLA_TRICITY",
+    "07:30",
+    -1
+  ],
+  [
+    "HRTC",
+    "Volvo AC",
+    "E",
+    "SHIMLA_TRICITY",
+    "09:15",
+    -1
+  ],
+  [
+    "CTU",
+    "HVAC",
+    "E",
+    "SHIMLA_TRICITY",
+    "11:00",
+    -1
+  ],
+  [
+    "HRTC",
+    "Ordinary",
+    "E",
+    "SHIMLA_TRICITY",
+    "13:00",
+    -1
+  ],
+  [
+    "CTU",
+    "Ordinary",
+    "E",
+    "SHIMLA_TRICITY",
+    "15:15",
+    -1
+  ],
+  [
+    "HRTC",
+    "Volvo AC",
+    "E",
+    "SHIMLA_TRICITY",
+    "17:30",
+    -1
+  ],
+  [
+    "CTU",
+    "HVAC",
+    "E",
+    "SHIMLA_TRICITY",
+    "19:45",
+    -1
+  ],
+  [
+    "HRTC",
+    "Ordinary",
+    "E",
+    "DHARAMSHALA_KANGRA",
+    "05:45",
+    1
+  ],
+  [
+    "Punbus",
+    "Ordinary",
+    "E",
+    "DHARAMSHALA_KANGRA",
+    "07:30",
+    1
+  ],
+  [
+    "HRTC",
+    "HVAC Semi-Deluxe",
+    "E",
+    "DHARAMSHALA_KANGRA",
+    "09:45",
+    1
+  ],
+  [
+    "Punbus",
+    "HVAC Semi-Deluxe",
+    "E",
+    "DHARAMSHALA_KANGRA",
+    "12:30",
+    1
+  ],
+  [
+    "HRTC",
+    "Volvo AC",
+    "E",
+    "DHARAMSHALA_KANGRA",
+    "15:15",
+    1
+  ],
+  [
+    "Punbus",
+    "Ordinary",
+    "E",
+    "DHARAMSHALA_KANGRA",
+    "18:00",
+    1
+  ],
+  [
+    "HRTC",
+    "Ordinary",
+    "E",
+    "DHARAMSHALA_KANGRA",
+    "06:15",
+    -1
+  ],
+  [
+    "Punbus",
+    "Ordinary",
+    "E",
+    "DHARAMSHALA_KANGRA",
+    "08:00",
+    -1
+  ],
+  [
+    "HRTC",
+    "HVAC Semi-Deluxe",
+    "E",
+    "DHARAMSHALA_KANGRA",
+    "10:30",
+    -1
+  ],
+  [
+    "Punbus",
+    "HVAC Semi-Deluxe",
+    "E",
+    "DHARAMSHALA_KANGRA",
+    "13:15",
+    -1
+  ],
+  [
+    "HRTC",
+    "Volvo AC",
+    "E",
+    "DHARAMSHALA_KANGRA",
+    "16:00",
+    -1
+  ],
+  [
+    "Punbus",
+    "Ordinary",
+    "E",
+    "DHARAMSHALA_KANGRA",
+    "18:45",
+    -1
+  ],
+  [
+    "Punbus",
+    "Ordinary",
+    "E",
+    "JAMMU_KATRA_TRUNK",
+    "05:00",
+    1
+  ],
+  [
+    "PRTC PEPSU",
+    "Ordinary",
+    "E",
+    "JAMMU_KATRA_TRUNK",
+    "06:45",
+    1
+  ],
+  [
+    "JKSRTC",
+    "HVAC Semi-Deluxe",
+    "E",
+    "JAMMU_KATRA_TRUNK",
+    "08:30",
+    1
+  ],
+  [
+    "Haryana Roadways",
+    "Ordinary",
+    "E",
+    "JAMMU_KATRA_TRUNK",
+    "10:45",
+    1
+  ],
+  [
+    "Punbus",
+    "HVAC Semi-Deluxe",
+    "E",
+    "JAMMU_KATRA_TRUNK",
+    "13:15",
+    1
+  ],
+  [
+    "JKSRTC",
+    "Volvo AC",
+    "E",
+    "JAMMU_KATRA_TRUNK",
+    "16:00",
+    1
+  ],
+  [
+    "PRTC PEPSU",
+    "HVAC Semi-Deluxe",
+    "E",
+    "JAMMU_KATRA_TRUNK",
+    "19:00",
+    1
+  ],
+  [
+    "Punbus",
+    "Volvo AC",
+    "E",
+    "JAMMU_KATRA_TRUNK",
+    "22:00",
+    1
+  ],
+  [
+    "JKSRTC",
+    "Ordinary",
+    "E",
+    "JAMMU_KATRA_TRUNK",
+    "05:30",
+    -1
+  ],
+  [
+    "Punbus",
+    "Ordinary",
+    "E",
+    "JAMMU_KATRA_TRUNK",
+    "07:15",
+    -1
+  ],
+  [
+    "PRTC PEPSU",
+    "Ordinary",
+    "E",
+    "JAMMU_KATRA_TRUNK",
+    "09:30",
+    -1
+  ],
+  [
+    "Haryana Roadways",
+    "Ordinary",
+    "E",
+    "JAMMU_KATRA_TRUNK",
+    "11:45",
+    -1
+  ],
+  [
+    "JKSRTC",
+    "HVAC Semi-Deluxe",
+    "E",
+    "JAMMU_KATRA_TRUNK",
+    "14:15",
+    -1
+  ],
+  [
+    "Punbus",
+    "HVAC Semi-Deluxe",
+    "E",
+    "JAMMU_KATRA_TRUNK",
+    "17:00",
+    -1
+  ],
+  [
+    "PRTC PEPSU",
+    "Ordinary",
+    "E",
+    "JAMMU_KATRA_TRUNK",
+    "19:45",
+    -1
+  ],
+  [
+    "Punbus",
+    "Volvo AC",
+    "E",
+    "JAMMU_KATRA_TRUNK",
+    "22:30",
+    -1
+  ],
+  [
+    "Punbus",
+    "Ordinary",
+    "E",
+    "AMRITSAR_JAMMU_KATRA",
+    "05:30",
+    1
+  ],
+  [
+    "PRTC PEPSU",
+    "Ordinary",
+    "E",
+    "AMRITSAR_JAMMU_KATRA",
+    "07:15",
+    1
+  ],
+  [
+    "JKSRTC",
+    "HVAC Semi-Deluxe",
+    "E",
+    "AMRITSAR_JAMMU_KATRA",
+    "09:30",
+    1
+  ],
+  [
+    "Punbus",
+    "HVAC Semi-Deluxe",
+    "E",
+    "AMRITSAR_JAMMU_KATRA",
+    "12:15",
+    1
+  ],
+  [
+    "JKSRTC",
+    "Volvo AC",
+    "E",
+    "AMRITSAR_JAMMU_KATRA",
+    "15:00",
+    1
+  ],
+  [
+    "PRTC PEPSU",
+    "Ordinary",
+    "E",
+    "AMRITSAR_JAMMU_KATRA",
+    "17:45",
+    1
+  ],
+  [
+    "Punbus",
+    "Volvo AC",
+    "E",
+    "AMRITSAR_JAMMU_KATRA",
+    "21:15",
+    1
+  ],
+  [
+    "JKSRTC",
+    "Ordinary",
+    "E",
+    "AMRITSAR_JAMMU_KATRA",
+    "06:00",
+    -1
+  ],
+  [
+    "Punbus",
+    "Ordinary",
+    "E",
+    "AMRITSAR_JAMMU_KATRA",
+    "07:45",
+    -1
+  ],
+  [
+    "PRTC PEPSU",
+    "Ordinary",
+    "E",
+    "AMRITSAR_JAMMU_KATRA",
+    "10:00",
+    -1
+  ],
+  [
+    "JKSRTC",
+    "HVAC Semi-Deluxe",
+    "E",
+    "AMRITSAR_JAMMU_KATRA",
+    "12:45",
+    -1
+  ],
+  [
+    "Punbus",
+    "HVAC Semi-Deluxe",
+    "E",
+    "AMRITSAR_JAMMU_KATRA",
+    "15:30",
+    -1
+  ],
+  [
+    "JKSRTC",
+    "Volvo AC",
+    "E",
+    "AMRITSAR_JAMMU_KATRA",
+    "18:15",
+    -1
+  ],
+  [
+    "PRTC PEPSU",
+    "Ordinary",
+    "E",
+    "AMRITSAR_JAMMU_KATRA",
+    "21:30",
+    -1
+  ],
+  [
+    "HRTC",
+    "Ordinary",
+    "L",
+    "DALHOUSIE_CHAMBA",
+    "06:30",
+    1
+  ],
+  [
+    "Punbus",
+    "Ordinary",
+    "E",
+    "DALHOUSIE_CHAMBA",
+    "09:15",
+    1
+  ],
+  [
+    "HRTC",
+    "HVAC Semi-Deluxe",
+    "E",
+    "DALHOUSIE_CHAMBA",
+    "12:30",
+    1
+  ],
+  [
+    "HRTC",
+    "Ordinary",
+    "L",
+    "DALHOUSIE_CHAMBA",
+    "15:45",
+    1
+  ],
+  [
+    "Punbus",
+    "Ordinary",
+    "E",
+    "DALHOUSIE_CHAMBA",
+    "18:15",
+    1
+  ],
+  [
+    "HRTC",
+    "Ordinary",
+    "L",
+    "DALHOUSIE_CHAMBA",
+    "07:00",
+    -1
+  ],
+  [
+    "Punbus",
+    "Ordinary",
+    "E",
+    "DALHOUSIE_CHAMBA",
+    "09:45",
+    -1
+  ],
+  [
+    "HRTC",
+    "HVAC Semi-Deluxe",
+    "E",
+    "DALHOUSIE_CHAMBA",
+    "13:00",
+    -1
+  ],
+  [
+    "HRTC",
+    "Ordinary",
+    "L",
+    "DALHOUSIE_CHAMBA",
+    "16:15",
+    -1
+  ],
+  [
+    "Punbus",
+    "Ordinary",
+    "E",
+    "UNA_HIMACHAL",
+    "06:15",
+    1
+  ],
+  [
+    "HRTC",
+    "Ordinary",
+    "L",
+    "UNA_HIMACHAL",
+    "08:45",
+    1
+  ],
+  [
+    "Punbus",
+    "HVAC Semi-Deluxe",
+    "E",
+    "UNA_HIMACHAL",
+    "11:30",
+    1
+  ],
+  [
+    "HRTC",
+    "Ordinary",
+    "E",
+    "UNA_HIMACHAL",
+    "14:15",
+    1
+  ],
+  [
+    "Punbus",
+    "Ordinary",
+    "E",
+    "UNA_HIMACHAL",
+    "17:00",
+    1
+  ],
+  [
+    "HRTC",
+    "Ordinary",
+    "L",
+    "UNA_HIMACHAL",
+    "19:30",
+    1
+  ],
+  [
+    "HRTC",
+    "Ordinary",
+    "E",
+    "UNA_HIMACHAL",
+    "06:45",
+    -1
+  ],
+  [
+    "Punbus",
+    "Ordinary",
+    "L",
+    "UNA_HIMACHAL",
+    "09:15",
+    -1
+  ],
+  [
+    "HRTC",
+    "Ordinary",
+    "E",
+    "UNA_HIMACHAL",
+    "12:00",
+    -1
+  ],
+  [
+    "Punbus",
+    "HVAC Semi-Deluxe",
+    "E",
+    "UNA_HIMACHAL",
+    "14:45",
+    -1
+  ],
+  [
+    "HRTC",
+    "Ordinary",
+    "L",
+    "UNA_HIMACHAL",
+    "17:30",
+    -1
+  ],
+  [
+    "PRTC PEPSU",
+    "Ordinary",
+    "E",
+    "RAJASTHAN_GANGANAGAR",
+    "05:45",
+    1
+  ],
+  [
+    "RSRTC",
+    "Ordinary",
+    "E",
+    "RAJASTHAN_GANGANAGAR",
+    "07:30",
+    1
+  ],
+  [
+    "New Deep",
+    "Ordinary",
+    "L",
+    "RAJASTHAN_GANGANAGAR",
+    "09:45",
+    1
+  ],
+  [
+    "PRTC PEPSU",
+    "HVAC Semi-Deluxe",
+    "E",
+    "RAJASTHAN_GANGANAGAR",
+    "12:15",
+    1
+  ],
+  [
+    "RSRTC",
+    "Ordinary",
+    "E",
+    "RAJASTHAN_GANGANAGAR",
+    "14:45",
+    1
+  ],
+  [
+    "New Deep",
+    "Ordinary",
+    "E",
+    "RAJASTHAN_GANGANAGAR",
+    "17:15",
+    1
+  ],
+  [
+    "PRTC PEPSU",
+    "Ordinary",
+    "E",
+    "RAJASTHAN_GANGANAGAR",
+    "19:45",
+    1
+  ],
+  [
+    "RSRTC",
+    "Ordinary",
+    "E",
+    "RAJASTHAN_GANGANAGAR",
+    "06:15",
+    -1
+  ],
+  [
+    "PRTC PEPSU",
+    "Ordinary",
+    "E",
+    "RAJASTHAN_GANGANAGAR",
+    "08:15",
+    -1
+  ],
+  [
+    "New Deep",
+    "Ordinary",
+    "L",
+    "RAJASTHAN_GANGANAGAR",
+    "10:30",
+    -1
+  ],
+  [
+    "RSRTC",
+    "Ordinary",
+    "E",
+    "RAJASTHAN_GANGANAGAR",
+    "13:00",
+    -1
+  ],
+  [
+    "PRTC PEPSU",
+    "HVAC Semi-Deluxe",
+    "E",
+    "RAJASTHAN_GANGANAGAR",
+    "15:30",
+    -1
+  ],
+  [
+    "New Deep",
+    "Ordinary",
+    "E",
+    "RAJASTHAN_GANGANAGAR",
+    "18:00",
+    -1
+  ],
+  [
+    "RSRTC",
+    "Ordinary",
+    "E",
+    "RAJASTHAN_BIKANER_JAIPUR",
+    "06:00",
+    1
+  ],
+  [
+    "PRTC PEPSU",
+    "Ordinary",
+    "E",
+    "RAJASTHAN_BIKANER_JAIPUR",
+    "09:30",
+    1
+  ],
+  [
+    "RSRTC",
+    "HVAC Semi-Deluxe",
+    "E",
+    "RAJASTHAN_BIKANER_JAIPUR",
+    "14:00",
+    1
+  ],
+  [
+    "RSRTC",
+    "Volvo AC",
+    "E",
+    "RAJASTHAN_BIKANER_JAIPUR",
+    "19:30",
+    1
+  ],
+  [
+    "RSRTC",
+    "Ordinary",
+    "E",
+    "RAJASTHAN_BIKANER_JAIPUR",
+    "06:30",
+    -1
+  ],
+  [
+    "PRTC PEPSU",
+    "Ordinary",
+    "E",
+    "RAJASTHAN_BIKANER_JAIPUR",
+    "10:15",
+    -1
+  ],
+  [
+    "RSRTC",
+    "HVAC Semi-Deluxe",
+    "E",
+    "RAJASTHAN_BIKANER_JAIPUR",
+    "15:00",
+    -1
+  ],
+  [
+    "RSRTC",
+    "Volvo AC",
+    "E",
+    "RAJASTHAN_BIKANER_JAIPUR",
+    "20:45",
+    -1
+  ],
+  [
+    "Haryana Roadways",
+    "Ordinary",
+    "E",
+    "HARYANA_SIRSA_HISAR",
+    "05:30",
+    1
+  ],
+  [
+    "PRTC PEPSU",
+    "Ordinary",
+    "L",
+    "HARYANA_SIRSA_HISAR",
+    "08:00",
+    1
+  ],
+  [
+    "Haryana Roadways",
+    "Ordinary",
+    "E",
+    "HARYANA_SIRSA_HISAR",
+    "11:15",
+    1
+  ],
+  [
+    "PRTC PEPSU",
+    "Ordinary",
+    "E",
+    "HARYANA_SIRSA_HISAR",
+    "14:30",
+    1
+  ],
+  [
+    "Haryana Roadways",
+    "Ordinary",
+    "E",
+    "HARYANA_SIRSA_HISAR",
+    "17:45",
+    1
+  ],
+  [
+    "Haryana Roadways",
+    "Ordinary",
+    "E",
+    "HARYANA_SIRSA_HISAR",
+    "06:00",
+    -1
+  ],
+  [
+    "PRTC PEPSU",
+    "Ordinary",
+    "L",
+    "HARYANA_SIRSA_HISAR",
+    "08:45",
+    -1
+  ],
+  [
+    "Haryana Roadways",
+    "Ordinary",
+    "E",
+    "HARYANA_SIRSA_HISAR",
+    "12:00",
+    -1
+  ],
+  [
+    "PRTC PEPSU",
+    "Ordinary",
+    "E",
+    "HARYANA_SIRSA_HISAR",
+    "15:15",
+    -1
+  ],
+  [
+    "Haryana Roadways",
+    "Ordinary",
+    "E",
+    "HARYANA_SIRSA_HISAR",
+    "18:30",
+    -1
+  ],
+  [
+    "PRTC PEPSU",
+    "Ordinary",
+    "E",
+    "HARIDWAR_RISHIKESH_DEHRADUN",
+    "05:15",
+    1
+  ],
+  [
+    "UTC (Uttarakhand)",
+    "Ordinary",
+    "E",
+    "HARIDWAR_RISHIKESH_DEHRADUN",
+    "07:30",
+    1
+  ],
+  [
+    "Punbus",
+    "HVAC Semi-Deluxe",
+    "E",
+    "HARIDWAR_RISHIKESH_DEHRADUN",
+    "10:45",
+    1
+  ],
+  [
+    "UTC (Uttarakhand)",
+    "HVAC Semi-Deluxe",
+    "E",
+    "HARIDWAR_RISHIKESH_DEHRADUN",
+    "15:00",
+    1
+  ],
+  [
+    "PRTC PEPSU",
+    "HVAC Semi-Deluxe",
+    "E",
+    "HARIDWAR_RISHIKESH_DEHRADUN",
+    "18:30",
+    1
+  ],
+  [
+    "Punbus",
+    "Volvo AC",
+    "E",
+    "HARIDWAR_RISHIKESH_DEHRADUN",
+    "21:45",
+    1
+  ],
+  [
+    "UTC (Uttarakhand)",
+    "Ordinary",
+    "E",
+    "HARIDWAR_RISHIKESH_DEHRADUN",
+    "05:45",
+    -1
+  ],
+  [
+    "PRTC PEPSU",
+    "Ordinary",
+    "E",
+    "HARIDWAR_RISHIKESH_DEHRADUN",
+    "08:15",
+    -1
+  ],
+  [
+    "Punbus",
+    "HVAC Semi-Deluxe",
+    "E",
+    "HARIDWAR_RISHIKESH_DEHRADUN",
+    "11:30",
+    -1
+  ],
+  [
+    "UTC (Uttarakhand)",
+    "HVAC Semi-Deluxe",
+    "E",
+    "HARIDWAR_RISHIKESH_DEHRADUN",
+    "15:45",
+    -1
+  ],
+  [
+    "PRTC PEPSU",
+    "HVAC Semi-Deluxe",
+    "E",
+    "HARIDWAR_RISHIKESH_DEHRADUN",
+    "19:15",
+    -1
+  ],
+  [
+    "Punbus",
+    "Volvo AC",
+    "E",
+    "HARIDWAR_RISHIKESH_DEHRADUN",
+    "22:15",
+    -1
+  ],
+  [
+    "PRTC PEPSU",
+    "Ordinary",
+    "L",
+    "LUDHIANA_DHURI_SANGRUR",
+    "06:30",
+    1
+  ],
+  [
+    "Local Mini Bus",
+    "Mini Bus",
+    "L",
+    "LUDHIANA_DHURI_SANGRUR",
+    "08:45",
+    1
+  ],
+  [
+    "Libra",
+    "HVAC Semi-Deluxe",
+    "E",
+    "LUDHIANA_DHURI_SANGRUR",
+    "11:15",
+    1
+  ],
+  [
+    "PRTC PEPSU",
+    "Ordinary",
+    "E",
+    "LUDHIANA_DHURI_SANGRUR",
+    "14:00",
+    1
+  ],
+  [
+    "Local Mini Bus",
+    "Mini Bus",
+    "L",
+    "LUDHIANA_DHURI_SANGRUR",
+    "16:30",
+    1
+  ],
+  [
+    "PRTC PEPSU",
+    "Ordinary",
+    "L",
+    "LUDHIANA_DHURI_SANGRUR",
+    "19:00",
+    1
+  ],
+  [
+    "PRTC PEPSU",
+    "Ordinary",
+    "L",
+    "LUDHIANA_DHURI_SANGRUR",
+    "07:15",
+    -1
+  ],
+  [
+    "Local Mini Bus",
+    "Mini Bus",
+    "L",
+    "LUDHIANA_DHURI_SANGRUR",
+    "09:30",
+    -1
+  ],
+  [
+    "Libra",
+    "HVAC Semi-Deluxe",
+    "E",
+    "LUDHIANA_DHURI_SANGRUR",
+    "12:00",
+    -1
+  ],
+  [
+    "PRTC PEPSU",
+    "Ordinary",
+    "E",
+    "LUDHIANA_DHURI_SANGRUR",
+    "14:45",
+    -1
+  ],
+  [
+    "Local Mini Bus",
+    "Mini Bus",
+    "L",
+    "LUDHIANA_DHURI_SANGRUR",
+    "17:15",
+    -1
+  ],
+  [
+    "PRTC PEPSU",
+    "Ordinary",
+    "E",
+    "BATHINDA_MUKTSAR_FIROZPUR",
+    "06:15",
+    1
+  ],
+  [
+    "New Deep",
+    "Ordinary",
+    "L",
+    "BATHINDA_MUKTSAR_FIROZPUR",
+    "08:45",
+    1
+  ],
+  [
+    "Punbus",
+    "Ordinary",
+    "E",
+    "BATHINDA_MUKTSAR_FIROZPUR",
+    "11:30",
+    1
+  ],
+  [
+    "New Deep",
+    "Ordinary",
+    "E",
+    "BATHINDA_MUKTSAR_FIROZPUR",
+    "14:15",
+    1
+  ],
+  [
+    "PRTC PEPSU",
+    "Ordinary",
+    "L",
+    "BATHINDA_MUKTSAR_FIROZPUR",
+    "17:00",
+    1
+  ],
+  [
+    "New Deep",
+    "Ordinary",
+    "E",
+    "BATHINDA_MUKTSAR_FIROZPUR",
+    "07:00",
+    -1
+  ],
+  [
+    "PRTC PEPSU",
+    "Ordinary",
+    "E",
+    "BATHINDA_MUKTSAR_FIROZPUR",
+    "09:30",
+    -1
+  ],
+  [
+    "Punbus",
+    "Ordinary",
+    "L",
+    "BATHINDA_MUKTSAR_FIROZPUR",
+    "12:15",
+    -1
+  ],
+  [
+    "New Deep",
+    "Ordinary",
+    "L",
+    "BATHINDA_MUKTSAR_FIROZPUR",
+    "15:00",
+    -1
+  ],
+  [
+    "PRTC PEPSU",
+    "Ordinary",
+    "E",
+    "BATHINDA_MUKTSAR_FIROZPUR",
+    "17:45",
+    -1
+  ],
+  [
+    "Punbus",
+    "Ordinary",
+    "L",
+    "AMRITSAR_AJNALA_DERA",
+    "07:00",
+    1
+  ],
+  [
+    "Local Mini Bus",
+    "Mini Bus",
+    "L",
+    "AMRITSAR_AJNALA_DERA",
+    "10:15",
+    1
+  ],
+  [
+    "Punbus",
+    "Ordinary",
+    "E",
+    "AMRITSAR_AJNALA_DERA",
+    "13:45",
+    1
+  ],
+  [
+    "Local Mini Bus",
+    "Mini Bus",
+    "L",
+    "AMRITSAR_AJNALA_DERA",
+    "17:15",
+    1
+  ],
+  [
+    "Punbus",
+    "Ordinary",
+    "L",
+    "AMRITSAR_AJNALA_DERA",
+    "08:30",
+    -1
+  ],
+  [
+    "Local Mini Bus",
+    "Mini Bus",
+    "L",
+    "AMRITSAR_AJNALA_DERA",
+    "11:45",
+    -1
+  ],
+  [
+    "Punbus",
+    "Ordinary",
+    "E",
+    "AMRITSAR_AJNALA_DERA",
+    "15:15",
+    -1
+  ],
+  [
+    "Local Mini Bus",
+    "Mini Bus",
+    "L",
+    "AMRITSAR_AJNALA_DERA",
+    "18:45",
+    -1
+  ]
 ];
 
 export const OWN: Record<string, 'G' | 'P' | 'O'> = {
@@ -720,10 +6888,15 @@ export const OWN: Record<string, 'G' | 'P' | 'O'> = {
   "Punbus": "G",
   "CTU": "G",
   "Haryana Roadways": "G",
+  "HRTC": "G",
+  "JKSRTC": "G",
+  "RSRTC": "G",
+  "UTC (Uttarakhand)": "G",
   "Orbit Aviators": "P",
   "Libra": "P",
   "Jujhar": "P",
   "New Deep": "P",
+  "Indo-Canadian": "P",
   "Local Mini Bus": "O"
 };
 
@@ -737,18 +6910,20 @@ export const CLASS_RATES: Record<string, number> = {
   "Mini Bus": 0.8,
   "Ordinary": 0.9,
   "HVAC Semi-Deluxe": 1.15,
+  "HVAC": 1.25,
   "Volvo AC": 2.4
 };
 
-// All unique stops across all 23 districts of Punjab (alphabetically sorted)
+// All unique stops across all routes (alphabetically sorted)
 export const STOPS = Array.from(
   new Set(Object.values(ROUTES).flatMap((route) => route.map(([name]) => name)))
 ).sort();
 
-// Comprehensive list of Punjab bus stands, stops, and regional transit landmarks across all 23 districts
+// Comprehensive list of Punjab bus stands, stops, and regional transit landmarks
 export const ALL_PUNJAB_LOCATIONS: string[] = Array.from(
   new Set([
     ...STOPS,
+    ...[
     "Zirakpur Bus Stand",
     "Mohali Phase 7 Bus Stand",
     "Mohali Phase 8 Bus Stand",
@@ -799,28 +6974,116 @@ export const ALL_PUNJAB_LOCATIONS: string[] = Array.from(
     "Ludhiana Railway Station",
     "Jalandhar City Railway Station",
     "Dera Bassi Highway Junction"
+]
   ])
 ).sort();
 
-// Curated Popular Trips covering all regions of Punjab (Majha, Doaba, and Malwa)
+// Curated Popular Trips covering all regions of Punjab (Majha, Doaba, and Malwa) and Interstate links
 export const POPULAR_TRIPS: [string, string][] = [
-  ["Chandigarh ISBT 43", "Amritsar ISBT"],
-  ["Chandigarh ISBT 43", "Ludhiana Bus Stand"],
-  ["Ludhiana Bus Stand", "Jalandhar Central Bus Stand"],
-  ["Jalandhar Central Bus Stand", "Amritsar ISBT"],
-  ["Chandigarh ISBT 43", "Patiala Central Bus Stand"],
-  ["Patiala Central Bus Stand", "Bathinda Central Bus Stand"],
-  ["Ludhiana Bus Stand", "Moga Central Bus Stand"],
-  ["Amritsar ISBT", "Bathinda Central Bus Stand"],
-  ["Amritsar ISBT", "Pathankot Bus Stand"],
-  ["Jalandhar Central Bus Stand", "Hoshiarpur Bus Stand"],
-  ["Ludhiana Bus Stand", "Barnala Bus Stand"],
-  ["Bathinda Central Bus Stand", "Mansa Central Bus Stand"],
-  ["Firozpur Cantt Bus Stand", "Fazilka Central Bus Stand"],
-  ["Gurdaspur Central Bus Stand", "Batala Bus Stand"],
-  ["Chandigarh ISBT 43", "Rupnagar (Ropar) Bus Stand"],
-  ["Gharuan (CU Gate 2)", "Ludhiana Bus Stand"],
-  ["Ambala Cantt", "Chandigarh ISBT 17"]
+  [
+    "Chandigarh ISBT 43",
+    "Amritsar ISBT"
+  ],
+  [
+    "Chandigarh ISBT 43",
+    "Ludhiana Bus Stand"
+  ],
+  [
+    "Ludhiana Bus Stand",
+    "Jalandhar Central Bus Stand"
+  ],
+  [
+    "Jalandhar Central Bus Stand",
+    "Amritsar ISBT"
+  ],
+  [
+    "Delhi ISBT Kashmiri Gate",
+    "Amritsar ISBT"
+  ],
+  [
+    "Delhi Airport T3",
+    "Ludhiana Bus Stand"
+  ],
+  [
+    "Delhi ISBT Kashmiri Gate",
+    "Chandigarh ISBT 43"
+  ],
+  [
+    "Chandigarh ISBT 43",
+    "Manali Bus Stand"
+  ],
+  [
+    "Chandigarh ISBT 43",
+    "Shimla ISBT"
+  ],
+  [
+    "Ludhiana Bus Stand",
+    "Jammu Tawi Bus Stand"
+  ],
+  [
+    "Amritsar ISBT",
+    "Katra ISBT"
+  ],
+  [
+    "Chandigarh ISBT 43",
+    "Patiala Central Bus Stand"
+  ],
+  [
+    "Patiala Central Bus Stand",
+    "Bathinda Central Bus Stand"
+  ],
+  [
+    "Ludhiana Bus Stand",
+    "Moga Central Bus Stand"
+  ],
+  [
+    "Amritsar ISBT",
+    "Bathinda Central Bus Stand"
+  ],
+  [
+    "Amritsar ISBT",
+    "Pathankot Bus Stand"
+  ],
+  [
+    "Jalandhar Central Bus Stand",
+    "Hoshiarpur Bus Stand"
+  ],
+  [
+    "Bathinda Central Bus Stand",
+    "Sri Ganganagar Central Bus Stand"
+  ],
+  [
+    "Amritsar ISBT",
+    "Haridwar Central Bus Stand"
+  ],
+  [
+    "Ludhiana Bus Stand",
+    "Barnala Bus Stand"
+  ],
+  [
+    "Bathinda Central Bus Stand",
+    "Mansa Central Bus Stand"
+  ],
+  [
+    "Firozpur Cantt Bus Stand",
+    "Fazilka Central Bus Stand"
+  ],
+  [
+    "Gurdaspur Central Bus Stand",
+    "Batala Bus Stand"
+  ],
+  [
+    "Chandigarh ISBT 43",
+    "Rupnagar (Ropar) Bus Stand"
+  ],
+  [
+    "Gharuan (CU Gate 2)",
+    "Ludhiana Bus Stand"
+  ],
+  [
+    "Ambala Cantt",
+    "Chandigarh ISBT 17"
+  ]
 ];
 
 export const TIMES: [string, string][] = [
@@ -844,6 +7107,12 @@ export const OWNERS: [string, string][] = [
   ["O", "Other"]
 ];
 
+export const AC_TYPES: [string, string][] = [
+  ["any", "All Comfort"],
+  ["ac", "❄️ AC / Luxury"],
+  ["non-ac", "🍃 Non-AC"]
+];
+
 export const BUS_SERVICES: BusService[] = RAW_BUS_DEFINITIONS.map(
   ([op, cls, t, r, s, d], idx) => {
     const routeStops = ROUTES[r];
@@ -861,6 +7130,8 @@ export const BUS_SERVICES: BusService[] = RAW_BUS_DEFINITIONS.map(
       busClass: cls as any,
       serviceType: t,
       ownership: (OWN[op] === 'G' ? 'gov' : 'pvt') as any,
+      operatesDaily: true,
+      frequency: 'Daily (Mon–Sun)',
       startMinutes,
       stops,
       bookingUrl: cls === 'Volvo AC' ? 'https://www.redbus.in/' : undefined
@@ -869,7 +7140,7 @@ export const BUS_SERVICES: BusService[] = RAW_BUS_DEFINITIONS.map(
 );
 
 /**
- * Verified Depot & Bus Stand Helpdesks across all 23 Punjab Districts
+ * Verified Depot & Bus Stand Helpdesks across all 23 Punjab Districts & Connecting Inter-state Terminals
  */
 export const INQUIRY_CONTACTS: InquiryContact[] = [
   {
@@ -2341,6 +8612,96 @@ export const INQUIRY_CONTACTS: InquiryContact[] = [
     "category": "private",
     "timings": "06:00 AM – 10:00 PM",
     "notes": "Stage carriage passenger operations across Ludhiana, Moga, and Chandigarh routes."
+  },
+  {
+    "id": "delhi-isbt-kashmiri-gate",
+    "title": "Delhi ISBT Kashmiri Gate (Punjab & PRTC Counter)",
+    "location": "Interstate Bus Terminal, Kashmiri Gate, Delhi (National Capital)",
+    "phone": "01123868694",
+    "displayPhone": "011-23868694",
+    "category": "depot",
+    "timings": "24x7 Control Room",
+    "notes": "Main arrival and departure terminal connecting Delhi with Amritsar, Jalandhar, Ludhiana, Patiala, and Chandigarh."
+  },
+  {
+    "id": "delhi-airport-t3-counter",
+    "title": "Delhi IGI Airport Terminal 3 Luxury Transit Desk",
+    "location": "Arrival Hall Pillar 10 / Stage Carriage Berth, IGI T3, New Delhi",
+    "phone": "01149637878",
+    "displayPhone": "011-49637878",
+    "category": "private",
+    "timings": "24x7 Operations",
+    "notes": "Indo-Canadian and Punbus Volvo luxury express direct connectivity to Ludhiana, Jalandhar, and Amritsar."
+  },
+  {
+    "id": "katra-isbt-inquiry",
+    "title": "Katra Vaishno Devi ISBT Transit Control",
+    "location": "Central Bus Stand, Katra, Reasi (J&K / Punjab Trunk)",
+    "phone": "01991232049",
+    "displayPhone": "01991-232049",
+    "category": "depot",
+    "timings": "24x7 Control Room",
+    "notes": "Pilgrimage interstate terminus connecting Punjab (Pathankot, Jalandhar, Amritsar, Ludhiana) with Mata Vaishno Devi."
+  },
+  {
+    "id": "jammu-tawi-bus-stand",
+    "title": "Jammu Tawi General Bus Stand Control Room",
+    "location": "BC Road, Jammu Tawi, Jammu & Kashmir",
+    "phone": "01912577456",
+    "displayPhone": "0191-2577456",
+    "category": "depot",
+    "timings": "24x7 Control Room",
+    "notes": "JKSRTC and Punbus northern trunk hub connecting Punjab via Lakhanpur and Pathankot."
+  },
+  {
+    "id": "shimla-isbt-inquiry",
+    "title": "Shimla Tutikandi ISBT Control Desk",
+    "location": "New ISBT Tutikandi, Shimla, Himachal Pradesh",
+    "phone": "01772656326",
+    "displayPhone": "0177-2656326",
+    "category": "depot",
+    "timings": "05:00 AM – 11:00 PM",
+    "notes": "HRTC & CTU terminal connecting Chandigarh, Zirakpur, Kalka, and Punjab routes."
+  },
+  {
+    "id": "manali-bus-stand",
+    "title": "Manali Central Bus Stand Helpdesk",
+    "location": "The Mall Road, Manali, Kullu, Himachal Pradesh",
+    "phone": "01902252323",
+    "displayPhone": "01902-252323",
+    "category": "depot",
+    "timings": "05:30 AM – 10:30 PM",
+    "notes": "Shivalik highway transit desk connecting Chandigarh, Ropar, Kiratpur, and Punjab commuters."
+  },
+  {
+    "id": "dharamshala-bus-stand",
+    "title": "Dharamshala Central ISBT Helpdesk",
+    "location": "Lower Dharamshala Bus Stand, Kangra, Himachal Pradesh",
+    "phone": "01892224903",
+    "displayPhone": "01892-224903",
+    "category": "depot",
+    "timings": "06:00 AM – 09:30 PM",
+    "notes": "Connecting Kangra valley with Hoshiarpur, Jalandhar, and Amritsar Golden Temple corridor."
+  },
+  {
+    "id": "haridwar-bus-stand",
+    "title": "Haridwar Central Inter-State Bus Stand Desk",
+    "location": "Opposite Railway Station, Haridwar, Uttarakhand",
+    "phone": "01334227037",
+    "displayPhone": "01334-227037",
+    "category": "depot",
+    "timings": "24x7 Control Room",
+    "notes": "Pilgrimage hub connecting Punjab (Amritsar, Jalandhar, Ludhiana, Chandigarh) with Haridwar and Rishikesh."
+  },
+  {
+    "id": "sri-ganganagar-bus-stand",
+    "title": "Sri Ganganagar Central Bus Stand Helpdesk",
+    "location": "Sukhadia Circle, Sri Ganganagar, Rajasthan",
+    "phone": "01542440182",
+    "displayPhone": "0154-2440182",
+    "category": "depot",
+    "timings": "05:30 AM – 10:00 PM",
+    "notes": "RSRTC and PRTC interstate border desk connecting Abohar, Malout, and Bathinda."
   }
 ];
 

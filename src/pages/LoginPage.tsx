@@ -1,12 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
+import { Sun, Moon } from 'lucide-react';
+import { useAuth, UserSession } from '../context/AuthContext';
+import { useTheme } from '../context/ThemeContext';
 import { AnyStopLogo } from '../components/AnyStopLogo';
 import './LoginPage.css';
 
 export const LoginPage: React.FC = () => {
   const navigate = useNavigate();
-  const { login } = useAuth();
+  const { login, signInWithCredentials, signUpWithCredentials, signInWithGoogleAuth, isSupabaseActive } = useAuth();
+  const { darkMode, toggleDarkMode } = useTheme();
 
   const [mode, setMode] = useState<'in' | 'up'>('in');
   const [ticketNoLogin] = useState<string>(() => "NO. " + String(Math.floor(Math.random() * 4000) + 1000));
@@ -18,9 +21,24 @@ export const LoginPage: React.FC = () => {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
 
+  // Sign up specific fields
+  const [signupEmail, setSignupEmail] = useState('');
+  const [signupPhone, setSignupPhone] = useState('');
+  const [signupPassword, setSignupPassword] = useState('');
+  const [signupConfirmPassword, setSignupConfirmPassword] = useState('');
+  const [showSignupPassword, setShowSignupPassword] = useState(false);
+  const [showSignupConfirmPassword, setShowSignupConfirmPassword] = useState(false);
+
   const [badName, setBadName] = useState(false);
   const [badId, setBadId] = useState(false);
   const [badPw, setBadPw] = useState(false);
+  const [badEmail, setBadEmail] = useState(false);
+  const [badPhone, setBadPhone] = useState(false);
+  const [badSignupPw, setBadSignupPw] = useState(false);
+  const [badConfirmPw, setBadConfirmPw] = useState(false);
+  const [confirmPwErrorMsg, setConfirmPwErrorMsg] = useState('Passwords do not match.');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [serverError, setServerError] = useState<string | null>(null);
 
   const [isTorn, setIsTorn] = useState(false);
   const [isBusRunning, setIsBusRunning] = useState(false);
@@ -37,13 +55,26 @@ export const LoginPage: React.FC = () => {
     setBadName(false);
     setBadId(false);
     setBadPw(false);
+    setBadEmail(false);
+    setBadPhone(false);
+    setBadSignupPw(false);
+    setBadConfirmPw(false);
+    setServerError(null);
+  };
+
+  const validEmail = (v: string) => {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v.trim());
+  };
+
+  const validPhone = (v: string) => {
+    return /^[6-9]\d{9}$/.test(v.replace(/[\s-]/g, ''));
   };
 
   const validId = (v: string) => {
     return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v) || /^[6-9]\d{9}$/.test(v.replace(/[\s-]/g, ''));
   };
 
-  const triggerBad = (field: 'name' | 'id' | 'pw') => {
+  const triggerBad = (field: 'name' | 'id' | 'pw' | 'email' | 'phone' | 'signupPw' | 'confirmPw') => {
     if (field === 'name') {
       setBadName(false);
       setTimeout(() => setBadName(true), 10);
@@ -53,6 +84,18 @@ export const LoginPage: React.FC = () => {
     } else if (field === 'pw') {
       setBadPw(false);
       setTimeout(() => setBadPw(true), 10);
+    } else if (field === 'email') {
+      setBadEmail(false);
+      setTimeout(() => setBadEmail(true), 10);
+    } else if (field === 'phone') {
+      setBadPhone(false);
+      setTimeout(() => setBadPhone(true), 10);
+    } else if (field === 'signupPw') {
+      setBadSignupPw(false);
+      setTimeout(() => setBadSignupPw(true), 10);
+    } else if (field === 'confirmPw') {
+      setBadConfirmPw(false);
+      setTimeout(() => setBadConfirmPw(true), 10);
     }
   };
 
@@ -60,12 +103,14 @@ export const LoginPage: React.FC = () => {
   const getBusProgress = () => {
     const isUp = mode === 'up';
     let score = 0;
-    const total = isUp ? 3 : 2;
+    const total = isUp ? 5 : 2;
 
     if (isUp) {
       if (name.trim().length > 0) score += Math.min(1, name.trim().length / 3);
-      if (identifier.trim().length > 0) score += Math.min(1, identifier.trim().length / 5);
-      if (password.length > 0) score += Math.min(1, password.length / 6);
+      if (signupEmail.trim().length > 0) score += Math.min(1, signupEmail.trim().length / 6);
+      if (signupPhone.trim().length > 0) score += Math.min(1, signupPhone.trim().length / 8);
+      if (signupPassword.length > 0) score += Math.min(1, signupPassword.length / 6);
+      if (signupConfirmPassword.length > 0) score += Math.min(1, signupConfirmPassword.length / 6);
     } else {
       if (identifier.trim().length > 0) score += Math.min(1, identifier.trim().length / 5);
       if (password.length > 0) score += Math.min(1, password.length / 6);
@@ -90,15 +135,24 @@ export const LoginPage: React.FC = () => {
     isDriving = true;
   }
 
-  const board = (who: string, isGuest = false) => {
+  const board = (who: string, isGuest = false, fullUser?: UserSession) => {
     setWelcomeName(who);
 
-    login({
-      name: who,
-      isGuest,
-      ticketNo: mode === 'up' ? ticketNoSignup : ticketNoLogin,
-      boardedAt: Date.now()
-    });
+    if (fullUser) {
+      login({
+        ...fullUser,
+        name: who,
+        isGuest,
+        boardedAt: fullUser.boardedAt || Date.now(),
+      });
+    } else {
+      login({
+        name: who,
+        isGuest,
+        ticketNo: mode === 'up' ? ticketNoSignup : ticketNoLogin,
+        boardedAt: Date.now()
+      });
+    }
 
     setIsTorn(true);
     setTimeout(() => {
@@ -110,34 +164,122 @@ export const LoginPage: React.FC = () => {
     }, 450);
   };
 
-  const handleSubmit = (e: React.FormEvent, submitMode: 'in' | 'up') => {
+  const handleSubmit = async (e: React.FormEvent, submitMode: 'in' | 'up') => {
     e.preventDefault();
+    if (isSubmitting) return;
 
-    const n = name.trim();
-    const i = identifier.trim();
-    const p = password;
+    if (submitMode === 'up') {
+      const n = name.trim();
+      const em = signupEmail.trim();
+      const ph = signupPhone.trim();
+      const sp = signupPassword;
+      const scp = signupConfirmPassword;
 
-    const e1 = submitMode === 'up' && n.length < 2;
-    const e2 = !validId(i);
-    const e3 = p.length < 6;
+      const e1 = n.length < 2;
+      const e2 = !validEmail(em);
+      const e3 = !validPhone(ph);
+      const e4 = sp.length < 6;
+      let e5 = false;
+      if (scp.length < 6 || scp !== sp) {
+        e5 = true;
+        setConfirmPwErrorMsg(scp !== sp ? 'Passwords do not match.' : 'Confirm password must be at least 6 characters.');
+      }
 
-    if (e1) triggerBad('name');
-    else setBadName(false);
+      if (e1) triggerBad('name');
+      else setBadName(false);
 
-    if (e2) triggerBad('id');
-    else setBadId(false);
+      if (e2) triggerBad('email');
+      else setBadEmail(false);
 
-    if (e3) triggerBad('pw');
-    else setBadPw(false);
+      if (e3) triggerBad('phone');
+      else setBadPhone(false);
 
-    if (e1 || e2 || e3) return;
+      if (e4) triggerBad('signupPw');
+      else setBadSignupPw(false);
 
-    const who = submitMode === 'up' ? n.split(' ')[0] : (i.includes('@') ? i.split('@')[0] : 'traveller');
-    board(who, false);
+      if (e5) triggerBad('confirmPw');
+      else setBadConfirmPw(false);
+
+      if (e1 || e2 || e3 || e4 || e5) return;
+
+      setServerError(null);
+      setIsSubmitting(true);
+
+      try {
+        const res = await signUpWithCredentials(n, em, sp, ticketNoSignup, ph);
+        if (!res.success) {
+          setServerError(res.error || 'Registration failed. Please try again.');
+          setIsSubmitting(false);
+          return;
+        }
+        board(res.user?.name || n.split(' ')[0], false, res.user);
+      } catch {
+        setServerError('An unexpected error occurred. Please try again.');
+      } finally {
+        setIsSubmitting(false);
+      }
+    } else {
+      const i = identifier.trim();
+      const p = password;
+
+      const e1 = !validId(i);
+      const e2 = p.length < 6;
+
+      if (e1) triggerBad('id');
+      else setBadId(false);
+
+      if (e2) triggerBad('pw');
+      else setBadPw(false);
+
+      if (e1 || e2) return;
+
+      setServerError(null);
+      setIsSubmitting(true);
+
+      try {
+        const res = await signInWithCredentials(i, p);
+        if (!res.success) {
+          setServerError(res.error || 'Login failed. Please check your credentials.');
+          setIsSubmitting(false);
+          return;
+        }
+        const who = res.user?.name || (i.includes('@') ? i.split('@')[0] : 'Passenger');
+        board(who, false, res.user);
+      } catch {
+        setServerError('An unexpected error occurred. Please try again.');
+      } finally {
+        setIsSubmitting(false);
+      }
+    }
   };
 
-  const handleGuest = () => {
-    board('guest', true);
+  const handleGoogleSignIn = async () => {
+    setIsSubmitting(true);
+    setServerError(null);
+
+    try {
+      if (isSupabaseActive) {
+        const { error } = await signInWithGoogleAuth();
+        if (error) {
+          setServerError(error);
+          setIsSubmitting(false);
+        }
+      } else {
+        const demoGoogleUser: UserSession = {
+          name: 'Google Commuter',
+          phoneOrEmail: 'commuter@gmail.com',
+          ticketNo: `NO. ${Math.floor(Math.random() * 8999 + 1000)}`,
+          boardedAt: Date.now(),
+          homeStop: 'Chandigarh ISBT-43',
+          preferredClass: 'All Types',
+          totalSearches: 0,
+        };
+        board('Google Commuter', false, demoGoogleUser);
+      }
+    } catch (err: any) {
+      setServerError(err?.message || 'Google sign in failed. Please try again.');
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -145,19 +287,37 @@ export const LoginPage: React.FC = () => {
       <div className="stage">
         <div className="topbar">
           <div
-            className="logo cursor-pointer"
+            className="logo cursor-pointer shrink-0"
             onClick={() => navigate('/')}
             title="AnyStop Home"
           >
-            <AnyStopLogo variant="navbar" animated={true} height="34px" />
+            <AnyStopLogo variant="navbar" animated={true} height="32px" />
           </div>
-          <button
-            type="button"
-            className="back"
-            onClick={() => navigate('/')}
-          >
-            ← Back to landing page
-          </button>
+          <div className="topbar-actions">
+            <button
+              type="button"
+              onClick={(e) => toggleDarkMode(e)}
+              className="login-theme-toggle-btn theme-toggle-btn"
+              title={darkMode ? "Switch to Day theme" : "Switch to Night theme"}
+              aria-label="Toggle theme"
+            >
+              <span key={darkMode ? 'dark' : 'light'} className="theme-icon-container">
+                {darkMode ? (
+                  <Moon className="w-3.5 h-3.5 text-indigo-200 fill-indigo-200/50 theme-icon" />
+                ) : (
+                  <Sun className="w-3.5 h-3.5 text-amber-500 fill-amber-500/50 theme-icon" />
+                )}
+              </span>
+              <span className="theme-toggle-label hidden sm:inline">{darkMode ? 'Night' : 'Day'}</span>
+            </button>
+            <button
+              type="button"
+              className="back"
+              onClick={() => navigate('/')}
+            >
+              ← Back&nbsp;<span className="hidden sm:inline">to landing page</span>
+            </button>
+          </div>
         </div>
 
         <div className={`ticket-stack ${isTorn ? 'tear' : ''}`}>
@@ -273,6 +433,13 @@ export const LoginPage: React.FC = () => {
                     <div className="msg">Use at least 6 characters.</div>
                   </label>
 
+                  {serverError && mode === 'in' && (
+                    <div className="login-server-error-banner" role="alert">
+                      <span>⚠️</span>
+                      <span>{serverError}</span>
+                    </div>
+                  )}
+
                   <div className="barcode" aria-hidden="true" />
                 </form>
               </div>
@@ -300,23 +467,41 @@ export const LoginPage: React.FC = () => {
                 id="go-login"
                 type="submit"
                 form="f-login"
-                disabled={mode !== 'in'}
+                disabled={mode !== 'in' || isSubmitting}
                 tabIndex={mode === 'in' ? 0 : -1}
               >
-                Punch my ticket →
+                {isSubmitting ? 'Punching...' : 'Punch my ticket →'}
               </button>
               <button
-                className="guest"
-                id="guest-login"
+                className="google-btn"
+                id="google-login"
                 type="button"
                 onClick={(e) => {
                   e.stopPropagation();
-                  handleGuest();
+                  handleGoogleSignIn();
                 }}
-                disabled={mode !== 'in'}
+                disabled={mode !== 'in' || isSubmitting}
                 tabIndex={mode === 'in' ? 0 : -1}
               >
-                Continue as guest
+                <svg className="google-icon" viewBox="0 0 24 24" width="16" height="16">
+                  <path
+                    fill="#4285F4"
+                    d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
+                  />
+                  <path
+                    fill="#34A853"
+                    d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
+                  />
+                  <path
+                    fill="#FBBC05"
+                    d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"
+                  />
+                  <path
+                    fill="#EA4335"
+                    d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"
+                  />
+                </svg>
+                <span>Sign in with Google</span>
               </button>
             </div>
           </div>
@@ -404,57 +589,118 @@ export const LoginPage: React.FC = () => {
                     </div>
                   </div>
 
-                  <label className={`fld ${badId ? 'bad' : ''}`} id="fe-signup">
-                    <span>EMAIL OR PHONE</span>
+                  <label className={`fld ${badEmail ? 'bad' : ''}`} id="fe-signup">
+                    <span>EMAIL ADDRESS</span>
                     <div className="inp">
                       <input
-                        id="id-signup"
-                        autoComplete="username"
+                        id="email-signup"
+                        type="email"
+                        autoComplete="email"
                         inputMode="email"
                         placeholder="you@example.com"
-                        value={identifier}
+                        value={signupEmail}
                         readOnly={mode !== 'up'}
                         tabIndex={mode === 'up' ? 0 : -1}
                         onChange={(e) => {
-                          setIdentifier(e.target.value);
-                          if (badId) setBadId(false);
+                          setSignupEmail(e.target.value);
+                          if (badEmail) setBadEmail(false);
                         }}
                       />
                     </div>
-                    <div className="msg">Enter a valid email or 10-digit phone number.</div>
+                    <div className="msg">Enter a valid email address.</div>
                   </label>
 
-                  <label className={`fld ${badPw ? 'bad' : ''}`} id="fp-signup">
+                  <label className={`fld ${badPhone ? 'bad' : ''}`} id="fphone-signup">
+                    <span>PHONE NUMBER</span>
+                    <div className="inp">
+                      <input
+                        id="phone-signup"
+                        type="tel"
+                        autoComplete="tel"
+                        inputMode="tel"
+                        placeholder="10-digit mobile number"
+                        value={signupPhone}
+                        readOnly={mode !== 'up'}
+                        tabIndex={mode === 'up' ? 0 : -1}
+                        onChange={(e) => {
+                          setSignupPhone(e.target.value);
+                          if (badPhone) setBadPhone(false);
+                        }}
+                      />
+                    </div>
+                    <div className="msg">Enter a valid 10-digit mobile number.</div>
+                  </label>
+
+                  <label className={`fld ${badSignupPw ? 'bad' : ''}`} id="fp-signup">
                     <span>PASSWORD</span>
                     <div className="inp">
                       <input
                         id="pw-signup"
-                        type={showPassword ? 'text' : 'password'}
+                        type={showSignupPassword ? 'text' : 'password'}
                         autoComplete="new-password"
                         placeholder="At least 6 characters"
-                        value={password}
+                        value={signupPassword}
                         readOnly={mode !== 'up'}
                         tabIndex={mode === 'up' ? 0 : -1}
                         onChange={(e) => {
-                          setPassword(e.target.value);
-                          if (badPw) setBadPw(false);
+                          setSignupPassword(e.target.value);
+                          if (badSignupPw) setBadSignupPw(false);
                         }}
                       />
                       <button
                         type="button"
                         id="eye-signup"
-                        aria-label={showPassword ? 'Hide password' : 'Show password'}
+                        aria-label={showSignupPassword ? 'Hide password' : 'Show password'}
                         tabIndex={mode === 'up' ? 0 : -1}
                         onClick={(e) => {
                           e.stopPropagation();
-                          setShowPassword(!showPassword);
+                          setShowSignupPassword(!showSignupPassword);
                         }}
                       >
-                        {showPassword ? 'Hide' : 'Show'}
+                        {showSignupPassword ? 'Hide' : 'Show'}
                       </button>
                     </div>
                     <div className="msg">Use at least 6 characters.</div>
                   </label>
+
+                  <label className={`fld ${badConfirmPw ? 'bad' : ''}`} id="fcp-signup">
+                    <span>CONFIRM PASSWORD</span>
+                    <div className="inp">
+                      <input
+                        id="cpw-signup"
+                        type={showSignupConfirmPassword ? 'text' : 'password'}
+                        autoComplete="new-password"
+                        placeholder="Re-enter your password"
+                        value={signupConfirmPassword}
+                        readOnly={mode !== 'up'}
+                        tabIndex={mode === 'up' ? 0 : -1}
+                        onChange={(e) => {
+                          setSignupConfirmPassword(e.target.value);
+                          if (badConfirmPw) setBadConfirmPw(false);
+                        }}
+                      />
+                      <button
+                        type="button"
+                        id="eye-confirm-signup"
+                        aria-label={showSignupConfirmPassword ? 'Hide password' : 'Show password'}
+                        tabIndex={mode === 'up' ? 0 : -1}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setShowSignupConfirmPassword(!showSignupConfirmPassword);
+                        }}
+                      >
+                        {showSignupConfirmPassword ? 'Hide' : 'Show'}
+                      </button>
+                    </div>
+                    <div className="msg">{confirmPwErrorMsg}</div>
+                  </label>
+
+                  {serverError && mode === 'up' && (
+                    <div className="login-server-error-banner" role="alert">
+                      <span>⚠️</span>
+                      <span>{serverError}</span>
+                    </div>
+                  )}
 
                   <div className="barcode" aria-hidden="true" />
                 </form>
@@ -483,23 +729,41 @@ export const LoginPage: React.FC = () => {
                 id="go-signup"
                 type="submit"
                 form="f-signup"
-                disabled={mode !== 'up'}
+                disabled={mode !== 'up' || isSubmitting}
                 tabIndex={mode === 'up' ? 0 : -1}
               >
-                Issue my ticket →
+                {isSubmitting ? 'Issuing pass...' : 'Issue my ticket →'}
               </button>
               <button
-                className="guest"
-                id="guest-signup"
+                className="google-btn"
+                id="google-signup"
                 type="button"
                 onClick={(e) => {
                   e.stopPropagation();
-                  handleGuest();
+                  handleGoogleSignIn();
                 }}
-                disabled={mode !== 'up'}
+                disabled={mode !== 'up' || isSubmitting}
                 tabIndex={mode === 'up' ? 0 : -1}
               >
-                Continue as guest
+                <svg className="google-icon" viewBox="0 0 24 24" width="16" height="16">
+                  <path
+                    fill="#4285F4"
+                    d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
+                  />
+                  <path
+                    fill="#34A853"
+                    d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
+                  />
+                  <path
+                    fill="#FBBC05"
+                    d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"
+                  />
+                  <path
+                    fill="#EA4335"
+                    d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"
+                  />
+                </svg>
+                <span>Sign in with Google</span>
               </button>
             </div>
           </div>

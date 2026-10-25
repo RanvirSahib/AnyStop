@@ -1,5 +1,5 @@
 import { BusService, ComputedTrip, FilterState } from '../types/transit';
-import { CLASS_RATES, OWN } from '../data/transitData';
+import { OWN } from '../data/transitData';
 
 /**
  * Format minutes from midnight (0..1439) into 12-hour "hh:mm AM/PM" string
@@ -35,6 +35,99 @@ export function getCurrentMinutes(): number {
 }
 
 /**
+ * Return today's date formatted as YYYY-MM-DD
+ */
+export function getTodayDateString(): string {
+  const d = new Date();
+  const year = d.getFullYear();
+  const month = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
+
+/**
+ * Format a YYYY-MM-DD date into friendly text like "Today • Sun, 25 Oct" or "Sun, 25 Oct 2026"
+ */
+export function formatJourneyDate(dateStr: string): string {
+  if (!dateStr) return 'Today';
+  const today = getTodayDateString();
+  const parts = dateStr.split('-');
+  if (parts.length !== 3) return dateStr;
+  
+  const d = new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]));
+  const dayName = d.toLocaleDateString('en-IN', { weekday: 'short' });
+  const dayNum = d.getDate();
+  const monthName = d.toLocaleDateString('en-IN', { month: 'short' });
+  const year = d.getFullYear();
+
+  if (dateStr === today) {
+    return `Today • ${dayName}, ${dayNum} ${monthName}`;
+  }
+
+  // Check tomorrow
+  const tom = new Date();
+  tom.setDate(tom.getDate() + 1);
+  const tomYear = tom.getFullYear();
+  const tomMonth = String(tom.getMonth() + 1).padStart(2, '0');
+  const tomDay = String(tom.getDate()).padStart(2, '0');
+  const tomorrowStr = `${tomYear}-${tomMonth}-${tomDay}`;
+
+  if (dateStr === tomorrowStr) {
+    return `Tomorrow • ${dayName}, ${dayNum} ${monthName}`;
+  }
+
+  return `${dayName}, ${dayNum} ${monthName} ${year}`;
+}
+
+/**
+ * Gazetted Base Passenger Rates per minute/km for Punjab stage carriages
+ */
+export const CLASS_BASE_RATES: Record<string, number> = {
+  "Mini Bus": 1.20,
+  "Ordinary": 1.35,
+  "HVAC Semi-Deluxe": 1.65,
+  "HVAC": 1.95,
+  "Volvo AC": 3.15
+};
+
+/**
+ * Statutory GST rates: 0% for non-AC stage carriages, 5% for air-conditioned buses
+ */
+export const CLASS_GST_RATES: Record<string, number> = {
+  "Mini Bus": 0.00,
+  "Ordinary": 0.00,
+  "HVAC Semi-Deluxe": 0.05,
+  "HVAC": 0.05,
+  "Volvo AC": 0.05
+};
+
+/**
+ * Compute the statutory maximum price inclusive of GST
+ */
+export function computeMaximumPrice(busClass: string, durationMinutes: number) {
+  const baseRate = CLASS_BASE_RATES[busClass] || 1.35;
+  const gstRate = CLASS_GST_RATES[busClass] || 0.00;
+
+  // Minimum stage ticketing floor (₹15 for Ordinary/Mini, ₹30 for HVAC, ₹50 for Volvo)
+  const floor = busClass === 'Volvo AC' ? 50 : busClass.includes('HVAC') ? 30 : 15;
+
+  const rawBase = Math.max(floor, baseRate * durationMinutes);
+  const baseFare = Math.round(rawBase);
+  const gstAmount = Math.round(baseFare * gstRate);
+  const totalWithGst = baseFare + gstAmount;
+
+  // Round to nearest standard ₹5 ticketing increment
+  const maxFare = Math.max(floor, Math.round(totalWithGst / 5) * 5);
+
+  return {
+    baseFare,
+    gstAmount,
+    gstRatePercent: Math.round(gstRate * 100),
+    maxFare
+  };
+}
+
+/**
  * Compute valid trips between two stops and apply active filters
  */
 export function getMatchingTrips(
@@ -42,11 +135,17 @@ export function getMatchingTrips(
   filters: FilterState,
   currentMinutes: number = getCurrentMinutes()
 ): ComputedTrip[] {
-  const { from, to, timeFilter, typeFilter, ownerFilter } = filters;
+  const { from, to, journeyDate, timeFilter, typeFilter, ownerFilter, acFilter } = filters;
 
   if (!from || !to || from === to) {
     return [];
   }
+
+  const todayStr = getTodayDateString();
+  const activeDate = journeyDate || todayStr;
+  const isToday = activeDate === todayStr;
+  const isFuture = activeDate > todayStr;
+  const isPast = activeDate < todayStr;
 
   // 1. Find matching trips that stop at both 'from' and 'to', with 'to' after 'from'
   const matched: ComputedTrip[] = [];
@@ -61,12 +160,22 @@ export function getMatchingTrips(
       const durationMinutes = arrMinutes - depMinutes;
       const intermediateStops = toIndex - fromIndex - 1;
       
-      const rate = CLASS_RATES[bus.busClass] || 0.9;
-      const rawFare = rate * durationMinutes;
-      const estimatedFare = Math.max(10, Math.round(rawFare / 5) * 5);
+      const { baseFare, gstAmount, gstRatePercent, maxFare } = computeMaximumPrice(bus.busClass, durationMinutes);
 
       const diff = depMinutes - currentMinutes;
-      const hasDeparted = diff < 0;
+      let hasDeparted = false;
+      let minutesUntilDeparture = diff;
+
+      if (isToday) {
+        hasDeparted = diff < 0;
+        minutesUntilDeparture = diff;
+      } else if (isFuture) {
+        hasDeparted = false;
+        minutesUntilDeparture = depMinutes;
+      } else if (isPast) {
+        hasDeparted = true;
+        minutesUntilDeparture = -1;
+      }
 
       matched.push({
         ...bus,
@@ -76,10 +185,15 @@ export function getMatchingTrips(
         arrMinutes,
         durationMinutes,
         intermediateStops,
-        estimatedFare,
+        estimatedFare: maxFare,
+        maxFare,
+        baseFare,
+        gstAmount,
+        gstRatePercent,
         isNextBus: false,
-        minutesUntilDeparture: diff,
-        hasDeparted
+        minutesUntilDeparture,
+        hasDeparted,
+        journeyDate: activeDate
       });
     }
   }
@@ -100,13 +214,27 @@ export function getMatchingTrips(
     });
   }
 
+  // Filter by AC vs Non-AC
+  if (acFilter && acFilter !== 'any') {
+    const isAcClass = (cls: string) => cls === 'HVAC' || cls === 'HVAC Semi-Deluxe' || cls === 'Volvo AC';
+    if (acFilter === 'ac') {
+      filtered = filtered.filter(trip => isAcClass(trip.busClass));
+    } else if (acFilter === 'non-ac') {
+      filtered = filtered.filter(trip => !isAcClass(trip.busClass));
+    }
+  }
+
   // Filter by time window
   if (timeFilter === 'now') {
-    // Next 60 minutes
-    filtered = filtered.filter(trip => {
-      const diff = trip.depMinutes - currentMinutes;
-      return diff >= 0 && diff <= 60;
-    });
+    if (isToday) {
+      filtered = filtered.filter(trip => {
+        const diff = trip.depMinutes - currentMinutes;
+        return diff >= 0 && diff <= 60;
+      });
+    } else {
+      // For future dates, show morning first departures
+      filtered = filtered.filter(trip => trip.depMinutes < 420);
+    }
   } else if (timeFilter === 'am') {
     // 06:00 to 12:00 (360 to 720 mins)
     filtered = filtered.filter(trip => trip.depMinutes >= 360 && trip.depMinutes < 720);
@@ -120,6 +248,9 @@ export function getMatchingTrips(
 
   // 3. Sort by upcoming departure first
   filtered.sort((a, b) => {
+    if (isFuture || isPast) {
+      return a.depMinutes - b.depMinutes;
+    }
     const scoreA = a.depMinutes < currentMinutes ? a.depMinutes + 1440 : a.depMinutes;
     const scoreB = b.depMinutes < currentMinutes ? b.depMinutes + 1440 : b.depMinutes;
     return scoreA - scoreB;

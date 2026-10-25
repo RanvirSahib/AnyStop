@@ -1,7 +1,7 @@
 import React from 'react';
 import { Radio, Trash2 } from 'lucide-react';
 import { SpottedReport } from '../types/transit';
-import { formatMinutesToTime, formatDuration } from '../utils/transitEngine';
+import { formatMinutesToTime, formatDuration, computeMaximumPrice } from '../utils/transitEngine';
 import { OWNL, OWN, BUS_SERVICES } from '../data/transitData';
 
 interface SharedBusCardProps {
@@ -14,7 +14,7 @@ interface SharedBusCardProps {
   onDelete?: (id: string) => void;
 }
 
-export const SharedBusCard: React.FC<SharedBusCardProps> = ({
+export const SharedBusCard: React.FC<SharedBusCardProps> = React.memo(({
   report,
   index,
   isOpen,
@@ -39,6 +39,7 @@ export const SharedBusCard: React.FC<SharedBusCardProps> = ({
 
   const isVolvo = operatorName.includes('Volvo') || operatorName.includes('Orbit');
   const busClass = isVolvo ? 'Volvo AC' : 'Ordinary';
+  const isAc = isVolvo;
 
   // Timestamps and Duration
   const spottedDate = new Date(report.timestamp);
@@ -70,6 +71,7 @@ export const SharedBusCard: React.FC<SharedBusCardProps> = ({
   const relativeElapsed = elapsedMins < 60 ? `${elapsedMins}m ago` : `${Math.floor(elapsedMins / 60)}h ${elapsedMins % 60}m ago`;
 
   const isExpress = report.speedType === 'Express';
+  const { maxFare, baseFare, gstAmount, gstRatePercent } = computeMaximumPrice(busClass, estDuration);
 
   return (
     <article
@@ -106,6 +108,11 @@ export const SharedBusCard: React.FC<SharedBusCardProps> = ({
             {/* Government / Private Badge */}
             <span className={`badge ${ownerClass}`}>{ownerLabel}</span>
 
+            {/* AC / Non-AC Comfort Badge */}
+            <span className={`badge ${isAc ? 'b-ac' : 'b-non-ac'}`}>
+              {isAc ? '❄️ AC' : '🍃 Non-AC'}
+            </span>
+
             {/* Express / Local Badge */}
             <span className={`badge ${isExpress ? 'b-e' : 'b-l'}`}>
               {isExpress ? '⚡ Express' : '🐢 All-stop'}
@@ -128,14 +135,30 @@ export const SharedBusCard: React.FC<SharedBusCardProps> = ({
                 : '🔴 Heavy Rush'}
             </span>
 
-            {/* Fare & Mode */}
+            {/* Maximum Price incl. GST */}
+            <span
+              className="badge b-fare"
+              title={`Base Fare: ₹${baseFare} + GST (${gstRatePercent}%): ₹${gstAmount}`}
+            >
+              Max ₹{maxFare} (incl. GST)
+            </span>
+
+            {/* Boarding / Booking Mode */}
             <span className="badge b-n">
-              {isVolvo ? 'Book online' : 'Pay on board'} ~₹{Math.max(30, Math.round((estDuration * 0.9) / 5) * 5)}
+              {isVolvo ? 'Book online' : 'Pay on board'}
             </span>
 
             {/* Live Crowd Sighting Badge */}
             <span className="badge b-next">
               📡 Live Shared Bus
+            </span>
+
+            {/* Daily Corridor Badge */}
+            <span
+              className="badge b-daily"
+              title="Daily stage carriage corridor: regular daily operations"
+            >
+              📅 Daily corridor
             </span>
           </div>
         </div>
@@ -211,4 +234,4 @@ export const SharedBusCard: React.FC<SharedBusCardProps> = ({
       </div>
     </article>
   );
-};
+});

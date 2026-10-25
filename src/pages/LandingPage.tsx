@@ -1,7 +1,8 @@
 import React, { useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { MapPin, Zap, Landmark, Banknote, WifiOff, Users } from 'lucide-react';
+import { MapPin, Zap, Landmark, Banknote, Calendar, WifiOff, Users, Sun, Moon } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { useTheme } from '../context/ThemeContext';
 import { AnyStopLogo } from '../components/AnyStopLogo';
 import './LandingPage.css';
 
@@ -23,6 +24,7 @@ const NAMES = [
 export const LandingPage: React.FC = () => {
   const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
+  const { darkMode, toggleDarkMode } = useTheme();
   const navRef = useRef<HTMLElement>(null);
   const raceRef = useRef<HTMLElement>(null);
 
@@ -94,6 +96,22 @@ export const LandingPage: React.FC = () => {
             <a href="#how">How it works</a>
             <a href="#features">Features</a>
             <a href="#faq">FAQ</a>
+            <button
+              type="button"
+              onClick={(e) => toggleDarkMode(e)}
+              className="landing-theme-toggle-btn theme-toggle-btn"
+              title={darkMode ? "Switch to Day theme" : "Switch to Night theme"}
+              aria-label="Toggle theme"
+            >
+              <span key={darkMode ? 'dark' : 'light'} className="theme-icon-container">
+                {darkMode ? (
+                  <Moon className="w-4 h-4 text-indigo-300 fill-indigo-300/40 theme-icon" />
+                ) : (
+                  <Sun className="w-4 h-4 text-amber-500 fill-amber-500/50 theme-icon" />
+                )}
+              </span>
+              <span className="theme-mode-label hidden sm:inline">{darkMode ? 'Night' : 'Day'}</span>
+            </button>
             <button type="button" className="btn" onClick={handleLogin}>
               <svg
                 viewBox="0 0 24 24"
@@ -124,7 +142,7 @@ export const LandingPage: React.FC = () => {
               Know your bus <em>before</em> it arrives.
             </h1>
             <p className="lead">
-              Pick two stops. See which buses run between them, how many stops they make, and what the ticket costs.
+              Pick two stops. See all buses running between them every day on the same fixed timetable, intermediate stops, and statutory maximum prices including GST.
             </p>
             <div className="cta">
               <button type="button" className="btn b1" onClick={handleFindBus}>
@@ -150,7 +168,8 @@ export const LandingPage: React.FC = () => {
                 </div>
                 <span className="chip e">⚡ Express</span>
                 <span className="chip g">Government</span>
-                <span className="chip">~₹90</span>
+                <span className="chip" style={{ background: '#E8F5E9', color: '#1B5E20', fontWeight: 700 }}>Max ₹130 (incl. GST)</span>
+                <span className="chip" style={{ background: '#E0F2FE', color: '#0369A1', fontWeight: 600 }}>📅 Daily</span>
               </div>
 
               <div className="mini">
@@ -164,7 +183,8 @@ export const LandingPage: React.FC = () => {
                   </div>
                 </div>
                 <span className="chip">🐢 All-stop</span>
-                <span className="chip">~₹85</span>
+                <span className="chip" style={{ background: '#E8F5E9', color: '#1B5E20', fontWeight: 700 }}>Max ₹130 (incl. GST)</span>
+                <span className="chip" style={{ background: '#E0F2FE', color: '#0369A1', fontWeight: 600 }}>📅 Daily</span>
               </div>
 
               <div className="mini">
@@ -178,6 +198,7 @@ export const LandingPage: React.FC = () => {
                   </div>
                 </div>
                 <span className="chip">Private</span>
+                <span className="chip" style={{ background: '#E0F2FE', color: '#0369A1', fontWeight: 600 }}>📅 Daily</span>
               </div>
             </div>
           </div>
@@ -298,8 +319,15 @@ export const LandingPage: React.FC = () => {
               <div className="ic">
                 <Banknote className="w-6 h-6 text-[var(--sunink)]" strokeWidth={2.2} />
               </div>
-              <h3>Fare estimates</h3>
-              <p>Know how much cash to keep ready, or book online when the bus allows it.</p>
+              <h3>Maximum Price (incl. GST)</h3>
+              <p>Gazetted statutory fare caps with GST breakdown so you always know the exact legal price.</p>
+            </div>
+            <div className="f rv" style={{ ['--d' as any]: 1 }}>
+              <div className="ic">
+                <Calendar className="w-6 h-6 text-[var(--teal)]" strokeWidth={2.2} />
+              </div>
+              <h3>Runs Everyday (Mon–Sun)</h3>
+              <p>Every listed stage carriage service operates 365 days a year with the exact same daily timetable.</p>
             </div>
             <div className="f soon rv" style={{ ['--d' as any]: 1 }}>
               <div className="ic">
@@ -330,23 +358,23 @@ export const LandingPage: React.FC = () => {
           <h2 className="rv">Quick answers</h2>
           <br />
           <details className="rv">
-            <summary>Is the timetable live?</summary>
-            <p>Not yet. Today it shows planned timings. Live rider updates are on the roadmap.</p>
+            <summary>Do these buses run every day with the same timetable?</summary>
+            <p>Yes. All listed services are confirmed stage carriage buses operating every day (Monday to Sunday, 365 days a year) with the exact same departure and stoppage timetable.</p>
           </details>
           <details className="rv">
-            <summary>Which cities and routes are covered?</summary>
+            <summary>Which cities and corridors are covered?</summary>
             <p>
-              We’re starting with the Chandigarh, Ludhiana, Jalandhar and Ambala corridor and adding more stops over time.
+              All 23 districts of Punjab across Majha, Doaba, and Malwa regions, plus connecting interstate routes to Delhi, Jammu & Kashmir, Himachal Pradesh, Haryana, Uttarakhand, and Rajasthan.
             </p>
           </details>
           <details className="rv">
-            <summary>Do I need an account?</summary>
-            <p>No. You can search as a guest. An account will let you save favourite routes.</p>
+            <summary>Are ticket prices inclusive of GST?</summary>
+            <p>Yes. All prices shown are statutory maximum fares inclusive of GST (0% exempt for Ordinary/Mini stage carriage; 5% for AC and Volvo services).</p>
           </details>
           <details className="rv">
             <summary>Can I book tickets here?</summary>
             <p>
-              For buses that allow online booking, we link you to the booking site. Most government buses are paid on board.
+              For luxury Volvo buses that support online booking, we provide instant links. For ordinary and HVAC stage carriage buses, payment is made on board with the conductor.
             </p>
           </details>
         </div>
@@ -368,7 +396,7 @@ export const LandingPage: React.FC = () => {
       {/* Footer */}
       <footer>
         <div className="wrap">
-          <span>© AnyStop · Timetable shown is sample data for design preview.</span>
+          <span>© AnyStop · Punjab Daily Transit Timetables & Maximum Prices (incl. GST)</span>
           <span>
             <a onClick={handleFindBus}>Bus finder</a>
             <a onClick={handleLogin}>Log in</a>

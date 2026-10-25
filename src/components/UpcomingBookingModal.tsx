@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { X, Sparkles, Ticket, ArrowRight, CheckCircle2, ShieldCheck } from 'lucide-react';
+import { X, Sparkles, Ticket, ArrowRight, CheckCircle2, ShieldCheck, Calendar } from 'lucide-react';
 import { ComputedTrip } from '../types/transit';
-import { formatMinutesToTime } from '../utils/transitEngine';
+import { formatMinutesToTime, formatJourneyDate } from '../utils/transitEngine';
 
 interface UpcomingBookingModalProps {
   isOpen: boolean;
@@ -9,6 +9,7 @@ interface UpcomingBookingModalProps {
   trip: ComputedTrip | null;
   from: string;
   to: string;
+  journeyDate?: string;
 }
 
 export const UpcomingBookingModal: React.FC<UpcomingBookingModalProps> = ({
@@ -16,7 +17,8 @@ export const UpcomingBookingModal: React.FC<UpcomingBookingModalProps> = ({
   onClose,
   trip,
   from,
-  to
+  to,
+  journeyDate
 }) => {
   const [notified, setNotified] = useState(false);
   const [emailOrPhone, setEmailOrPhone] = useState('');
@@ -110,9 +112,28 @@ export const UpcomingBookingModal: React.FC<UpcomingBookingModalProps> = ({
               </div>
             </div>
 
-            <div className="mt-2 pt-2 border-t border-[var(--line)]/60 flex items-center justify-between text-[11px]">
-              <span className="text-[var(--muted)]">Service: <b className="text-[var(--ink)]">{trip.busClass}</b></span>
-              <span className="text-[var(--muted)]">Fare: <b className="text-[var(--coral)] font-bold">~₹{trip.estimatedFare}</b></span>
+            <div className="mt-2 pt-2 border-t border-[var(--line)]/60 flex flex-col gap-1 text-[11px]">
+              <div className="flex items-center justify-between">
+                <span className="text-[var(--muted)]">Service: <b className="text-[var(--ink)]">{trip.busClass}</b></span>
+                <span className="text-[var(--muted)]">Max Price: <b className="text-emerald-600 dark:text-emerald-400 font-bold">₹{trip.maxFare} (incl. GST)</b></span>
+              </div>
+              {journeyDate && (
+                <div className="flex items-center justify-between text-[10.5px]">
+                  <span className="text-[var(--muted)] flex items-center gap-1">
+                    <Calendar className="w-3 h-3 text-[var(--coral)]" />
+                    <span>Travel Date:</span>
+                  </span>
+                  <b className="text-[var(--ink)] font-bold">{formatJourneyDate(journeyDate)}</b>
+                </div>
+              )}
+              <div className="flex items-center justify-between text-[10px] text-[var(--muted)]">
+                <span>Statutory Fare Breakdown</span>
+                <span>Base: ₹{trip.baseFare} {trip.gstRatePercent > 0 ? `+ GST (${trip.gstRatePercent}%): ₹${trip.gstAmount}` : '(0% GST exempt)'}</span>
+              </div>
+              <div className="flex items-center justify-between text-[10px] text-[var(--muted)] pt-0.5 border-t border-[var(--line)]/40">
+                <span>Operating Schedule</span>
+                <span className="font-semibold text-sky-700 dark:text-sky-300">📅 Runs Everyday (Mon–Sun • Same Daily Timetable)</span>
+              </div>
             </div>
           </div>
 

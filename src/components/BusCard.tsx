@@ -1,6 +1,6 @@
 import React from 'react';
 import { ComputedTrip } from '../types/transit';
-import { formatMinutesToTime, formatDuration } from '../utils/transitEngine';
+import { formatMinutesToTime, formatDuration, getTodayDateString } from '../utils/transitEngine';
 import { OWNL, OWN } from '../data/transitData';
 
 interface BusCardProps {
@@ -13,7 +13,7 @@ interface BusCardProps {
   index: number;
 }
 
-export const BusCard: React.FC<BusCardProps> = ({
+export const BusCard: React.FC<BusCardProps> = React.memo(({
   trip,
   userFrom,
   userTo,
@@ -23,8 +23,10 @@ export const BusCard: React.FC<BusCardProps> = ({
   index
 }) => {
   const isVolvo = trip.busClass === 'Volvo AC';
+  const isAc = trip.busClass === 'HVAC' || trip.busClass === 'HVAC Semi-Deluxe' || trip.busClass === 'Volvo AC';
   const ownerCode = OWN[trip.operator] || (trip.ownership === 'gov' ? 'G' : 'P');
   const [ownerLabel, ownerClass] = OWNL[ownerCode] || ['Government', 'b-g'];
+  const isToday = !trip.journeyDate || trip.journeyDate === getTodayDateString();
 
   // Stoppage list items
   const fromName = userFrom.split(' (')[0];
@@ -57,7 +59,7 @@ export const BusCard: React.FC<BusCardProps> = ({
           <div className="op">{trip.operator}</div>
           <div className="meta">
             {trip.busClass}
-            {!trip.hasDeparted && trip.minutesUntilDeparture <= 90
+            {!trip.hasDeparted && isToday && trip.minutesUntilDeparture <= 90
               ? ` • leaves in ${trip.minutesUntilDeparture} min`
               : ''}
           </div>
@@ -65,6 +67,11 @@ export const BusCard: React.FC<BusCardProps> = ({
           <div style={{ marginTop: '4px' }}>
             {/* Government / Private Badge */}
             <span className={`badge ${ownerClass}`}>{ownerLabel}</span>
+
+            {/* AC / Non-AC Comfort Badge */}
+            <span className={`badge ${isAc ? 'b-ac' : 'b-non-ac'}`}>
+              {isAc ? '❄️ AC' : '🍃 Non-AC'}
+            </span>
 
             {/* Express / Local Badge */}
             <span className={`badge ${trip.serviceType === 'E' ? 'b-e' : 'b-l'}`}>
@@ -78,16 +85,39 @@ export const BusCard: React.FC<BusCardProps> = ({
                 : `${trip.intermediateStops} stop${trip.intermediateStops === 1 ? '' : 's'} between`}
             </span>
 
-            {/* Fare & Mode */}
+            {/* Maximum Price incl. GST */}
+            <span
+              className="badge b-fare"
+              title={`Base Fare: ₹${trip.baseFare} + GST (${trip.gstRatePercent}%): ₹${trip.gstAmount}`}
+            >
+              Max ₹{trip.maxFare} (incl. GST)
+            </span>
+
+            {/* Daily Service Badge */}
+            <span
+              className="badge b-daily"
+              title="Confirmed regular stage carriage timetable: operates everyday (Mon–Sun, 365 days a year) with the same departure timings"
+            >
+              📅 Daily service
+            </span>
+
+            {/* Boarding / Booking Mode */}
             <span className="badge b-n">
-              {isVolvo ? 'Book online' : 'Pay on board'} ~₹{trip.estimatedFare}
+              {isVolvo ? 'Book online' : 'Pay on board'}
             </span>
 
             {/* Next Bus Blink Badge */}
             {trip.isNextBus && <span className="badge b-next">Next bus</span>}
 
             {/* Departed / Tomorrow Badge */}
-            {trip.hasDeparted && <span className="badge b-tomorrow">Runs tomorrow</span>}
+            {trip.hasDeparted && (
+              <span
+                className="badge b-tomorrow"
+                title="Runs everyday with the same timetable. Next departure tomorrow."
+              >
+                {isToday ? `Tomorrow at ${formatMinutesToTime(trip.depMinutes)}` : 'Departed'}
+              </span>
+            )}
           </div>
         </div>
 
@@ -117,6 +147,10 @@ export const BusCard: React.FC<BusCardProps> = ({
       {/* Expandable Stops Drawer */}
       <div className="stops">
         <div>
+          <div className="px-3 pt-2 pb-1.5 mb-2 rounded-lg bg-[var(--line)]/30 border border-[var(--line)]/50 text-[11px] text-[var(--muted)] flex items-center justify-between flex-wrap gap-1">
+            <span className="font-semibold text-[var(--ink)]">📅 Daily Fixed Timetable:</span>
+            <span>Runs everyday (Mon–Sun) at identical scheduled times</span>
+          </div>
           <ol className="stoplist">
             {trip.stops.map(([stopName, offsetMins], x) => {
               const isEnd = x === trip.fromIndex || x === trip.toIndex;
@@ -142,4 +176,4 @@ export const BusCard: React.FC<BusCardProps> = ({
       </div>
     </article>
   );
-};
+});

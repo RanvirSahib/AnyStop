@@ -11,5 +11,16 @@ export default defineConfig({
   preview: {
     port: 3005,
     host: true,
+  },
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          vendor: ['react', 'react-dom', 'react-router-dom'],
+          supabase: ['@supabase/supabase-js'],
+          icons: ['lucide-react']
+        }
+      }
+    }
   }
 });

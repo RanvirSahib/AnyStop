@@ -1,12 +1,13 @@
-const CACHE_NAME = 'anystop-v2';
+const CACHE_NAME = 'anystop-v3';
 const ASSETS = [
-  '/',
-  '/index.html',
   '/manifest.webmanifest',
-  '/bus-icon.svg'
+  '/bus-icon.svg',
+  '/favicon.svg',
+  '/logo.svg'
 ];
 
 self.addEventListener('install', (event) => {
+  // Pre-cache only static media/manifest assets, NEVER cache HTML to prevent stale route traps
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => cache.addAll(ASSETS))
   );
@@ -14,6 +15,7 @@ self.addEventListener('install', (event) => {
 });
 
 self.addEventListener('activate', (event) => {
+  // Immediately clean up all previous cache versions (v1, v2, etc.)
   event.waitUntil(
     caches.keys().then((keys) =>
       Promise.all(
@@ -28,14 +30,28 @@ self.addEventListener('activate', (event) => {
   self.clients.claim();
 });
 
+self.addEventListener('message', (event) => {
+  if (event.data && event.data.type === 'SKIP_WAITING') {
+    self.skipWaiting();
+  }
+});
+
 self.addEventListener('fetch', (event) => {
   if (event.request.method !== 'GET') return;
 
-  // For HTML / navigation requests: ALWAYS try network first so fresh Vercel deployments load immediately!
-  // Fall back to cached index.html only when user is truly offline.
-  if (event.request.mode === 'navigate') {
+  const url = new URL(event.request.url);
+
+  // Check if this is an HTML document navigation request
+  const isHtml =
+    event.request.mode === 'navigate' ||
+    event.request.destination === 'document' ||
+    (event.request.headers.get('accept') && event.request.headers.get('accept').includes('text/html'));
+
+  if (isHtml) {
+    // Navigation requests ALWAYS use Network-First with cache: 'no-cache'.
+    // This guarantees fresh Vercel deployments and initial landing page render immediately on first click!
     event.respondWith(
-      fetch(event.request)
+      fetch(event.request, { cache: 'no-cache' })
         .then((response) => {
           if (response.status === 200) {
             const clone = response.clone();
@@ -48,14 +64,14 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // For hashed static assets (JS/CSS/images), cache-first with network fallback:
+  // Static hashed assets (JS/CSS/images/icons) use Cache-First with Network fallback
   event.respondWith(
     caches.match(event.request).then((cached) => {
       return (
         cached ||
         fetch(event.request)
           .then((response) => {
-            if (response.status === 200) {
+            if (response.status === 200 && url.origin === self.location.origin) {
               const clone = response.clone();
               caches.open(CACHE_NAME).then((cache) => cache.put(event.request, clone));
             }

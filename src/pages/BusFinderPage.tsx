@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Radio, AlertCircle } from 'lucide-react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
+import { Radio, AlertCircle, Calendar } from 'lucide-react';
 import { FilterState, SpottedReport, ComputedTrip } from '../types/transit';
 import { STOPS, BUS_SERVICES, INQUIRY_CONTACTS, INITIAL_SPOTTED_REPORTS } from '../data/transitData';
-import { getMatchingTrips, getCurrentMinutes } from '../utils/transitEngine';
+import { getMatchingTrips, getCurrentMinutes, formatJourneyDate, getTodayDateString } from '../utils/transitEngine';
 import { Header } from '../components/Header';
 import { SearchSection } from '../components/SearchSection';
 import { BusCard } from '../components/BusCard';
@@ -18,7 +18,7 @@ import { useTheme } from '../context/ThemeContext';
 
 export const BusFinderPage: React.FC = () => {
   const navigate = useNavigate();
-  const { currentUser, logout, isAuthenticated } = useAuth();
+  const { currentUser, isAuthenticated } = useAuth();
   const { darkMode, toggleDarkMode } = useTheme();
 
   // Auth Protection Gate: if not logged in, redirect immediately to /login
@@ -38,15 +38,37 @@ export const BusFinderPage: React.FC = () => {
     return () => clearInterval(timer);
   }, []);
 
+  const [searchParams] = useSearchParams();
+  const qFrom = searchParams.get('from') || '';
+  const qTo = searchParams.get('to') || '';
+  const qDate = searchParams.get('date') || getTodayDateString();
+
   // Filter state
   const [filters, setFilters] = useState<FilterState>({
-    from: "",
-    to: "",
+    from: qFrom,
+    to: qTo,
+    journeyDate: qDate,
     timeFilter: "all",
     typeFilter: "any",
     ownerFilter: "any",
+    acFilter: "any",
     openCardKey: null
   });
+
+  useEffect(() => {
+    const newFrom = searchParams.get('from');
+    const newTo = searchParams.get('to');
+    const newDate = searchParams.get('date');
+    if (newFrom || newTo || newDate) {
+      setFilters(prev => ({
+        ...prev,
+        from: newFrom !== null ? newFrom : prev.from,
+        to: newTo !== null ? newTo : prev.to,
+        journeyDate: newDate !== null ? newDate : prev.journeyDate,
+        openCardKey: null
+      }));
+    }
+  }, [searchParams]);
 
   // Modals state
   const [isInquiryOpen, setIsInquiryOpen] = useState(false);
@@ -162,6 +184,13 @@ export const BusFinderPage: React.FC = () => {
     }
 
     return spottedReports.filter(r => {
+      if (filters.acFilter && filters.acFilter !== 'any') {
+        const isAcClass = (cls?: string) => cls === 'HVAC' || cls === 'HVAC Semi-Deluxe' || cls === 'Volvo AC';
+        const busClass = r.busClass || ((r.operator && (r.operator.includes('Volvo') || r.operator.includes('Orbit'))) ? 'Volvo AC' : 'Ordinary');
+        if (filters.acFilter === 'ac' && !isAcClass(busClass)) return false;
+        if (filters.acFilter === 'non-ac' && isAcClass(busClass)) return false;
+      }
+
       const matchExactUserFrom = isStopMatch(r.stop, filters.from);
       const matchExactUserTo = isStopMatch(r.direction, filters.to);
 
@@ -172,12 +201,7 @@ export const BusFinderPage: React.FC = () => {
 
       return stopInCorridor && destInCorridor;
     });
-  }, [spottedReports, filters.from, filters.to, areStopsValid]);
-
-  const handleLogout = () => {
-    logout();
-    navigate('/');
-  };
+  }, [spottedReports, filters.from, filters.to, filters.acFilter, areStopsValid]);
 
   if (!isAuthenticated) {
     return null;
@@ -194,8 +218,7 @@ export const BusFinderPage: React.FC = () => {
         spottedCount={spottedReports.length}
         currentUser={currentUser}
         onNavigateLanding={() => navigate('/')}
-        onNavigateLogin={() => navigate('/login')}
-        onLogout={handleLogout}
+        onNavigateProfile={() => navigate('/profile')}
       />
 
       {/* Main Content */}
@@ -205,16 +228,20 @@ export const BusFinderPage: React.FC = () => {
           from={filters.from}
           to={filters.to}
           stops={STOPS}
+          journeyDate={filters.journeyDate}
           timeFilter={filters.timeFilter}
           typeFilter={filters.typeFilter}
           ownerFilter={filters.ownerFilter}
+          acFilter={filters.acFilter}
           onChangeFrom={(from) => setFilters(prev => ({ ...prev, from, openCardKey: null }))}
           onChangeTo={(to) => setFilters(prev => ({ ...prev, to, openCardKey: null }))}
+          onChangeJourneyDate={(journeyDate) => setFilters(prev => ({ ...prev, journeyDate, openCardKey: null }))}
           onSwap={() => setFilters(prev => ({ ...prev, from: prev.to, to: prev.from, openCardKey: null }))}
           onSelectTrip={(from, to) => setFilters(prev => ({ ...prev, from, to, openCardKey: null }))}
           onChangeTimeFilter={(timeFilter) => setFilters(prev => ({ ...prev, timeFilter, openCardKey: null }))}
           onChangeTypeFilter={(typeFilter) => setFilters(prev => ({ ...prev, typeFilter, openCardKey: null }))}
           onChangeOwnerFilter={(ownerFilter) => setFilters(prev => ({ ...prev, ownerFilter, openCardKey: null }))}
+          onChangeAcFilter={(acFilter) => setFilters(prev => ({ ...prev, acFilter, openCardKey: null }))}
         />
 
         {/* Community Spotted Prompt Banner */}
@@ -286,9 +313,22 @@ export const BusFinderPage: React.FC = () => {
 
         {/* Results Header */}
         <div className="head">
-          <h2 id="title">
-            {areStopsValid ? `${filters.from} to ${filters.to}` : 'Buses'}
-          </h2>
+          <div>
+            <h2 id="title">
+              {areStopsValid ? `${filters.from} to ${filters.to}` : 'Buses'}
+            </h2>
+            {areStopsValid && (
+              <p className="text-[11.5px] text-[var(--muted)] mt-1 flex items-center gap-1.5 font-medium flex-wrap">
+                <span className="inline-block w-2 h-2 rounded-full bg-emerald-500 shrink-0"></span>
+                <span>Fixed Daily Timetable • Runs everyday</span>
+                <span className="text-[var(--line)] hidden sm:inline">•</span>
+                <span className="inline-flex items-center gap-1 text-[var(--ink)] font-bold bg-[var(--surface)] px-2 py-0.5 rounded-md border border-[var(--line)] text-xs shadow-sm">
+                  <Calendar className="w-3.5 h-3.5 text-[var(--coral)]" />
+                  <span>{formatJourneyDate(filters.journeyDate)}</span>
+                </span>
+              </p>
+            )}
+          </div>
           <span className="count" id="count">
             {areStopsValid && (trips.length + (trips.length === 1 ? ' bus' : ' buses'))}
           </span>
@@ -410,6 +450,7 @@ export const BusFinderPage: React.FC = () => {
         trip={bookingTrip}
         from={filters.from}
         to={filters.to}
+        journeyDate={filters.journeyDate}
       />
 
       {/* PWA Install Prompt */}
