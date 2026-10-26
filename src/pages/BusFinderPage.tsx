@@ -389,39 +389,55 @@ export const BusFinderPage: React.FC = () => {
 
       {/* Footer */}
       <footer className="mt-16 border-t border-[var(--line)] bg-[var(--card)]/40 py-8 backdrop-blur-sm transition-colors">
-        <div className="wrap flex flex-col sm:flex-row items-center justify-between gap-5 text-[var(--muted)]">
-          <div className="flex flex-col items-center sm:items-start gap-1">
-            <div onClick={() => navigate('/')} className="cursor-pointer" title="Return to Landing Page">
-              <AnyStopLogo variant="navbar" height="34px" />
+        <div className="wrap flex flex-col gap-6 text-[var(--muted)]">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-5">
+            <div className="flex flex-col items-center sm:items-start gap-1">
+              <div onClick={() => navigate('/')} className="cursor-pointer" title="Return to Landing Page">
+                <AnyStopLogo variant="navbar" height="34px" />
+              </div>
+              <span className="text-xs font-medium text-[var(--muted)] pl-1">
+                Real-time transit intelligence across all Punjab districts
+              </span>
             </div>
-            <span className="text-xs font-medium text-[var(--muted)] pl-1">
-              Real-time transit intelligence across all Punjab districts
-            </span>
+            <div className="flex flex-col items-center sm:items-end gap-2">
+              <div className="flex items-center gap-4 text-xs font-semibold text-[var(--ink)]">
+                <button
+                  onClick={() => navigate('/')}
+                  className="hover:text-[var(--coral)] cursor-pointer transition-colors"
+                >
+                  Landing
+                </button>
+                <button
+                  onClick={() => navigate('/login')}
+                  className="hover:text-[var(--coral)] cursor-pointer transition-colors"
+                >
+                  {currentUser ? `Boarding Pass (${currentUser.name})` : 'Log in'}
+                </button>
+                <button
+                  onClick={() => setIsInquiryOpen(true)}
+                  className="hover:text-[var(--coral)] cursor-pointer transition-colors"
+                >
+                  Inquiries
+                </button>
+              </div>
+              <div className="text-xs text-center sm:text-right max-w-sm leading-relaxed text-[var(--muted)]">
+                Connecting Majha, Doaba, and Malwa — unreserved state buses (PRTC, Punbus) & private fleets. Confirm depot timings before travel.
+              </div>
+            </div>
           </div>
-          <div className="flex flex-col items-center sm:items-end gap-2">
-            <div className="flex items-center gap-4 text-xs font-semibold text-[var(--ink)]">
-              <button
-                onClick={() => navigate('/')}
-                className="hover:text-[var(--coral)] cursor-pointer transition-colors"
+          <div className="pt-4 border-t border-[var(--line)]/50 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs">
+            <span>© AnyStop · Punjab Transit Intelligence</span>
+            <span>
+              Designed with ❤️ by{' '}
+              <a
+                href="https://pocketsitestudio.in/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="underline hover:text-[var(--coral)] font-medium transition-colors"
               >
-                Landing
-              </button>
-              <button
-                onClick={() => navigate('/login')}
-                className="hover:text-[var(--coral)] cursor-pointer transition-colors"
-              >
-                {currentUser ? `Boarding Pass (${currentUser.name})` : 'Log in'}
-              </button>
-              <button
-                onClick={() => setIsInquiryOpen(true)}
-                className="hover:text-[var(--coral)] cursor-pointer transition-colors"
-              >
-                Inquiries
-              </button>
-            </div>
-            <div className="text-xs text-center sm:text-right max-w-sm leading-relaxed text-[var(--muted)]">
-              Connecting Majha, Doaba, and Malwa — unreserved state buses (PRTC, Punbus) & private fleets. Confirm depot timings before travel.
-            </div>
+                PocketSite Studio
+              </a>
+            </span>
           </div>
         </div>
       </footer>

@@ -396,11 +396,24 @@ export const LandingPage: React.FC = () => {
       {/* Footer */}
       <footer>
         <div className="wrap">
-          <span>© AnyStop · Punjab Daily Transit Timetables & Maximum Prices (incl. GST)</span>
-          <span>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+            <span>© AnyStop · Punjab Daily Transit Timetables & Maximum Prices (incl. GST)</span>
+            <span style={{ fontSize: '13px' }}>
+              Designed with ❤️ by{' '}
+              <a
+                href="https://pocketsitestudio.in/"
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{ marginLeft: 0, textDecoration: 'underline' }}
+              >
+                PocketSite Studio
+              </a>
+            </span>
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center' }}>
             <a onClick={handleFindBus}>Bus finder</a>
             <a onClick={handleLogin}>Log in</a>
-          </span>
+          </div>
         </div>
       </footer>
     </div>
