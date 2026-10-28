@@ -8,6 +8,9 @@ import {
   saveProfileAvatar,
   removeProfileAvatar,
   signInWithGoogleOAuth,
+  sendOtpToIdentifier,
+  verifyOtpWithSupabase,
+  signUpWithOtp as signUpWithOtpService,
   AuthResult,
 } from '../services/authService';
 
@@ -36,6 +39,9 @@ interface AuthContextType {
   isLoadingAuth: boolean;
   signInWithCredentials: (identifier: string, password: string) => Promise<AuthResult>;
   signUpWithCredentials: (name: string, identifier: string, password: string, ticketNo?: string, phone?: string) => Promise<AuthResult>;
+  sendOtpCode: (identifier: string) => Promise<{ success: boolean; error?: string; otp?: string }>;
+  signInWithOtp: (identifier: string, token: string) => Promise<AuthResult>;
+  signUpWithOtp: (name: string, identifier: string, token: string, ticketNo?: string, phone?: string) => Promise<AuthResult>;
   signInWithGoogleAuth: () => Promise<{ error?: string }>;
 }
 
@@ -318,6 +324,61 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return { success: true, user: fallbackUser };
   }, [isSupabaseActive, login]);
 
+  const sendOtpCode = useCallback(async (identifier: string) => {
+    return await sendOtpToIdentifier(identifier);
+  }, []);
+
+  const signInWithOtp = useCallback(async (identifier: string, token: string): Promise<AuthResult> => {
+    if (isSupabaseActive) {
+      const res = await verifyOtpWithSupabase(identifier, token);
+      if (res.success && res.user) {
+        login(res.user);
+      }
+      return res;
+    }
+
+    const who = identifier.includes('@') ? identifier.split('@')[0] : 'Passenger';
+    const fallbackUser: UserSession = {
+      name: who,
+      phoneOrEmail: identifier,
+      ticketNo: `NO. ${Math.floor(Math.random() * 4000) + 1000}`,
+      boardedAt: Date.now(),
+      homeStop: 'Chandigarh ISBT-43',
+      preferredClass: 'All Types',
+      totalSearches: 0,
+    };
+    login(fallbackUser);
+    return { success: true, user: fallbackUser };
+  }, [isSupabaseActive, login]);
+
+  const signUpWithOtp = useCallback(async (
+    name: string,
+    identifier: string,
+    token: string,
+    ticketNo?: string,
+    phone?: string
+  ): Promise<AuthResult> => {
+    if (isSupabaseActive) {
+      const res = await signUpWithOtpService(name, identifier, token, ticketNo, phone);
+      if (res.success && res.user) {
+        login(res.user);
+      }
+      return res;
+    }
+
+    const fallbackUser: UserSession = {
+      name,
+      phoneOrEmail: identifier,
+      ticketNo: ticketNo || `NO. ${Math.floor(Math.random() * 4000) + 5000}`,
+      boardedAt: Date.now(),
+      homeStop: 'Chandigarh ISBT-43',
+      preferredClass: 'All Types',
+      totalSearches: 0,
+    };
+    login(fallbackUser);
+    return { success: true, user: fallbackUser };
+  }, [isSupabaseActive, login]);
+
   return (
     <AuthContext.Provider
       value={{
@@ -332,6 +393,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         isLoadingAuth,
         signInWithCredentials,
         signUpWithCredentials,
+        sendOtpCode,
+        signInWithOtp,
+        signUpWithOtp,
         signInWithGoogleAuth: signInWithGoogleOAuth,
       }}
     >

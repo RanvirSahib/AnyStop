@@ -2170,6 +2170,43 @@ This document tracks all features, user requests, architectural decisions, and i
 
 ---
 
+### Step 36: Add 'or' Divider Between Ticket Actions and Google Sign-In
+- **User Request**: *"Add 'or' between them and don't push into git yet and make sure you maintain the record of every step we done"*
+- **Implementation**:
+  1. **Added 'or' Divider in Boarding Pass Stub (`src/pages/LoginPage.tsx`)**:
+     - Added `<div className="divider-or" aria-hidden="true"><span>or</span></div>` between the primary ticket action button (`.go` - "Punch my ticket →" on login / "Issue my ticket →" on sign up) and the Google authentication button (`.google-btn` - "Sign in with Google") for both Ticket 1 (Login) and Ticket 2 (Sign up).
+  2. **Styling & Geometry Alignment (`src/pages/LoginPage.css`)**:
+     - Styled `.stopsense-login .divider-or` with subtle horizontal hairline borders (`var(--line)`), centered lowercase `or` in `DM Mono`, muted color (`var(--muted)`), and 0.8 opacity, automatically adapting across light and dark themes.
+     - Adjusted the ticket cutout notch depth variable `--cut` from `104px` to `126px` so the circular ticket punch cutouts on the left/right edges continue to align with the dashed perforation line at the top of the stub while comfortably accommodating the divider without crowding.
+- **Verification**:
+  - `npm run build` compiled with 0 errors (`✓ built in 19.58s`).
+  - Retained all changes locally in the working directory without pushing or committing to git (*"don't push into git yet"*).
+
+---
+
+### Step 37: Replace Password & Confirm Password with One-Time Password (OTP) Verification
+- **User Request**: *"Except let us use the OTP"* (with screenshot of `PASSWORD` and `CONFIRM PASSWORD` fields)
+- **Implementation**:
+  1. **Replaced Sign Up Password Fields with Clean OTP Flow (`src/pages/LoginPage.tsx`)**:
+     - Removed the tall, cumbersome `PASSWORD` and `CONFIRM PASSWORD` fields from Ticket 2 (Sign Up).
+     - Added a streamlined `ONE-TIME PASSWORD (OTP)` input (`#otp-signup`) with 6-digit numeric input mode (`inputMode="numeric"`, `maxLength={6}`), DM Mono monospace styling, and an inline action button (`Send OTP` / `Resend` with a 30-second live countdown timer).
+     - Integrated automatic OTP triggering: if the user completes their name, email, and 10-digit mobile number and clicks *"Issue my ticket →"* without having explicitly clicked *"Send OTP"*, the system auto-sends the code, focuses the field, and prompts them with a friendly notification.
+     - Added an interactive demo status notice (`.otp-notice-pill`) displaying the sent code with an instant **"Auto-fill"** chip for lightning-fast testing.
+  2. **Added Dual-Method Authentication to Login (`src/pages/LoginPage.tsx`)**:
+     - In Ticket 1 (Log in), added support for both **OTP Login** and **Password Login** via an intuitive toggle (*"Use password instead"* / *"Use OTP instead"*), ensuring passengers who register via OTP can log in effortlessly with their phone/email without requiring a password.
+  3. **Backend & Context Integration (`src/services/authService.ts`, `src/context/AuthContext.tsx`)**:
+     - Implemented `sendOtpToIdentifier`, `verifyOtpWithSupabase`, and `signUpWithOtp`.
+     - Supports live Supabase Auth SMS / Email OTP (`signInWithOtp`, `verifyOtp`) when Supabase credentials are configured, with graceful fallback to simulated 6-digit OTP codes in demo/local development.
+     - Updated dynamic bus progress tracking (`getBusProgress`) to seamlessly track 4 key stages: Passenger Name, Email, Mobile Number, and 6-digit OTP.
+  4. **Scoped Visual Styling (`src/pages/LoginPage.css`)**:
+     - Styled `.stopsense-login .fld-label-row` and `.otp-countdown-text` for clean timer displays.
+     - Styled `.stopsense-login .otp-notice-pill` and `.otp-paste-chip` with high contrast and smooth dark/light theme tokens.
+- **Verification**:
+  - `npm run build` compiled with 0 errors (`✓ built in 9.69s`).
+  - Kept all changes uncommitted in the working tree as instructed (*"don't push into git yet"*).
+
+---
+
 ## 🗂️ Key Files Reference
 | File | Role |
 | :--- | :--- |

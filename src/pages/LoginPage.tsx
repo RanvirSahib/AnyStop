@@ -8,7 +8,14 @@ import './LoginPage.css';
 
 export const LoginPage: React.FC = () => {
   const navigate = useNavigate();
-  const { login, signInWithCredentials, signUpWithCredentials, signInWithGoogleAuth, isSupabaseActive } = useAuth();
+  const {
+    login,
+    sendOtpCode,
+    signInWithOtp,
+    signUpWithOtp,
+    signInWithGoogleAuth,
+    isSupabaseActive
+  } = useAuth();
   const { darkMode, toggleDarkMode } = useTheme();
 
   const [mode, setMode] = useState<'in' | 'up'>('in');
@@ -18,27 +25,37 @@ export const LoginPage: React.FC = () => {
 
   const [name, setName] = useState('');
   const [identifier, setIdentifier] = useState('');
-  const [password, setPassword] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
 
-  // Sign up specific fields
+  // Sign up specific fields (OTP based)
   const [signupEmail, setSignupEmail] = useState('');
   const [signupPhone, setSignupPhone] = useState('');
-  const [signupPassword, setSignupPassword] = useState('');
-  const [signupConfirmPassword, setSignupConfirmPassword] = useState('');
-  const [showSignupPassword, setShowSignupPassword] = useState(false);
-  const [showSignupConfirmPassword, setShowSignupConfirmPassword] = useState(false);
+  const [signupOtp, setSignupOtp] = useState('');
+  const [otpSent, setOtpSent] = useState(false);
+  const [otpCountdown, setOtpCountdown] = useState(0);
+  const [demoOtp, setDemoOtp] = useState<string | null>(null);
+  const [otpNotice, setOtpNotice] = useState<string | null>(null);
+  const [isSendingOtp, setIsSendingOtp] = useState(false);
+  const [badSignupOtp, setBadSignupOtp] = useState(false);
+  const [otpErrorMsg, setOtpErrorMsg] = useState('Enter the 6-digit OTP code.');
+
+  // Login specific fields (100% OTP based - passwordless)
+  const [loginOtp, setLoginOtp] = useState('');
+  const [loginOtpSent, setLoginOtpSent] = useState(false);
+  const [loginOtpCountdown, setLoginOtpCountdown] = useState(0);
+  const [loginDemoOtp, setLoginDemoOtp] = useState<string | null>(null);
+  const [loginOtpNotice, setLoginOtpNotice] = useState<string | null>(null);
+  const [isSendingLoginOtp, setIsSendingLoginOtp] = useState(false);
+  const [badLoginOtp, setBadLoginOtp] = useState(false);
+  const [loginOtpErrorMsg, setLoginOtpErrorMsg] = useState('Enter the 6-digit OTP code.');
 
   const [badName, setBadName] = useState(false);
   const [badId, setBadId] = useState(false);
-  const [badPw, setBadPw] = useState(false);
   const [badEmail, setBadEmail] = useState(false);
   const [badPhone, setBadPhone] = useState(false);
-  const [badSignupPw, setBadSignupPw] = useState(false);
-  const [badConfirmPw, setBadConfirmPw] = useState(false);
-  const [confirmPwErrorMsg, setConfirmPwErrorMsg] = useState('Passwords do not match.');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [serverError, setServerError] = useState<string | null>(null);
+
+
 
   const [isTorn, setIsTorn] = useState(false);
   const [isBusRunning, setIsBusRunning] = useState(false);
@@ -48,17 +65,28 @@ export const LoginPage: React.FC = () => {
     document.title = 'AnyStop – Board your account';
   }, []);
 
+  useEffect(() => {
+    if (otpCountdown <= 0) return;
+    const t = setInterval(() => setOtpCountdown((c) => c - 1), 1000);
+    return () => clearInterval(t);
+  }, [otpCountdown]);
+
+  useEffect(() => {
+    if (loginOtpCountdown <= 0) return;
+    const t = setInterval(() => setLoginOtpCountdown((c) => c - 1), 1000);
+    return () => clearInterval(t);
+  }, [loginOtpCountdown]);
+
   const switchMode = (newMode: 'in' | 'up') => {
     if (newMode === mode) return;
     setMode(newMode);
     setAnimStep((prev) => prev + 1);
     setBadName(false);
     setBadId(false);
-    setBadPw(false);
     setBadEmail(false);
     setBadPhone(false);
-    setBadSignupPw(false);
-    setBadConfirmPw(false);
+    setBadSignupOtp(false);
+    setBadLoginOtp(false);
     setServerError(null);
   };
 
@@ -74,46 +102,122 @@ export const LoginPage: React.FC = () => {
     return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v) || /^[6-9]\d{9}$/.test(v.replace(/[\s-]/g, ''));
   };
 
-  const triggerBad = (field: 'name' | 'id' | 'pw' | 'email' | 'phone' | 'signupPw' | 'confirmPw') => {
+  const triggerBad = (field: 'name' | 'id' | 'email' | 'phone' | 'signupOtp' | 'loginOtp') => {
     if (field === 'name') {
       setBadName(false);
       setTimeout(() => setBadName(true), 10);
     } else if (field === 'id') {
       setBadId(false);
       setTimeout(() => setBadId(true), 10);
-    } else if (field === 'pw') {
-      setBadPw(false);
-      setTimeout(() => setBadPw(true), 10);
     } else if (field === 'email') {
       setBadEmail(false);
       setTimeout(() => setBadEmail(true), 10);
     } else if (field === 'phone') {
       setBadPhone(false);
       setTimeout(() => setBadPhone(true), 10);
-    } else if (field === 'signupPw') {
-      setBadSignupPw(false);
-      setTimeout(() => setBadSignupPw(true), 10);
-    } else if (field === 'confirmPw') {
-      setBadConfirmPw(false);
-      setTimeout(() => setBadConfirmPw(true), 10);
+    } else if (field === 'signupOtp') {
+      setBadSignupOtp(false);
+      setTimeout(() => setBadSignupOtp(true), 10);
+    } else if (field === 'loginOtp') {
+      setBadLoginOtp(false);
+      setTimeout(() => setBadLoginOtp(true), 10);
     }
   };
+
+  const handleSendOtp = async (targetMode: 'in' | 'up') => {
+    setServerError(null);
+
+    if (targetMode === 'up') {
+      const ph = signupPhone.trim();
+      const em = signupEmail.trim();
+      const n = name.trim();
+
+      let hasError = false;
+      if (n.length < 2) {
+        triggerBad('name');
+        hasError = true;
+      }
+      if (!validEmail(em)) {
+        triggerBad('email');
+        hasError = true;
+      }
+      if (!validPhone(ph)) {
+        triggerBad('phone');
+        hasError = true;
+      }
+
+      if (hasError) return;
+
+      setIsSendingOtp(true);
+      try {
+        // Prioritize email so real OTP emails can be sent via configured SMTP
+        const targetId = em || ph;
+        const res = await sendOtpCode(targetId);
+        if (res.success) {
+          setOtpSent(true);
+          setOtpCountdown(30);
+          if (res.otp) {
+            setDemoOtp(res.otp);
+            setOtpNotice(`Demo 6-digit OTP: ${res.otp}`);
+          } else {
+            setDemoOtp(null);
+            setOtpNotice(`Verification 6-digit OTP sent to ${targetId} (Valid for 10 minutes). Check your email inbox & spam.`);
+          }
+        } else {
+          setServerError(res.error || 'Failed to send OTP. Please try again.');
+        }
+      } catch {
+        setServerError('Could not send OTP. Please try again.');
+      } finally {
+        setIsSendingOtp(false);
+      }
+    } else {
+      const id = identifier.trim();
+      if (!validId(id)) {
+        triggerBad('id');
+        return;
+      }
+
+      setIsSendingLoginOtp(true);
+      try {
+        const res = await sendOtpCode(id);
+        if (res.success) {
+          setLoginOtpSent(true);
+          setLoginOtpCountdown(30);
+          if (res.otp) {
+            setLoginDemoOtp(res.otp);
+            setLoginOtpNotice(`Demo 6-digit OTP: ${res.otp}`);
+          } else {
+            setLoginDemoOtp(null);
+            setLoginOtpNotice(`Verification 6-digit OTP sent to ${id} (Valid for 10 minutes). Check your email inbox & spam.`);
+          }
+        } else {
+          setServerError(res.error || 'Failed to send OTP. Please try again.');
+        }
+      } catch {
+        setServerError('Could not send OTP. Please try again.');
+      } finally {
+        setIsSendingLoginOtp(false);
+      }
+    }
+  };
+
+
 
   // Calculate bus progress based on form typing
   const getBusProgress = () => {
     const isUp = mode === 'up';
     let score = 0;
-    const total = isUp ? 5 : 2;
+    const total = isUp ? 4 : 2;
 
     if (isUp) {
       if (name.trim().length > 0) score += Math.min(1, name.trim().length / 3);
       if (signupEmail.trim().length > 0) score += Math.min(1, signupEmail.trim().length / 6);
       if (signupPhone.trim().length > 0) score += Math.min(1, signupPhone.trim().length / 8);
-      if (signupPassword.length > 0) score += Math.min(1, signupPassword.length / 6);
-      if (signupConfirmPassword.length > 0) score += Math.min(1, signupConfirmPassword.length / 6);
+      if (signupOtp.length > 0) score += Math.min(1, signupOtp.length / 6);
     } else {
       if (identifier.trim().length > 0) score += Math.min(1, identifier.trim().length / 5);
-      if (password.length > 0) score += Math.min(1, password.length / 6);
+      if (loginOtp.length > 0) score += Math.min(1, loginOtp.length / 6);
     }
 
     return score / total;
@@ -172,18 +276,11 @@ export const LoginPage: React.FC = () => {
       const n = name.trim();
       const em = signupEmail.trim();
       const ph = signupPhone.trim();
-      const sp = signupPassword;
-      const scp = signupConfirmPassword;
+      const otp = signupOtp.trim();
 
       const e1 = n.length < 2;
       const e2 = !validEmail(em);
       const e3 = !validPhone(ph);
-      const e4 = sp.length < 6;
-      let e5 = false;
-      if (scp.length < 6 || scp !== sp) {
-        e5 = true;
-        setConfirmPwErrorMsg(scp !== sp ? 'Passwords do not match.' : 'Confirm password must be at least 6 characters.');
-      }
 
       if (e1) triggerBad('name');
       else setBadName(false);
@@ -194,19 +291,35 @@ export const LoginPage: React.FC = () => {
       if (e3) triggerBad('phone');
       else setBadPhone(false);
 
-      if (e4) triggerBad('signupPw');
-      else setBadSignupPw(false);
+      if (e1 || e2 || e3) return;
 
-      if (e5) triggerBad('confirmPw');
-      else setBadConfirmPw(false);
+      // Auto-send OTP if user hasn't clicked Send OTP yet
+      if (!otpSent) {
+        await handleSendOtp('up');
+        setOtpErrorMsg('OTP code sent! Please enter the code received in your email.');
+        triggerBad('signupOtp');
+        return;
+      }
 
-      if (e1 || e2 || e3 || e4 || e5) return;
+      if (otp.length !== 6) {
+        setOtpErrorMsg('Enter the 6-digit OTP code.');
+        triggerBad('signupOtp');
+        return;
+      }
 
+      if (demoOtp && otp !== demoOtp) {
+        setOtpErrorMsg('Incorrect OTP code. Please enter the code sent to you.');
+        triggerBad('signupOtp');
+        return;
+      }
+
+      setBadSignupOtp(false);
       setServerError(null);
       setIsSubmitting(true);
 
       try {
-        const res = await signUpWithCredentials(n, em, sp, ticketNoSignup, ph);
+        const targetId = em || ph;
+        const res = await signUpWithOtp(n, targetId, otp, ticketNoSignup, ph);
         if (!res.success) {
           setServerError(res.error || 'Registration failed. Please try again.');
           setIsSubmitting(false);
@@ -220,26 +333,42 @@ export const LoginPage: React.FC = () => {
       }
     } else {
       const i = identifier.trim();
-      const p = password;
-
       const e1 = !validId(i);
-      const e2 = p.length < 6;
 
       if (e1) triggerBad('id');
       else setBadId(false);
 
-      if (e2) triggerBad('pw');
-      else setBadPw(false);
+      if (e1) return;
 
-      if (e1 || e2) return;
+      const otp = loginOtp.trim();
 
+      if (!loginOtpSent) {
+        await handleSendOtp('in');
+        setLoginOtpErrorMsg('OTP code sent! Please enter the 6-digit code to punch your ticket.');
+        triggerBad('loginOtp');
+        return;
+      }
+
+      if (otp.length !== 6) {
+        setLoginOtpErrorMsg('Enter the 6-digit OTP code.');
+        triggerBad('loginOtp');
+        return;
+      }
+
+      if (loginDemoOtp && otp !== loginDemoOtp) {
+        setLoginOtpErrorMsg('Incorrect OTP code. Please check and try again.');
+        triggerBad('loginOtp');
+        return;
+      }
+
+      setBadLoginOtp(false);
       setServerError(null);
       setIsSubmitting(true);
 
       try {
-        const res = await signInWithCredentials(i, p);
+        const res = await signInWithOtp(i, otp);
         if (!res.success) {
-          setServerError(res.error || 'Login failed. Please check your credentials.');
+          setServerError(res.error || 'Login failed. Please check your OTP.');
           setIsSubmitting(false);
           return;
         }
@@ -388,7 +517,7 @@ export const LoginPage: React.FC = () => {
                         id="id-login"
                         autoComplete="username"
                         inputMode="email"
-                        placeholder="you@example.com"
+                        placeholder="you@example.com or 10-digit phone"
                         value={identifier}
                         readOnly={mode !== 'in'}
                         tabIndex={mode === 'in' ? 0 : -1}
@@ -401,37 +530,81 @@ export const LoginPage: React.FC = () => {
                     <div className="msg">Enter a valid email or 10-digit phone number.</div>
                   </label>
 
-                  <label className={`fld ${badPw ? 'bad' : ''}`} id="fp-login">
-                    <span>PASSWORD</span>
-                    <div className="inp">
+                  <label className={`fld ${badLoginOtp ? 'bad' : ''}`} id="fotp-login">
+                    <div className="fld-label-row">
+                      <span>ONE-TIME PASSWORD (OTP)</span>
+                      {loginOtpSent && loginOtpCountdown > 0 && (
+                        <span className="otp-countdown-text">Resend in {loginOtpCountdown}s</span>
+                      )}
+                    </div>
+                    <div className="inp otp-inp">
                       <input
-                        id="pw-login"
-                        type={showPassword ? 'text' : 'password'}
-                        autoComplete="current-password"
-                        placeholder="At least 6 characters"
-                        value={password}
+                        id="otp-login"
+                        type="text"
+                        inputMode="numeric"
+                        pattern="[0-9]*"
+                        maxLength={6}
+                        autoComplete="one-time-code"
+                        placeholder={loginOtpSent ? "Enter 6-digit OTP" : "Click 'Send OTP'"}
+                        value={loginOtp}
                         readOnly={mode !== 'in'}
                         tabIndex={mode === 'in' ? 0 : -1}
                         onChange={(e) => {
-                          setPassword(e.target.value);
-                          if (badPw) setBadPw(false);
+                          const val = e.target.value.replace(/\D/g, '').slice(0, 6);
+                          setLoginOtp(val);
+                          if (badLoginOtp) setBadLoginOtp(false);
                         }}
                       />
                       <button
                         type="button"
-                        id="eye-login"
-                        aria-label={showPassword ? 'Hide password' : 'Show password'}
+                        className="otp-action-btn"
+                        disabled={loginOtpCountdown > 0 || isSendingLoginOtp}
                         tabIndex={mode === 'in' ? 0 : -1}
                         onClick={(e) => {
                           e.stopPropagation();
-                          setShowPassword(!showPassword);
+                          handleSendOtp('in');
                         }}
                       >
-                        {showPassword ? 'Hide' : 'Show'}
+                        {isSendingLoginOtp ? 'Sending...' : loginOtpCountdown > 0 ? `${loginOtpCountdown}s` : loginOtpSent ? 'Resend' : 'Send OTP'}
                       </button>
                     </div>
-                    <div className="msg">Use at least 6 characters.</div>
+                    <div className="msg">{loginOtpErrorMsg}</div>
                   </label>
+
+                  {loginOtpNotice && (
+                    <div className="otp-notice-pill" role="status">
+                      <span className="otp-notice-msg">{loginOtpNotice}</span>
+                      {loginDemoOtp && (
+                        <button
+                          type="button"
+                          className="otp-paste-chip"
+                          onClick={() => {
+                            setLoginOtp(loginDemoOtp);
+                            setBadLoginOtp(false);
+                          }}
+                        >
+                          Auto-fill
+                        </button>
+                      )}
+                    </div>
+                  )}
+
+                  {loginOtpSent && (
+                    <div className="resend-otp-inline login-resend-standalone">
+                      <span className="resend-otp-hint">Didn't get code?</span>
+                      <button
+                        type="button"
+                        className="resend-otp-link"
+                        disabled={loginOtpCountdown > 0 || isSendingLoginOtp}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleSendOtp('in');
+                        }}
+                      >
+                        {isSendingLoginOtp ? 'Sending...' : loginOtpCountdown > 0 ? `Resend in ${loginOtpCountdown}s` : 'Resend OTP'}
+                      </button>
+                    </div>
+                  )}
 
                   {serverError && mode === 'in' && (
                     <div className="login-server-error-banner" role="alert">
@@ -472,6 +645,9 @@ export const LoginPage: React.FC = () => {
               >
                 {isSubmitting ? 'Punching...' : 'Punch my ticket →'}
               </button>
+              <div className="divider-or" aria-hidden="true">
+                <span>or</span>
+              </div>
               <button
                 className="google-btn"
                 id="google-login"
@@ -631,69 +807,82 @@ export const LoginPage: React.FC = () => {
                     <div className="msg">Enter a valid 10-digit mobile number.</div>
                   </label>
 
-                  <label className={`fld ${badSignupPw ? 'bad' : ''}`} id="fp-signup">
-                    <span>PASSWORD</span>
-                    <div className="inp">
+                  {/* OTP FIELD REPLACING PASSWORD & CONFIRM PASSWORD */}
+                  <label className={`fld ${badSignupOtp ? 'bad' : ''}`} id="fotp-signup">
+                    <div className="fld-label-row">
+                      <span>ONE-TIME PASSWORD (OTP)</span>
+                      {otpSent && otpCountdown > 0 && (
+                        <span className="otp-countdown-text">Resend in {otpCountdown}s</span>
+                      )}
+                    </div>
+                    <div className="inp otp-inp">
                       <input
-                        id="pw-signup"
-                        type={showSignupPassword ? 'text' : 'password'}
-                        autoComplete="new-password"
-                        placeholder="At least 6 characters"
-                        value={signupPassword}
+                        id="otp-signup"
+                        type="text"
+                        inputMode="numeric"
+                        pattern="[0-9]*"
+                        maxLength={6}
+                        autoComplete="one-time-code"
+                        placeholder={otpSent ? "Enter 6-digit OTP" : "Click 'Send OTP'"}
+                        value={signupOtp}
                         readOnly={mode !== 'up'}
                         tabIndex={mode === 'up' ? 0 : -1}
                         onChange={(e) => {
-                          setSignupPassword(e.target.value);
-                          if (badSignupPw) setBadSignupPw(false);
+                          const val = e.target.value.replace(/\D/g, '').slice(0, 6);
+                          setSignupOtp(val);
+                          if (badSignupOtp) setBadSignupOtp(false);
                         }}
                       />
                       <button
                         type="button"
-                        id="eye-signup"
-                        aria-label={showSignupPassword ? 'Hide password' : 'Show password'}
+                        className="otp-action-btn"
+                        disabled={otpCountdown > 0 || isSendingOtp}
                         tabIndex={mode === 'up' ? 0 : -1}
                         onClick={(e) => {
                           e.stopPropagation();
-                          setShowSignupPassword(!showSignupPassword);
+                          handleSendOtp('up');
                         }}
                       >
-                        {showSignupPassword ? 'Hide' : 'Show'}
+                        {isSendingOtp ? 'Sending...' : otpCountdown > 0 ? `${otpCountdown}s` : otpSent ? 'Resend' : 'Send OTP'}
                       </button>
                     </div>
-                    <div className="msg">Use at least 6 characters.</div>
+                    <div className="msg">{otpErrorMsg}</div>
                   </label>
 
-                  <label className={`fld ${badConfirmPw ? 'bad' : ''}`} id="fcp-signup">
-                    <span>CONFIRM PASSWORD</span>
-                    <div className="inp">
-                      <input
-                        id="cpw-signup"
-                        type={showSignupConfirmPassword ? 'text' : 'password'}
-                        autoComplete="new-password"
-                        placeholder="Re-enter your password"
-                        value={signupConfirmPassword}
-                        readOnly={mode !== 'up'}
-                        tabIndex={mode === 'up' ? 0 : -1}
-                        onChange={(e) => {
-                          setSignupConfirmPassword(e.target.value);
-                          if (badConfirmPw) setBadConfirmPw(false);
-                        }}
-                      />
+                  {otpNotice && (
+                    <div className="otp-notice-pill" role="status">
+                      <span className="otp-notice-msg">{otpNotice}</span>
+                      {demoOtp && (
+                        <button
+                          type="button"
+                          className="otp-paste-chip"
+                          onClick={() => {
+                            setSignupOtp(demoOtp);
+                            setBadSignupOtp(false);
+                          }}
+                        >
+                          Auto-fill
+                        </button>
+                      )}
+                    </div>
+                  )}
+
+                  {otpSent && (
+                    <div className="resend-otp-inline resend-signup">
+                      <span className="resend-otp-hint">Didn't receive the OTP?</span>
                       <button
                         type="button"
-                        id="eye-confirm-signup"
-                        aria-label={showSignupConfirmPassword ? 'Hide password' : 'Show password'}
-                        tabIndex={mode === 'up' ? 0 : -1}
+                        className="resend-otp-link"
+                        disabled={otpCountdown > 0 || isSendingOtp}
                         onClick={(e) => {
                           e.stopPropagation();
-                          setShowSignupConfirmPassword(!showSignupConfirmPassword);
+                          handleSendOtp('up');
                         }}
                       >
-                        {showSignupConfirmPassword ? 'Hide' : 'Show'}
+                        {isSendingOtp ? 'Sending...' : otpCountdown > 0 ? `Resend in ${otpCountdown}s` : 'Resend OTP'}
                       </button>
                     </div>
-                    <div className="msg">{confirmPwErrorMsg}</div>
-                  </label>
+                  )}
 
                   {serverError && mode === 'up' && (
                     <div className="login-server-error-banner" role="alert">
@@ -734,6 +923,9 @@ export const LoginPage: React.FC = () => {
               >
                 {isSubmitting ? 'Issuing pass...' : 'Issue my ticket →'}
               </button>
+              <div className="divider-or" aria-hidden="true">
+                <span>or</span>
+              </div>
               <button
                 className="google-btn"
                 id="google-signup"
@@ -793,6 +985,8 @@ export const LoginPage: React.FC = () => {
           <circle cx="88" cy="40" r="3" fill="#ccc" />
         </svg>
       </div>
+
+
     </div>
   );
 };

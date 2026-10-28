@@ -25,6 +25,29 @@ export const Header: React.FC<HeaderProps> = ({
   onNavigateLogin,
   onNavigateProfile
 }) => {
+  const getGreeting = () => {
+    const hour = new Date().getHours();
+    if (hour >= 5 && hour < 12) {
+      return { text: 'Good morning', emoji: '🌅' };
+    }
+    if (hour >= 12 && hour < 17) {
+      return { text: 'Good afternoon', emoji: '☀️' };
+    }
+    if (hour >= 17 && hour < 22) {
+      return { text: 'Good evening', emoji: '🌇' };
+    }
+    return { text: 'Good night', emoji: '🌙' };
+  };
+
+  const greeting = getGreeting();
+
+  const getFirstName = (name?: string, isGuest?: boolean) => {
+    if (isGuest || !name) return 'Traveller';
+    const trimmed = name.trim();
+    const first = trimmed.split(/\s+/)[0];
+    return first || 'Traveller';
+  };
+
   return (
     <header className="hero">
       <div className="wrap">
@@ -128,6 +151,41 @@ export const Header: React.FC<HeaderProps> = ({
             </button>
           </div>
         </div>
+
+        {/* Dynamic User Greeting */}
+        {currentUser && (
+          <div className="user-hero-greeting" role="status" aria-live="polite">
+            <div
+              className={`greeting-pill ${onNavigateProfile ? 'cursor-pointer' : ''}`}
+              onClick={onNavigateProfile}
+              title={onNavigateProfile ? 'View your passenger profile & boarding pass' : undefined}
+            >
+              <span className="greeting-avatar">
+                {currentUser.avatarUrl ? (
+                  <img
+                    src={currentUser.avatarUrl}
+                    alt={currentUser.name}
+                    className="greeting-avatar-img"
+                  />
+                ) : (
+                  <span className="greeting-initial">
+                    {currentUser.name ? currentUser.name.charAt(0).toUpperCase() : 'G'}
+                  </span>
+                )}
+              </span>
+              <span className="greeting-content">
+                <span className="greeting-salutation">
+                  <span className="greeting-emoji">{greeting.emoji}</span> {greeting.text},
+                </span>{' '}
+                <strong className="greeting-name">
+                  {getFirstName(currentUser.name, currentUser.isGuest)}!
+                </strong>
+                <span className="greeting-wave" aria-hidden="true">👋</span>
+              </span>
+              <span className="greeting-live-dot" title="Connected to AnyStop Punjab Live" />
+            </div>
+          </div>
+        )}
 
         <h1>Which bus runs between your two stops across Punjab?</h1>
         <p>
