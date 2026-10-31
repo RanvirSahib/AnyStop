@@ -23,13 +23,15 @@ export const SharedBusCard: React.FC<SharedBusCardProps> = React.memo(({
   userTo,
   onDelete
 }) => {
-  // Origin & Destination naming
-  const fromName = userFrom ? userFrom.split(' (')[0] : report.stop.split(' (')[0];
-  const toRaw = userTo || report.direction.replace(/^towards\s+/i, '').trim();
-  const toName = toRaw.split(' (')[0];
+  // Origin & Destination naming with defensive null/type checks
+  const safeStop = typeof report?.stop === 'string' ? report.stop : 'Corridor Stop';
+  const safeDirection = typeof report?.direction === 'string' ? report.direction : 'Destination';
+  const fromName = (userFrom ? userFrom : safeStop).split(' (')[0] || 'Origin';
+  const toRaw = (userTo || safeDirection).replace(/^towards\s+/i, '').trim();
+  const toName = toRaw.split(' (')[0] || 'Destination';
 
   // Operator and ownership
-  const operatorName = report.operator || 'PRTC PEPSU';
+  const operatorName = typeof report?.operator === 'string' && report.operator ? report.operator : 'PRTC PEPSU';
   const isGov = operatorName.includes('PRTC') || 
                 operatorName.includes('Punbus') || 
                 operatorName.includes('CTU') || 
@@ -41,24 +43,30 @@ export const SharedBusCard: React.FC<SharedBusCardProps> = React.memo(({
   const busClass = isVolvo ? 'Volvo AC' : 'Ordinary';
   const isAc = isVolvo;
 
-  // Timestamps and Duration
-  const spottedDate = new Date(report.timestamp);
-  const spottedMinutes = spottedDate.getHours() * 60 + spottedDate.getMinutes();
+  // Timestamps and Duration with robust NaN fallback
+  const rawTimestamp = typeof report?.timestamp === 'number' && !isNaN(report.timestamp) && report.timestamp > 0
+    ? report.timestamp
+    : Date.now();
+  const spottedDate = new Date(rawTimestamp);
+  const spottedMinutes = isNaN(spottedDate.getTime())
+    ? 480
+    : spottedDate.getHours() * 60 + spottedDate.getMinutes();
   const depTimeFormatted = formatMinutesToTime(spottedMinutes);
 
   // Calculate estimated travel time: check corridor matches in BUS_SERVICES or default to 95 mins
   let estDuration = 95;
-  const matchCorridor = BUS_SERVICES.find(bus => {
-    const hasFrom = bus.stops.some(([s]) => s.toLowerCase().includes(fromName.toLowerCase()));
-    const hasTo = bus.stops.some(([s]) => s.toLowerCase().includes(toName.toLowerCase()));
+  const matchCorridor = Array.isArray(BUS_SERVICES) ? BUS_SERVICES.find(bus => {
+    if (!bus || !Array.isArray(bus.stops)) return false;
+    const hasFrom = bus.stops.some(([s]) => typeof s === 'string' && s.toLowerCase().includes(fromName.toLowerCase()));
+    const hasTo = bus.stops.some(([s]) => typeof s === 'string' && s.toLowerCase().includes(toName.toLowerCase()));
     return hasFrom && hasTo;
-  });
+  }) : undefined;
 
-  if (matchCorridor) {
-    const fIdx = matchCorridor.stops.findIndex(([s]) => s.toLowerCase().includes(fromName.toLowerCase()));
-    const tIdx = matchCorridor.stops.findIndex(([s]) => s.toLowerCase().includes(toName.toLowerCase()));
-    if (fIdx >= 0 && tIdx > fIdx) {
-      estDuration = matchCorridor.stops[tIdx][1] - matchCorridor.stops[fIdx][1];
+  if (matchCorridor && Array.isArray(matchCorridor.stops)) {
+    const fIdx = matchCorridor.stops.findIndex(([s]) => typeof s === 'string' && s.toLowerCase().includes(fromName.toLowerCase()));
+    const tIdx = matchCorridor.stops.findIndex(([s]) => typeof s === 'string' && s.toLowerCase().includes(toName.toLowerCase()));
+    if (fIdx >= 0 && tIdx > fIdx && typeof matchCorridor.stops[tIdx][1] === 'number' && typeof matchCorridor.stops[fIdx][1] === 'number') {
+      estDuration = Math.max(15, matchCorridor.stops[tIdx][1] - matchCorridor.stops[fIdx][1]);
     }
   }
 
@@ -67,10 +75,12 @@ export const SharedBusCard: React.FC<SharedBusCardProps> = React.memo(({
   const durationFormatted = formatDuration(estDuration);
 
   // Relative elapsed time
-  const elapsedMins = Math.max(1, Math.round((Date.now() - report.timestamp) / 60000));
-  const relativeElapsed = elapsedMins < 60 ? `${elapsedMins}m ago` : `${Math.floor(elapsedMins / 60)}h ${elapsedMins % 60}m ago`;
+  const elapsedMins = Math.max(1, Math.round((Date.now() - rawTimestamp) / 60000));
+  const relativeElapsed = isNaN(elapsedMins) || elapsedMins < 60
+    ? `${isNaN(elapsedMins) ? 1 : elapsedMins}m ago`
+    : `${Math.floor(elapsedMins / 60)}h ${elapsedMins % 60}m ago`;
 
-  const isExpress = report.speedType === 'Express';
+  const isExpress = report?.speedType === 'Express';
   const { maxFare, baseFare, gstAmount, gstRatePercent } = computeMaximumPrice(busClass, estDuration);
 
   return (

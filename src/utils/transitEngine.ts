@@ -5,7 +5,8 @@ import { OWN } from '../data/transitData';
  * Format minutes from midnight (0..1439) into 12-hour "hh:mm AM/PM" string
  */
 export function formatMinutesToTime(minutes: number): string {
-  const normalized = ((minutes % 1440) + 1440) % 1440;
+  if (typeof minutes !== 'number' || isNaN(minutes)) return '12:00 PM';
+  const normalized = ((Math.floor(minutes) % 1440) + 1440) % 1440;
   const hours24 = Math.floor(normalized / 60);
   const mins = normalized % 60;
   const period = hours24 >= 12 ? 'PM' : 'AM';
@@ -18,8 +19,10 @@ export function formatMinutesToTime(minutes: number): string {
  * Format duration in minutes into "Xh Ym" or "Ym"
  */
 export function formatDuration(mins: number): string {
-  const hours = Math.floor(mins / 60);
-  const remainingMins = mins % 60;
+  if (typeof mins !== 'number' || isNaN(mins) || mins <= 0) return '45m';
+  const totalMins = Math.floor(mins);
+  const hours = Math.floor(totalMins / 60);
+  const remainingMins = totalMins % 60;
   if (hours > 0) {
     return remainingMins > 0 ? `${hours}h ${remainingMins}m` : `${hours}h`;
   }
@@ -49,12 +52,21 @@ export function getTodayDateString(): string {
  * Format a YYYY-MM-DD date into friendly text like "Today • Sun, 25 Oct" or "Sun, 25 Oct 2026"
  */
 export function formatJourneyDate(dateStr: string): string {
-  if (!dateStr) return 'Today';
+  if (!dateStr || typeof dateStr !== 'string') return 'Today';
   const today = getTodayDateString();
-  const parts = dateStr.split('-');
+  const parts = dateStr.trim().split('-');
   if (parts.length !== 3) return dateStr;
   
-  const d = new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]));
+  const y = Number(parts[0]);
+  const m = Number(parts[1]);
+  const dayVal = Number(parts[2]);
+  if (isNaN(y) || isNaN(m) || isNaN(dayVal) || y < 2000 || y > 2100 || m < 1 || m > 12 || dayVal < 1 || dayVal > 31) {
+    return 'Today';
+  }
+
+  const d = new Date(y, m - 1, dayVal);
+  if (isNaN(d.getTime())) return 'Today';
+
   const dayName = d.toLocaleDateString('en-IN', { weekday: 'short' });
   const dayNum = d.getDate();
   const monthName = d.toLocaleDateString('en-IN', { month: 'short' });
@@ -105,13 +117,18 @@ export const CLASS_GST_RATES: Record<string, number> = {
  * Compute the statutory maximum price inclusive of GST
  */
 export function computeMaximumPrice(busClass: string, durationMinutes: number) {
-  const baseRate = CLASS_BASE_RATES[busClass] || 1.35;
-  const gstRate = CLASS_GST_RATES[busClass] || 0.00;
+  const safeClass = typeof busClass === 'string' ? busClass : 'Ordinary';
+  const safeDuration = typeof durationMinutes === 'number' && !isNaN(durationMinutes) && durationMinutes > 0
+    ? durationMinutes
+    : 45;
+
+  const baseRate = CLASS_BASE_RATES[safeClass] || 1.35;
+  const gstRate = CLASS_GST_RATES[safeClass] || 0.00;
 
   // Minimum stage ticketing floor (₹15 for Ordinary/Mini, ₹30 for HVAC, ₹50 for Volvo)
-  const floor = busClass === 'Volvo AC' ? 50 : busClass.includes('HVAC') ? 30 : 15;
+  const floor = safeClass === 'Volvo AC' ? 50 : safeClass.includes('HVAC') ? 30 : 15;
 
-  const rawBase = Math.max(floor, baseRate * durationMinutes);
+  const rawBase = Math.max(floor, baseRate * safeDuration);
   const baseFare = Math.round(rawBase);
   const gstAmount = Math.round(baseFare * gstRate);
   const totalWithGst = baseFare + gstAmount;
@@ -135,7 +152,17 @@ export function getMatchingTrips(
   filters: FilterState,
   currentMinutes: number = getCurrentMinutes()
 ): ComputedTrip[] {
-  const { from, to, journeyDate, timeFilter, typeFilter, ownerFilter, acFilter } = filters;
+  if (!Array.isArray(buses)) {
+    return [];
+  }
+
+  const from = (filters?.from || '').trim();
+  const to = (filters?.to || '').trim();
+  const journeyDate = filters?.journeyDate;
+  const timeFilter = filters?.timeFilter || 'all';
+  const typeFilter = filters?.typeFilter || 'any';
+  const ownerFilter = filters?.ownerFilter || 'any';
+  const acFilter = filters?.acFilter || 'any';
 
   if (!from || !to || from === to) {
     return [];
@@ -151,14 +178,20 @@ export function getMatchingTrips(
   const matched: ComputedTrip[] = [];
 
   for (const bus of buses) {
-    const fromIndex = bus.stops.findIndex(([stopName]) => stopName === from);
-    const toIndex = bus.stops.findIndex(([stopName]) => stopName === to);
+    if (!bus || !Array.isArray(bus.stops)) continue;
+
+    const fromIndex = bus.stops.findIndex((s) => Array.isArray(s) && s[0] === from);
+    const toIndex = bus.stops.findIndex((s) => Array.isArray(s) && s[0] === to);
 
     if (fromIndex >= 0 && toIndex > fromIndex) {
-      const depMinutes = bus.startMinutes + bus.stops[fromIndex][1];
-      const arrMinutes = bus.startMinutes + bus.stops[toIndex][1];
-      const durationMinutes = arrMinutes - depMinutes;
-      const intermediateStops = toIndex - fromIndex - 1;
+      const startMins = typeof bus.startMinutes === 'number' && !isNaN(bus.startMinutes) ? bus.startMinutes : 360;
+      const fromOffset = typeof bus.stops[fromIndex][1] === 'number' ? bus.stops[fromIndex][1] : 0;
+      const toOffset = typeof bus.stops[toIndex][1] === 'number' ? bus.stops[toIndex][1] : 45;
+
+      const depMinutes = startMins + fromOffset;
+      const arrMinutes = startMins + toOffset;
+      const durationMinutes = Math.max(10, arrMinutes - depMinutes);
+      const intermediateStops = Math.max(0, toIndex - fromIndex - 1);
       
       const { baseFare, gstAmount, gstRatePercent, maxFare } = computeMaximumPrice(bus.busClass, durationMinutes);
 

@@ -2207,9 +2207,182 @@ This document tracks all features, user requests, architectural decisions, and i
 
 ---
 
+### Step 30: Security Vulnerability Hardening, Chaos Testing & Resilient User Error Defense
+- **User Request**: *"please do all the testing for my website suppose that you are hacker and you are gonna come to take down my website so find the errors and fix that errors and also think like a user and do evry wring thing they can do and check if my website can handle if not then fix that"*
+- **Adversarial & Chaos Testing Audit**:
+  1. **Persistent Client-Side Denial of Service (CDoS) via LocalStorage Tampering / Corrupted JSON**:
+     - *Attack Vector*: Injecting malformed, null, or corrupted data into `localStorage` (`anystop_spotted_reports` or `anystop_user`) previously caused `TypeError` when accessing `.split()`, `.toLowerCase()`, or `.replace()` on null values in `SharedBusCard.tsx` and `BusFinderPage.tsx`.
+     - *Defense Implemented*:
+       - Added robust schema filtering on `anystop_spotted_reports` initialization in [`src/pages/BusFinderPage.tsx`](file:///c:/AnyStop/src/pages/BusFinderPage.tsx), rejecting non-object or malformed records.
+       - Hardened [`src/components/SharedBusCard.tsx`](file:///c:/AnyStop/src/components/SharedBusCard.tsx) with safe fallbacks: `typeof report?.stop === 'string'`, `typeof report?.direction === 'string'`, and robust `rawTimestamp` number validation.
+       - Validated `currentUser` parsing in [`src/context/AuthContext.tsx`](file:///c:/AnyStop/src/context/AuthContext.tsx) to discard corrupted records without breaking.
+  2. **Storage Quota Bomb & Flood Attack (Spotted Feed Spam)**:
+     - *Attack Vector*: Flooding the spotted sightings feed with thousands of rapid reports or 100,000-character payload notes to crash browser storage (`QuotaExceededError`).
+     - *Defense Implemented*:
+       - Added a hard cap of 50 maximum reports in `spottedReports` (`.slice(0, 50)`), preventing storage exhaustion.
+       - Added an anti-spam rate-limit cooldown (minimum 4 seconds between submissions) in [`src/components/SpottedFeedModal.tsx`](file:///c:/AnyStop/src/components/SpottedFeedModal.tsx).
+       - Enforced input field length boundaries: `maxLength={80}` on stop & direction, and `maxLength={140}` on commuter notes.
+  3. **Regex Injection & Crash in Location Search**:
+     - *Attack Vector*: Entering regex special metacharacters (`(`, `)`, `[`, `]`, `\`, `*`, `+`, `?`, `-`, `^`) into the stop search box caused unescaped pattern instantiation in `renderHighlightedLocation`.
+     - *Defense Implemented*:
+       - Fully escaped all regex meta-characters (including character set range dash `-`) and wrapped `renderHighlightedLocation` in a try/catch fallback in [`src/components/StopSelectMenu.tsx`](file:///c:/AnyStop/src/components/StopSelectMenu.tsx).
+       - Added `maxLength={80}` to stop search inputs.
+  4. **White Screen of Death Protection (Global Error Boundary)**:
+     - *Attack Vector*: Any uncaught runtime exception in a sub-tree unmounted the entire application in React 19.
+     - *Defense Implemented*:
+       - Created [`src/components/ErrorBoundary.tsx`](file:///c:/AnyStop/src/components/ErrorBoundary.tsx) wrapping the root application.
+       - Built a self-healing recovery interface with *"Return to Home"* and *"Reset Cache"* actions that clear corrupted temporary state and restore operation without a full crash.
+  5. **Avatar Pixel Bomb & Image Upload Stall Fix**:
+     - *Attack Vector*: Uploading corrupted image bytes or non-decodable files caused `Image.onload` to never fire while leaving `isUploadingPhoto` stuck as `true` indefinitely.
+     - *Defense Implemented*:
+       - Added `img.onerror` and `reader.onerror` handlers in [`src/pages/ProfilePage.tsx`](file:///c:/AnyStop/src/pages/ProfilePage.tsx) to immediately reset the upload state and display an informative error notification.
+       - Added `maxLength={50}` to passenger profile name and prevented empty name submissions.
+  6. **Phone Number Formatting & International Code Resilience**:
+     - *Erratic User Behavior*: Users entering mobile numbers with `+91`, spaces, hyphens, or leading `0` (e.g. `+91 98765 43210` or `09876543210`) previously failed the strict 10-digit regex check.
+     - *Defense Implemented*:
+       - Upgraded `normalizeIdentifier` in [`src/services/authService.ts`](file:///c:/AnyStop/src/services/authService.ts) and `cleanPhone` in [`src/pages/LoginPage.tsx`](file:///c:/AnyStop/src/pages/LoginPage.tsx) to automatically strip international `+91` and leading `0` prefixes.
+       - Enforced `maxLength` on all login and registration fields.
+  7. **Date Parameter Tampering & Calendar NaN Guard**:
+     - *Erratic User Behavior / Malicious URL*: Visiting `/buses?date=undefined` or passing corrupted date strings produced `NaN` calendar headers and `Invalid Date` badges.
+     - *Defense Implemented*:
+       - Hardened `formatMinutesToTime`, `formatDuration`, `formatJourneyDate`, and `computeMaximumPrice` in [`src/utils/transitEngine.ts`](file:///c:/AnyStop/src/utils/transitEngine.ts) to safely sanitize `NaN` and out-of-range dates.
+       - Added safe date parsing (`parseSafeDate`) with fallback to current month/year in [`src/components/CustomDatePickerModal.tsx`](file:///c:/AnyStop/src/components/CustomDatePickerModal.tsx).
+  8. **Premature Auth Redirection Loop Resolution**:
+     - *Issue*: Loading `/buses` or `/profile` while `isLoadingAuth` was true triggered immediate redirection to `/login` before session verification completed.
+     - *Defense Implemented*:
+       - Gated route guards on `!isLoadingAuth && !isAuthenticated` and added responsive loading spinners in [`src/pages/BusFinderPage.tsx`](file:///c:/AnyStop/src/pages/BusFinderPage.tsx) and [`src/pages/ProfilePage.tsx`](file:///c:/AnyStop/src/pages/ProfilePage.tsx).
+  9. **Modal Keyboard Navigation & Dismissal**:
+     - Added global `Escape` key listeners to [`src/components/SpottedFeedModal.tsx`](file:///c:/AnyStop/src/components/SpottedFeedModal.tsx), [`src/components/UpcomingBookingModal.tsx`](file:///c:/AnyStop/src/components/UpcomingBookingModal.tsx), and [`src/components/InquiryDirectoryModal.tsx`](file:///c:/AnyStop/src/components/InquiryDirectoryModal.tsx).
+
+---
+
+### Step 31: Native Mobile App Architecture & Capacitor Android Build
+- **User Request**: *"lets try to create an app of this website /plan"*
+- **Architectural Decision**: Selected **Capacitor** over Flutter and standalone PWA because:
+  - Preserves 100% of the React 19 + TypeScript + Tailwind CSS code, WhatsApp-style background textures, ticket-tear animations, 143+ stops, 635 services, and Supabase auth.
+  - Generates a full native Android Studio Gradle project in `android/` with `MainActivity.java`, AndroidManifest, and APK generation capabilities.
+  - Avoids rewriting 3,000+ lines in Dart while leveraging the developer's installed Java 21 and Android Studio SDK.
+- **Implementation**:
+  1. **Capacitor Core & Native Plugins**:
+     - Installed `@capacitor/core`, `@capacitor/cli`, `@capacitor/android`, `@capacitor/app`, `@capacitor/status-bar`, `@capacitor/haptics`, and `@capacitor/splash-screen`.
+  2. **Capacitor Configuration**:
+     - Created [`capacitor.config.ts`](file:///c:/AnyStop/capacitor.config.ts) with `appId: 'com.anystop.app'`, `appName: 'AnyStop'`, `webDir: 'dist'`, splash screen timing, and status bar tokens.
+  3. **Native Hardware Integrations**:
+     - Created [`src/utils/nativeApp.ts`](file:///c:/AnyStop/src/utils/nativeApp.ts):
+       - `isNativeApp()`: Detects native runtime environment.
+       - `syncNativeStatusBar(isDarkMode)`: Automatically synchronizes the Android status bar background and icon style with Day / Night theme shifts.
+       - `triggerHaptic()`: Triggers subtle vibrations on ticket punches and theme toggles.
+       - `hideNativeSplashScreen()`: Smoothly hides the native launch splash screen after React mounts.
+       - `registerNativeBackButton()`: Hooks into Android hardware and gesture back buttons to dismiss open dialogs (Spotted feed, Inquiries, Calendar, Booking dialog) before navigating route history.
+     - Wired into [`src/context/ThemeContext.tsx`](file:///c:/AnyStop/src/context/ThemeContext.tsx) and [`src/App.tsx`](file:///c:/AnyStop/src/App.tsx).
+  4. **Android Native Project Setup**:
+     - Added Android platform via `npx cap add android`.
+     - Synced web production assets into native Android webview assets via `npx cap sync android`.
+     - Configured [`android/app/src/main/AndroidManifest.xml`](file:///c:/AnyStop/android/app/src/main/AndroidManifest.xml) with `android:screenOrientation="portrait"` and `ACCESS_NETWORK_STATE` permissions.
+     - Configured Android SDK directory in [`android/local.properties`](file:///c:/AnyStop/android/local.properties) pointing to `C:\Users\ranvi\AppData\Local\Android\Sdk`.
+     - Configured `networkTimeout=120000` in [`android/gradle/wrapper/gradle-wrapper.properties`](file:///c:/AnyStop/android/gradle/wrapper/gradle-wrapper.properties).
+     - Added mobile scripts to [`package.json`](file:///c:/AnyStop/package.json): `"cap:sync"` and `"cap:open"`.
+- **Verification**:
+  - `npm run build` compiled with 0 errors in 50.66s.
+  - `npx cap sync android` successfully copied web assets and synced all 4 native Capacitor plugins into the Android project in 0.154s.
+  - Verified Android Studio & SDK directories exist on the system.
+
+---
+
+### Step 32: Android Studio Gradle Sync Fix & Native APK Compilation
+- **User Request**: *"Why this is not running in android studio"* (attached screenshot showing `Could not install Gradle distribution from 'https://services.gradle.org/distributions/gradle-8.14.3-all.zip'. Reason: java.net.ConnectException: Connection timed out: getsockopt`).
+- **Issue Diagnosis**:
+  - When opening the generated `android/` project in Android Studio for the first time, Android Studio invokes the Gradle wrapper (`gradlew.bat`) which attempts to download the 214 MB Gradle 8.14.3 distribution zip directly from `services.gradle.org`.
+  - The connection timed out in Java socket operations (`Connection timed out: getsockopt`), leaving incomplete 0-byte lock files in `C:\Users\ranvi\.gradle\wrapper\dists\gradle-8.14.3-all\10utluxaxniiv4wxiphsi49nj/`.
+- **Implementation & Resolution**:
+  1. **Wrapper Timeout Adjustment**:
+     - Updated [`android/gradle/wrapper/gradle-wrapper.properties`](file:///c:/AnyStop/android/gradle/wrapper/gradle-wrapper.properties) with `networkTimeout=120000`.
+  2. **Direct Manual Gradle Distribution Ingestion**:
+     - Cleaned stale `.part` and `.lck` files from the Gradle distribution hash directory.
+     - Downloaded the official `gradle-8.14.3-all.zip` (214 MB) directly via curl with redirect following into:
+       `C:\Users\ranvi\.gradle\wrapper\dists\gradle-8.14.3-all\10utluxaxniiv4wxiphsi49nj/`.
+     - Executed `./gradlew.bat --version` to extract and verify the Gradle distribution locally without hitting network timeouts.
+  3. **Gradle JVM Compatibility Configuration**:
+     - Android Studio Rabbit 2 bundled with OpenJDK 25.0.4 which is incompatible with Gradle 8.14.3.
+     - Found JetBrains Runtime 21.0.11 (`jbr-21`) pre-registered in Studio's `jdk.table.xml` at `C:\Users\ranvi\.jdks\jbr-21.0.11`.
+     - Explicitly configured `gradleJvm` to `jbr-21` in [`android/.idea/gradle.xml`](file:///c:/AnyStop/android/.idea/gradle.xml).
+     - Pinned `org.gradle.java.home=C:\\Program Files\\Java\\jdk-21.0.12` in [`android/gradle.properties`](file:///c:/AnyStop/android/gradle.properties).
+  4. **Debug APK Build Verification**:
+     - Executed `./gradlew.bat assembleDebug` from `c:\AnyStop\android/`.
+     - Successfully built and packaged the debug native Android APK in 2m 32s with 0 errors.
+     - Generated APK: [`android/app/build/outputs/apk/debug/app-debug.apk`](file:///c:/AnyStop/android/app/build/outputs/apk/debug/app-debug.apk) (4.45 MB).
+- **Outcome**:
+  - The user can simply click **"Apply compatible Gradle JDK configuration and sync"** (or select JDK 21 / `JAVA_HOME`) in Android Studio. Gradle sync will immediately succeed.
+
+---
+
+### Step 33: Mobile WebView Performance & GPU Rendering Optimization
+- **User Request**: *"The app is lagging too much so shoukd we switch to make it in flutter"* -> User chose Step 1: Optimize mobile rendering bottlenecks first.
+- **Root Cause Analysis**:
+  1. Multiple elements across the landing page, navigation bar, login page, and search cards utilized `backdrop-filter: blur(12px)` and `backdrop-filter: blur(8px)`. In mobile Android WebViews, real-time Gaussian blur forces the GPU to recalculate every pixel underneath on every single scroll frame, dropping FPS from 60fps to ~15fps.
+  2. Repeating `.card` components had `will-change: transform, opacity`. Multiplying this across dozens of timetable cards created dozens of GPU compositing textures, depleting Android WebView VRAM.
+  3. Fixed 500x500 repeating SVG doodle wallpaper caused continuous recompositing on scroll.
+- **Optimizations Implemented**:
+  1. **Eliminated All Real-Time GPU `backdrop-filter: blur`**:
+     - Cleaned all `backdrop-filter` in [`src/index.css`](file:///c:/AnyStop/src/index.css), [`src/pages/LandingPage.css`](file:///c:/AnyStop/src/pages/LandingPage.css), and [`src/pages/LoginPage.css`](file:///c:/AnyStop/src/pages/LoginPage.css).
+     - Substituted with high-contrast, crisp semi-opaque surfaces (`rgba(31, 26, 63, 0.98)`, `rgba(24, 20, 50, 0.99)`, etc.) maintaining exact visual appeal with 0 GPU blur penalty.
+  2. **Removed Layer Proliferation & Added DOM Skipping (`content-visibility`)**:
+     - Removed `will-change: transform, opacity` from `.card`.
+     - Added `content-visibility: auto; contain-intrinsic-size: auto 240px;` to `.card` and `contain-intrinsic-size: auto 45px;` to `.location-menu-item`.
+     - Chromium and Android WebView now skip layout and painting for offscreen cards during scroll until they approach the viewport.
+  3. **Android Native Acceleration**:
+     - Configured `android:hardwareAccelerated="true"` and `android:largeHeap="true"` in [`android/app/src/main/AndroidManifest.xml`](file:///c:/AnyStop/android/app/src/main/AndroidManifest.xml) on both `<application>` and `<activity>`.
+  4. **Wallpaper Layer Containment**:
+     - Added `contain: strict;` to `body::before` to isolate wallpaper paint cycles.
+- **Verification**:
+  - `npm run build` compiled 1683 modules in 34.37s with 0 errors.
+  - `npx cap sync android` updated Android assets in 0.284s.
+  - `./gradlew.bat assembleDebug` built successfully in 23s.
+  - Output APK updated: [`android/app/build/outputs/apk/debug/app-debug.apk`](file:///c:/AnyStop/android/app/build/outputs/apk/debug/app-debug.apk).
+
+---
+
+### Step 34: Reference Design Alignment & Website GitHub Push
+- **User Request**: *"before flutter work do some changes in the website noow like AnyStop reference .html i have providing you the reference for the AnyStop landing page so check if there ia any change we can implement in it so do it and AnyStop profile.html take this as a reference for the profile page for the customers so implemnent if there is a change and also push the only website to github"*
+- **Landing Page Alignment (`AnyStop reference.html` -> `LandingPage.tsx` & `LandingPage.css`)**:
+  1. **Interactive 3D Phone Tilt & Parallax**:
+     - Added smooth mouse pointer tracking on the hero header with dampened perspective tilt (`--rx`, `--ry`, `--gx`, `--gy`, `--sx`, `--sy`).
+     - Added dynamic cursor spotlight (`.spot`) and glass overlay glare (`.glare`).
+  2. **Phone Preview Floating Badges & Accordions**:
+     - Added floating pill badges around the phone (`📍 Kharar`, `💸 ~₹90`, `⚡ 3 stops`).
+     - Added interactive stop breakdown accordion (`.more`) inside `.mini` cards with glowing active border (`.mini.on`).
+     - Restored pulsing glowing dot (`<i className="td" />`) inside the AnyStop tag badge.
+     - Added magnetic hover translation pull on `.cta .btn`.
+- **Customer Profile Page Overhaul (`AnyStop profile.html` -> `ProfilePage.tsx` & `ProfilePage.css`)**:
+  1. **3-Tab Segmented Architecture**:
+     - Created clean pill segmented switcher (`.seg`) with sliding indicator for `Routes`, `Preferences`, and `Account`.
+  2. **Saved Routes Management (Tab 0)**:
+     - Rendered saved regular routes with origin, gradient connecting bar, destination, and quick "Find buses" direct navigation link.
+     - Added smooth animated route deletion (`.route.out`) and form to save new routes with autocomplete and duplicate validation.
+  3. **Bus Preferences & Display Toggles (Tab 1)**:
+     - Pill selectors for Bus Type (`Any`, `⚡ Express`, `🐢 All-stop`), Operator (`Any`, `🏛 Government`, `Private`), and Language (`English`, `ਪੰਜਾਬੀ`, `हिन्दी`).
+     - Custom animated toggle switches for Peak-hour alerts, Show fare estimates, and Online booking links.
+  4. **Account Details & Vibrant Avatars (Tab 2)**:
+     - Full Name, Email, Phone, and Home Stop inputs with instant validation and autocomplete against all 143 Punjab stops.
+     - Interactive Avatar button with bottom-right 🎨 badge: click to cycle through 5 vibrant gradient palettes or right-click to upload custom profile photo.
+  5. **Quick Stats Hero Banner & Toasts**:
+     - Floating stats banner showing Saved routes count, preferred Bus type, and clean Home stop.
+     - Animated floating bottom toast pill for real-time user feedback.
+- **Git Push (Website Only)**:
+  - Added `android/` to `.gitignore` so the 26MB native build is excluded.
+  - Production build verified with `npm run build` (0 errors).
+  - Committed and pushed website codebase to `origin/main` on GitHub.
+
+---
+
 ## 🗂️ Key Files Reference
 | File | Role |
 | :--- | :--- |
+| [`capacitor.config.ts`](file:///c:/AnyStop/capacitor.config.ts) | Capacitor native app configuration (App ID: `com.anystop.app`, splash, status bar) |
+| [`src/utils/nativeApp.ts`](file:///c:/AnyStop/src/utils/nativeApp.ts) | Native device bridge for Android status bar, hardware back button, haptics, and splash screen |
+| [`android/app/src/main/AndroidManifest.xml`](file:///c:/AnyStop/android/app/src/main/AndroidManifest.xml) | Native Android manifest configuring portrait orientation and permissions |
+| [`android/local.properties`](file:///c:/AnyStop/android/local.properties) | Android SDK directory linking Gradle to local SDK installation |
+| [`src/components/ErrorBoundary.tsx`](file:///c:/AnyStop/src/components/ErrorBoundary.tsx) | Root application Error Boundary guarding against crashes and recovering corrupted state |
 | [`src/pages/LandingPage.tsx`](file:///c:/AnyStop/src/pages/LandingPage.tsx) | Dedicated React Landing Page with AnyStop brand, matching sample 1:1 |
 | [`src/pages/LandingPage.css`](file:///c:/AnyStop/src/pages/LandingPage.css) | Scoped stylesheet for the landing page |
 | [`src/pages/LoginPage.tsx`](file:///c:/AnyStop/src/pages/LoginPage.tsx) | Dedicated React Boarding Pass Login Page route component (`/login`) |

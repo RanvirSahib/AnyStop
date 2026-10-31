@@ -90,16 +90,24 @@ export const LoginPage: React.FC = () => {
     setServerError(null);
   };
 
+  const cleanPhone = (v: string) => {
+    let digits = (v || '').replace(/\D/g, '');
+    if (digits.length === 12 && digits.startsWith('91')) digits = digits.slice(2);
+    else if (digits.length === 11 && digits.startsWith('0')) digits = digits.slice(1);
+    return digits;
+  };
+
   const validEmail = (v: string) => {
-    return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v.trim());
+    return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test((v || '').trim());
   };
 
   const validPhone = (v: string) => {
-    return /^[6-9]\d{9}$/.test(v.replace(/[\s-]/g, ''));
+    return /^[6-9]\d{9}$/.test(cleanPhone(v));
   };
 
   const validId = (v: string) => {
-    return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v) || /^[6-9]\d{9}$/.test(v.replace(/[\s-]/g, ''));
+    const trimmed = (v || '').trim();
+    return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(trimmed) || /^[6-9]\d{9}$/.test(cleanPhone(trimmed));
   };
 
   const triggerBad = (field: 'name' | 'id' | 'email' | 'phone' | 'signupOtp' | 'loginOtp') => {
@@ -517,6 +525,7 @@ export const LoginPage: React.FC = () => {
                         id="id-login"
                         autoComplete="username"
                         inputMode="email"
+                        maxLength={100}
                         placeholder="you@example.com or 10-digit phone"
                         value={identifier}
                         readOnly={mode !== 'in'}
@@ -750,6 +759,7 @@ export const LoginPage: React.FC = () => {
                           <input
                             id="name-signup"
                             autoComplete="name"
+                            maxLength={50}
                             placeholder="Your name"
                             value={name}
                             readOnly={mode !== 'up'}
@@ -773,6 +783,7 @@ export const LoginPage: React.FC = () => {
                         type="email"
                         autoComplete="email"
                         inputMode="email"
+                        maxLength={100}
                         placeholder="you@example.com"
                         value={signupEmail}
                         readOnly={mode !== 'up'}
@@ -794,6 +805,7 @@ export const LoginPage: React.FC = () => {
                         type="tel"
                         autoComplete="tel"
                         inputMode="tel"
+                        maxLength={16}
                         placeholder="10-digit mobile number"
                         value={signupPhone}
                         readOnly={mode !== 'up'}

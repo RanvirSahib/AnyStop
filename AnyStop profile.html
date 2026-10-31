@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>StopSense – My profile</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&family=Figtree:wght@400;500;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#FFF5EC;--surface:#fff;--ink:#231F3D;--muted:#6B6585;--line:#EBDDD0;--field:#FFF9F3;--coral:#FF5A4E;--coral2:#E8433A;--sun:#FFB020;--teal:#0B8F82;--tealbg:#D8F5F0;--night:#1F1A3F;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);color-scheme:light}
+@media (prefers-color-scheme:dark){:root{--bg:#15122B;--surface:#211C40;--ink:#F6F1FF;--muted:#A9A2C8;--line:#342E5A;--field:#1A1535;--tealbg:#0E3B3A;--teal:#4DE0CF;color-scheme:dark}}
+*{box-sizing:border-box;margin:0}
+body{background:var(--bg);color:var(--ink);font:400 17px/1.55 "Figtree",system-ui,sans-serif;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+h1,h2,h3{font-family:"Bricolage Grotesque",Georgia,sans-serif;font-weight:800;letter-spacing:-.02em;line-height:1.05}
+button,input{font:inherit;color:inherit}button{cursor:pointer;min-height:44px}
+a{color:inherit}
+:focus-visible{outline:3px solid var(--sun);outline-offset:2px}
+.wrap{max-width:720px;margin:0 auto;padding:0 18px}
+@keyframes rise{from{opacity:0;transform:translateY(22px)}}
+
+.hero{background:radial-gradient(700px 360px at 90% 100%,rgba(255,90,78,.5),transparent 60%),linear-gradient(160deg,#1F1A3F,#3B1D63);color:#fff;padding:18px 0 96px}
+.top{display:flex;justify-content:space-between;align-items:center}
+.logo{font-family:"Bricolage Grotesque",sans-serif;font-weight:800;font-size:21px;text-decoration:none;display:flex;gap:8px;align-items:center}
+.logo i{width:13px;height:13px;border-radius:50%;background:var(--coral);box-shadow:0 0 0 4px rgba(255,90,78,.3)}
+.tl{color:#DAD3F2;text-decoration:none;font-weight:500;padding:10px 0;min-height:44px;display:flex;align-items:center}
+.who{display:flex;align-items:center;gap:18px;margin-top:26px;animation:rise .7s both}
+.av{flex:none;width:92px;height:92px;border-radius:50%;border:0;display:grid;place-items:center;font-family:"Bricolage Grotesque";font-weight:800;font-size:36px;color:#fff;position:relative;background:var(--g,linear-gradient(135deg,#FF5A4E,#B8338A));box-shadow:0 0 0 4px rgba(255,255,255,.25),0 14px 30px rgba(0,0,0,.35);transition:transform .35s cubic-bezier(.3,1.4,.4,1)}
+.av:hover{transform:rotate(-6deg) scale(1.06)}.av:active{transform:scale(.94)}
+.av:after{content:"🎨";position:absolute;right:-4px;bottom:-4px;width:30px;height:30px;border-radius:50%;background:#fff;font-size:15px;display:grid;place-items:center;box-shadow:0 4px 10px rgba(0,0,0,.3)}
+.who h1{font-size:clamp(28px,7vw,40px);word-break:break-word}
+.who p{color:#DAD3F2;font-size:15px;word-break:break-all}
+.tag{display:inline-block;font-family:"DM Mono",monospace;font-size:11px;letter-spacing:.12em;background:rgba(255,255,255,.14);border-radius:99px;padding:3px 11px;margin-top:6px}
+
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:-58px;animation:rise .7s .15s both}
+.st{background:var(--surface);border-radius:20px;padding:14px 12px;text-align:center;box-shadow:0 14px 34px rgba(31,26,63,.2)}
+.st b{display:block;font-family:"Bricolage Grotesque";font-weight:800;font-size:26px;line-height:1.1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.st span{font-size:13px;color:var(--muted)}
+
+.seg{display:grid;grid-template-columns:repeat(3,1fr);background:var(--surface);border:2px solid var(--line);border-radius:99px;padding:3px;position:relative;margin:22px 0 18px;--i:0}
+.seg:before{content:"";position:absolute;top:3px;bottom:3px;left:3px;width:calc(33.333% - 2px);border-radius:99px;background:var(--ink);transform:translateX(calc(var(--i)*100%));transition:transform .45s cubic-bezier(.3,1.25,.4,1)}
+.seg button{position:relative;border:0;background:none;border-radius:99px;font-weight:700;color:var(--muted);transition:color .3s}
+.seg button[aria-selected=true]{color:var(--bg)}
+.panel{display:none}.panel.on{display:block;animation:rise .45s both}
+.card{background:var(--surface);border-radius:22px;padding:20px;box-shadow:0 2px 0 var(--line);margin-bottom:14px}
+h2{font-size:24px;margin-bottom:12px}
+.sub{color:var(--muted);font-size:15px;margin:-6px 0 14px}
+
+.route{display:flex;align-items:center;gap:12px;padding:14px;border-radius:16px;background:var(--field);border:2px solid var(--line);margin-bottom:10px;transition:transform .3s,opacity .3s,border-color .2s,max-height .35s;max-height:120px;overflow:hidden}
+.route:hover{border-color:var(--coral);transform:translateX(4px)}
+.route.out{transform:translateX(60px);opacity:0;max-height:0;padding-top:0;padding-bottom:0;margin-bottom:0;border-width:0}
+.rt{flex:1;min-width:0}
+.rt b{display:block;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rt i{display:block;height:4px;border-radius:2px;margin:6px 0;background:linear-gradient(90deg,var(--coral),var(--sun));width:60%}
+.rt span{font-size:14px;color:var(--muted)}
+.mini{border:2px solid var(--line);background:var(--surface);border-radius:12px;padding:0 14px;font-weight:700;text-decoration:none;min-height:44px;display:inline-flex;align-items:center;transition:background .2s}
+.mini:hover{background:var(--bg)}
+.x{width:44px;border:0;background:none;font-size:20px;color:var(--muted);border-radius:12px;transition:color .2s,background .2s}.x:hover{color:var(--coral2);background:var(--bg)}
+.empty{text-align:center;color:var(--muted);padding:16px;border:2px dashed var(--line);border-radius:16px}
+
+label.f{display:block;margin-top:12px}
+label.f span{font-family:"DM Mono",monospace;font-size:11px;letter-spacing:.14em;color:var(--muted)}
+.inp{width:100%;height:50px;margin-top:4px;border:2px solid var(--line);background:var(--field);border-radius:14px;padding:0 14px;font-weight:500;transition:border-color .2s,box-shadow .2s}
+.inp:focus{outline:0;border-color:var(--coral);box-shadow:0 0 0 4px rgba(255,90,78,.18)}
+.two{display:grid;gap:10px}@media(min-width:560px){.two{grid-template-columns:1fr 1fr}}
+.err{color:var(--coral2);font-weight:700;font-size:14px;min-height:20px;margin-top:6px}
+.btn{width:100%;margin-top:12px;border:0;border-radius:14px;min-height:52px;background:var(--coral);color:#fff;font-weight:700;font-size:17px;transition:transform .15s,background .2s,box-shadow .2s;box-shadow:0 10px 24px rgba(255,90,78,.35)}
+.btn:hover{background:var(--coral2)}.btn:active{transform:scale(.97)}
+.btn.out{background:none;color:var(--coral2);border:2px solid var(--line);box-shadow:none;display:flex;align-items:center;justify-content:center;text-decoration:none}
+.btn.out:hover{background:var(--bg)}
+
+.pills{display:flex;flex-wrap:wrap;gap:8px}
+.pill{border:2px solid var(--line);background:var(--field);border-radius:99px;padding:0 16px;transition:transform .15s,background .2s,border-color .2s}
+.pill:hover{border-color:var(--coral)}.pill:active{transform:scale(.94)}
+.pill[aria-pressed=true]{background:var(--ink);border-color:var(--ink);color:var(--bg);font-weight:700}
+.lbl{font-weight:700;margin:16px 0 8px}.lbl:first-of-type{margin-top:0}
+.tg{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px 0;border-top:1px solid var(--line)}
+.tg small{display:block;color:var(--muted);font-size:14px}
+.sw{flex:none;width:56px;height:32px;min-height:32px;border-radius:99px;border:0;background:var(--line);position:relative;transition:background .3s}
+.sw:after{content:"";position:absolute;top:4px;left:4px;width:24px;height:24px;border-radius:50%;background:#fff;box-shadow:0 2px 6px rgba(0,0,0,.3);transition:transform .35s cubic-bezier(.3,1.4,.4,1)}
+.sw[aria-checked=true]{background:var(--teal)}.sw[aria-checked=true]:after{transform:translateX(24px)}
+.toast{position:fixed;left:50%;bottom:calc(22px + env(safe-area-inset-bottom,0px));transform:translate(-50%,130px);background:var(--night);color:#fff;border-radius:14px;padding:12px 20px;font-weight:700;transition:transform .4s cubic-bezier(.2,.9,.3,1);z-index:9;max-width:92%}
+.toast.on{transform:translate(-50%,0)}
+.note{font-size:13px;color:var(--muted);text-align:center;margin:18px 0 40px}
+@media(prefers-reduced-motion:reduce){*,*:before,*:after{animation:none!important;transition-duration:.01ms!important}}
+</style>
+</head>
+<body>
+<header class="hero"><div class="wrap">
+  <div class="top"><a class="logo" href="https://claude.ai/artifact/Cg9yoadbtN5dyaCcyMFG7x" style="color:#fff"><i></i>StopSense</a><a class="tl" href="https://claude.ai/artifact/4Rvd4U8DexvTfNXgbMztDj">← Find a bus</a></div>
+  <div class="who">
+    <button class="av" id="av" aria-label="Change avatar colour"><span id="ini">T</span></button>
+    <div><h1 id="nm">Traveller</h1><p id="em">Add your email in Account</p><span class="tag">STOPSENSE MEMBER</span></div>
+  </div>
+</div></header>
+
+<main class="wrap">
+  <div class="stats"><div class="st"><b id="s1">0</b><span>Saved routes</span></div><div class="st"><b id="s2">Any</b><span>Bus type</span></div><div class="st"><b id="s3">—</b><span>Home stop</span></div></div>
+
+  <div class="seg" id="seg" role="tablist">
+    <button role="tab" aria-selected="true" data-t="0">Routes</button><button role="tab" aria-selected="false" data-t="1">Preferences</button><button role="tab" aria-selected="false" data-t="2">Account</button>
+  </div>
+
+  <section class="panel on" id="p0">
+    <div class="card"><h2>Saved routes</h2><p class="sub">Your regular trips, one tap away.</p><div id="rl"></div></div>
+    <div class="card"><h2>Add a route</h2>
+      <div class="two"><label class="f"><span>FROM</span><input class="inp" id="rf" list="sl" placeholder="Type a stop" autocomplete="off"></label><label class="f"><span>TO</span><input class="inp" id="rtt" list="sl" placeholder="Type a stop" autocomplete="off"></label></div>
+      <div class="err" id="re" role="alert"></div><button class="btn" id="add">Save route</button></div>
+  </section>
+
+  <section class="panel" id="p1">
+    <div class="card"><h2>Bus preferences</h2>
+      <p class="lbl">Preferred bus type</p><div class="pills" id="pt"></div>
+      <p class="lbl">Run by</p><div class="pills" id="po"></div>
+      <p class="lbl">Language</p><div class="pills" id="pl"></div></div>
+    <div class="card"><h2>Alerts and display</h2>
+      <div class="tg"><div><b>Peak-hour alerts</b><small>Heads-up on busy days like Fridays</small></div><button class="sw" role="switch" aria-checked="true" aria-label="Peak-hour alerts" data-k="alerts"></button></div>
+      <div class="tg"><div><b>Show fare estimates</b><small>Keep cash ready before you board</small></div><button class="sw" role="switch" aria-checked="true" aria-label="Show fare estimates" data-k="fares"></button></div>
+      <div class="tg"><div><b>Online booking links</b><small>Show Book online where possible</small></div><button class="sw" role="switch" aria-checked="true" aria-label="Online booking links" data-k="book"></button></div></div>
+  </section>
+
+  <section class="panel" id="p2">
+    <div class="card"><h2>Your details</h2>
+      <label class="f"><span>FULL NAME</span><input class="inp" id="an" autocomplete="name" placeholder="Your name"></label>
+      <label class="f"><span>EMAIL</span><input class="inp" id="ae" type="email" autocomplete="email" placeholder="you@example.com"></label>
+      <label class="f"><span>PHONE</span><input class="inp" id="ap" type="tel" autocomplete="tel" placeholder="10-digit mobile number"></label>
+      <label class="f"><span>HOME STOP</span><input class="inp" id="ah" list="sl" placeholder="Where you usually start" autocomplete="off"></label>
+      <div class="err" id="ae2" role="alert"></div><button class="btn" id="save">Save changes</button></div>
+    <a class="btn out" href="https://claude.ai/artifact/749eiJTp8SjU1YMvmRGrB3">Log out</a>
+  </section>
+  <datalist id="sl"></datalist>
+  <p class="note">Preview only: your details and routes are kept on this device until real accounts are connected.</p>
+</main>
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+const $=id=>document.getElementById(id);
+const STOPS=["Chandigarh ISBT 43","Chandigarh ISBT 17","Kharar","Gharuan (CU Gate 2)","Morinda","Khamano","Samrala","Kohara","Cheema Chowk","Ludhiana Bus Stand","Phillaur","Jalandhar","Zirakpur","Ambala Cantt"];
+$("sl").innerHTML=STOPS.map(s=>`<option value="${s}">`).join("");
+const GR=["linear-gradient(135deg,#FF5A4E,#B8338A)","linear-gradient(135deg,#0B8F82,#1F1A3F)","linear-gradient(135deg,#FFB020,#FF5A4E)","linear-gradient(135deg,#6E64E6,#B8338A)","linear-gradient(135deg,#12B5A6,#6E64E6)"];
+const D={name:"",email:"",phone:"",home:"",g:0,routes:[["Chandigarh ISBT 43","Ludhiana Bus Stand"],["Kharar","Morinda"]],type:"any",own:"any",lang:"en",alerts:true,fares:true,book:true};
+let P={...D};
+try{const s=localStorage.getItem("ss_profile");if(s)P={...D,...JSON.parse(s)}}catch(e){}
+const save=()=>{try{localStorage.setItem("ss_profile",JSON.stringify(P))}catch(e){}};
+function toast(t){const e=$("toast");e.textContent=t;e.classList.add("on");clearTimeout(toast.t);toast.t=setTimeout(()=>e.classList.remove("on"),2200)}
+const esc=s=>s.replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const TL={any:"Any",E:"Express",L:"All-stop"};
+function head(){const n=P.name.trim();$("nm").textContent=n||"Traveller";$("ini").textContent=(n||"T").trim()[0].toUpperCase();$("em").textContent=P.email||"Add your email in Account";
+ $("av").style.setProperty("--g",GR[P.g%GR.length]);$("s1").textContent=P.routes.length;$("s2").textContent=TL[P.type];$("s3").textContent=P.home?P.home.split(" (")[0].replace(" Bus Stand",""):"—"}
+function routes(){$("rl").innerHTML=P.routes.length?P.routes.map((r,i)=>`<div class="route" data-i="${i}"><div class="rt"><b>${esc(r[0])}</b><i></i><b>${esc(r[1])}</b></div><a class="mini" href="https://claude.ai/artifact/4Rvd4U8DexvTfNXgbMztDj">Find buses</a><button class="x" aria-label="Remove route" data-i="${i}">✕</button></div>`).join(""):'<div class="empty">No saved routes yet. Add your first one below.</div>';head()}
+function pills(id,arr,key){$(id).innerHTML=arr.map(([k,v])=>`<button class="pill" data-k="${k}" aria-pressed="${P[key]===k}">${v}</button>`).join("");
+ $(id).onclick=e=>{const k=e.target.closest("button")?.dataset.k;if(!k)return;P[key]=k;[...$(id).children].forEach(c=>c.setAttribute("aria-pressed",c.dataset.k===k));save();head();toast("Preference saved")}}
+pills("pt",[["any","Any"],["E","⚡ Express"],["L","🐢 All-stop"]],"type");pills("po",[["any","Any"],["G","🏛 Government"],["P","Private"]],"own");pills("pl",[["en","English"],["pa","ਪੰਜਾਬੀ"],["hi","हिन्दी"]],"lang");
+document.querySelectorAll(".sw").forEach(b=>{b.setAttribute("aria-checked",P[b.dataset.k]);b.onclick=()=>{P[b.dataset.k]=!P[b.dataset.k];b.setAttribute("aria-checked",P[b.dataset.k]);save();toast(P[b.dataset.k]?"Turned on":"Turned off")}});
+$("seg").onclick=e=>{const t=e.target.closest("button")?.dataset.t;if(t==null)return;$("seg").style.setProperty("--i",t);[...$("seg").children].forEach(c=>c.setAttribute("aria-selected",c.dataset.t===t));document.querySelectorAll(".panel").forEach((p,i)=>p.classList.toggle("on",i==t))};
+$("av").onclick=()=>{P.g=(P.g+1)%GR.length;save();head()};
+$("rl").onclick=e=>{const b=e.target.closest(".x");if(!b)return;const row=b.closest(".route");row.classList.add("out");setTimeout(()=>{P.routes.splice(+b.dataset.i,1);save();routes();toast("Route removed")},350)};
+$("add").onclick=()=>{const a=$("rf").value.trim(),b=$("rtt").value.trim();
+ if(!STOPS.includes(a)||!STOPS.includes(b)){$("re").textContent="Pick both stops from the list.";return}
+ if(a===b){$("re").textContent="Choose two different stops.";return}
+ if(P.routes.some(r=>r[0]===a&&r[1]===b)){$("re").textContent="You already saved this route.";return}
+ $("re").textContent="";P.routes.unshift([a,b]);save();routes();$("rf").value=$("rtt").value="";toast("Route saved ✓")};
+$("an").value=P.name;$("ae").value=P.email;$("ap").value=P.phone;$("ah").value=P.home;
+$("save").onclick=()=>{const n=$("an").value.trim(),e=$("ae").value.trim(),p=$("ap").value.replace(/[\s-]/g,""),h=$("ah").value.trim();
+ const er=[];if(n.length<2)er.push("Enter your name.");if(e&&!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(e))er.push("Email looks wrong.");if(p&&!/^[6-9]\d{9}$/.test(p))er.push("Phone must be 10 digits.");if(h&&!STOPS.includes(h))er.push("Pick your home stop from the list.");
+ $("ae2").textContent=er.join(" ");if(er.length)return;
+ Object.assign(P,{name:n,email:e,phone:p,home:h});save();head();toast("Profile updated ✓")};
+routes();
+</script>
+</body>
+</html>

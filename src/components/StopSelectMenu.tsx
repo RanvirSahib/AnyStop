@@ -34,28 +34,34 @@ export const formatLocationDisplay = (stop: string): string => {
  * Helper to highlight matching letters in the search results
  */
 export const renderHighlightedLocation = (fullLocation: string, searchQuery: string) => {
-  const q = searchQuery.trim();
+  if (!fullLocation || typeof fullLocation !== 'string') return '';
+  const q = (searchQuery || '').trim();
   if (!q) return fullLocation;
 
-  const regex = new RegExp(`(${q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
-  const parts = fullLocation.split(regex);
+  try {
+    const escaped = q.replace(/[.*+?^${}()|[\]\\-]/g, '\\$&');
+    const regex = new RegExp(`(${escaped})`, 'gi');
+    const parts = fullLocation.split(regex);
 
-  return (
-    <>
-      {parts.map((part, idx) =>
-        part.toLowerCase() === q.toLowerCase() ? (
-          <mark
-            key={idx}
-            className="bg-transparent font-extrabold text-[var(--coral)] underline decoration-[var(--coral)] decoration-2"
-          >
-            {part}
-          </mark>
-        ) : (
-          <React.Fragment key={idx}>{part}</React.Fragment>
-        )
-      )}
-    </>
-  );
+    return (
+      <>
+        {parts.map((part, idx) =>
+          part.toLowerCase() === q.toLowerCase() ? (
+            <mark
+              key={idx}
+              className="bg-transparent font-extrabold text-[var(--coral)] underline decoration-[var(--coral)] decoration-2"
+            >
+              {part}
+            </mark>
+          ) : (
+            <React.Fragment key={idx}>{part}</React.Fragment>
+          )
+        )}
+      </>
+    );
+  } catch {
+    return fullLocation;
+  }
 };
 
 export const StopSelectMenu: React.FC<StopSelectMenuProps> = ({
@@ -164,6 +170,7 @@ export const StopSelectMenu: React.FC<StopSelectMenuProps> = ({
           type="text"
           id={id}
           autoComplete="off"
+          maxLength={80}
           placeholder={placeholder}
           value={value}
           onChange={(e) => {

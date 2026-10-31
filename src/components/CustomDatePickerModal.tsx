@@ -28,36 +28,30 @@ export const CustomDatePickerModal: React.FC<CustomDatePickerModalProps> = ({
   const currentYear = todayDate.getFullYear();
   const currentMonth = todayDate.getMonth();
 
-  // Parse initial view from selectedDate or today
-  const [viewYear, setViewYear] = useState<number>(() => {
-    if (selectedDate) {
-      const parts = selectedDate.split('-');
-      if (parts.length === 3) return parseInt(parts[0], 10);
+  // Safely parse view date with fallback to today
+  const parseSafeDate = (dStr: string) => {
+    if (!dStr || typeof dStr !== 'string') return { y: currentYear, m: currentMonth };
+    const parts = dStr.trim().split('-');
+    if (parts.length === 3) {
+      const y = parseInt(parts[0], 10);
+      const m = parseInt(parts[1], 10) - 1;
+      if (!isNaN(y) && !isNaN(m) && y >= 2000 && y <= 2100 && m >= 0 && m <= 11) {
+        return { y, m };
+      }
     }
-    return currentYear;
-  });
+    return { y: currentYear, m: currentMonth };
+  };
 
-  const [viewMonth, setViewMonth] = useState<number>(() => {
-    if (selectedDate) {
-      const parts = selectedDate.split('-');
-      if (parts.length === 3) return parseInt(parts[1], 10) - 1;
-    }
-    return currentMonth;
-  });
+  const initialView = parseSafeDate(selectedDate);
+  const [viewYear, setViewYear] = useState<number>(initialView.y);
+  const [viewMonth, setViewMonth] = useState<number>(initialView.m);
 
   // Sync view when selectedDate changes or modal opens
   useEffect(() => {
     if (isOpen) {
-      if (selectedDate) {
-        const parts = selectedDate.split('-');
-        if (parts.length === 3) {
-          setViewYear(parseInt(parts[0], 10));
-          setViewMonth(parseInt(parts[1], 10) - 1);
-        }
-      } else {
-        setViewYear(currentYear);
-        setViewMonth(currentMonth);
-      }
+      const parsed = parseSafeDate(selectedDate);
+      setViewYear(parsed.y);
+      setViewMonth(parsed.m);
     }
   }, [isOpen, selectedDate, currentYear, currentMonth]);
 

@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import {
   X,
   PhoneCall,
@@ -31,6 +31,16 @@ export const InquiryDirectoryModal: React.FC<InquiryDirectoryModalProps> = ({
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<FilterCategory>('all');
   const [copiedId, setCopiedId] = useState<string | null>(null);
+
+  // Close modal on Escape key press
+  useEffect(() => {
+    if (!isOpen) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose();
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, onClose]);
 
   // Copy phone number to clipboard with feedback
   const handleCopyPhone = (phone: string, id: string, e: React.MouseEvent) => {
@@ -132,6 +142,7 @@ export const InquiryDirectoryModal: React.FC<InquiryDirectoryModalProps> = ({
             <Search className="inquiry-search-icon" />
             <input
               type="text"
+              maxLength={80}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search by bus stand, city, depot, or phone number..."

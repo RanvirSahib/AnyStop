@@ -77,11 +77,12 @@ export const SearchSection: React.FC<SearchSectionProps> = ({
     onSwap();
   };
 
-  // Validation
-  const trimmedFrom = from.trim();
-  const trimmedTo = to.trim();
-  const badFrom = trimmedFrom && !stops.includes(trimmedFrom);
-  const badTo = trimmedTo && !stops.includes(trimmedTo);
+  // Validation with defensive arrays
+  const safeStops = Array.isArray(stops) ? stops : [];
+  const trimmedFrom = (from || '').trim();
+  const trimmedTo = (to || '').trim();
+  const badFrom = trimmedFrom && !safeStops.includes(trimmedFrom);
+  const badTo = trimmedTo && !safeStops.includes(trimmedTo);
 
   let errorMessage = '';
   if (badFrom && badTo) {

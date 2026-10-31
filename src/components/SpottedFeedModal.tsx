@@ -91,8 +91,20 @@ export const SpottedFeedModal: React.FC<SpottedFeedModalProps> = ({
   const [statusNote, setStatusNote] = useState('');
   const [submitted, setSubmitted] = useState(false);
   const [openCardId, setOpenCardId] = useState<string | null>(null);
+  const [spamError, setSpamError] = useState<string | null>(null);
+  const lastSubmitRef = useRef<number>(0);
 
   const isFormValid = Boolean(operator.trim() && stop.trim() && direction.trim());
+
+  // Handle escape key to close
+  useEffect(() => {
+    if (!isOpen) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose();
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, onClose]);
 
   // Close menus when clicking outside
   useEffect(() => {
@@ -119,13 +131,23 @@ export const SpottedFeedModal: React.FC<SpottedFeedModalProps> = ({
     if (!operator.trim() || !stop.trim() || !direction.trim()) {
       return;
     }
+
+    // Anti-spam rate-limit check (minimum 4 seconds between posts)
+    const now = Date.now();
+    if (now - lastSubmitRef.current < 4000) {
+      setSpamError('Please wait a few seconds before sharing another sighting.');
+      setTimeout(() => setSpamError(null), 3000);
+      return;
+    }
+    lastSubmitRef.current = now;
+
     onAddReport({
-      operator: operator.trim(),
-      stop: stop.trim(),
-      direction: direction.trim(),
+      operator: operator.trim().slice(0, 80),
+      stop: stop.trim().slice(0, 80),
+      direction: direction.trim().slice(0, 80),
       speedType,
       crowdLevel,
-      statusNote: statusNote.trim() || 'Bus spotted running on corridor'
+      statusNote: statusNote.trim().slice(0, 140) || 'Bus spotted running on corridor'
     });
     setSubmitted(true);
     setTimeout(() => {
@@ -361,6 +383,7 @@ export const SpottedFeedModal: React.FC<SpottedFeedModalProps> = ({
                     <Building2 className="w-4 h-4 text-[#6B6585] dark:text-[#A9A2C8] shrink-0 pointer-events-none" />
                     <input
                       type="text"
+                      maxLength={80}
                       value={stop}
                       onChange={(e) => {
                         setStop(e.target.value);
@@ -464,6 +487,7 @@ export const SpottedFeedModal: React.FC<SpottedFeedModalProps> = ({
                     <Navigation className="w-4 h-4 text-[#0B8F82] dark:text-[#4DE0CF] shrink-0 pointer-events-none" />
                     <input
                       type="text"
+                      maxLength={80}
                       value={direction}
                       onChange={(e) => {
                         setDirection(e.target.value);
@@ -691,12 +715,20 @@ export const SpottedFeedModal: React.FC<SpottedFeedModalProps> = ({
                 </label>
                 <input
                   type="text"
+                  maxLength={140}
                   placeholder="e.g. Just cleared flyover, conductor giving tickets, plenty seats..."
                   value={statusNote}
                   onChange={(e) => setStatusNote(e.target.value)}
                   className="w-full h-10 rounded-xl border border-[#DFD2C4] dark:border-[#3B3264] bg-[#F9F5F0] dark:bg-[#181333] px-3 text-xs font-medium text-[#231F3D] dark:text-[#F6F1FF] placeholder-[#8E87A5] focus:outline-none focus:border-[#0B8F82] focus:ring-2 focus:ring-[#0B8F82]/20 transition-all"
                 />
               </div>
+
+              {spamError && (
+                <div className="p-2.5 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-600 dark:text-rose-400 text-xs font-bold flex items-center gap-1.5 animate-fadeIn">
+                  <AlertCircle className="w-4 h-4 shrink-0" />
+                  <span>{spamError}</span>
+                </div>
+              )}
 
               {/* Submit Button */}
               <button

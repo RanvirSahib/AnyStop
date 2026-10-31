@@ -18,15 +18,15 @@ import { useTheme } from '../context/ThemeContext';
 
 export const BusFinderPage: React.FC = () => {
   const navigate = useNavigate();
-  const { currentUser, isAuthenticated } = useAuth();
+  const { currentUser, isAuthenticated, isLoadingAuth } = useAuth();
   const { darkMode, toggleDarkMode } = useTheme();
 
-  // Auth Protection Gate: if not logged in, redirect immediately to /login
+  // Auth Protection Gate: only redirect if finished loading and unauthenticated
   useEffect(() => {
-    if (!isAuthenticated) {
+    if (!isLoadingAuth && !isAuthenticated) {
       navigate('/login', { replace: true });
     }
-  }, [isAuthenticated, navigate]);
+  }, [isLoadingAuth, isAuthenticated, navigate]);
 
   // Current clock time updated every 30s
   const [currentMinutes, setCurrentMinutes] = useState<number>(getCurrentMinutes());
@@ -75,7 +75,7 @@ export const BusFinderPage: React.FC = () => {
   const [isSpottedOpen, setIsSpottedOpen] = useState(false);
   const [bookingTrip, setBookingTrip] = useState<ComputedTrip | null>(null);
 
-  // Spotted reports with persistence & auto-purge of expired items
+  // Spotted reports with persistence, anti-bloat capping & auto-purge of expired items
   const [spottedReports, setSpottedReports] = useState<SpottedReport[]>(() => {
     try {
       const saved = localStorage.getItem('anystop_spotted_reports');
@@ -86,16 +86,21 @@ export const BusFinderPage: React.FC = () => {
           const valid = parsed.filter(
             (r: any) =>
               r &&
-              r.id &&
+              typeof r === 'object' &&
+              typeof r.id === 'string' &&
+              typeof r.stop === 'string' &&
+              typeof r.direction === 'string' &&
+              typeof r.timestamp === 'number' &&
+              !isNaN(r.timestamp) &&
               !['spot-1', 'spot-2', 'spot-3', 'spot-4'].includes(r.id) &&
-              (now - (r.timestamp || 0)) < 3 * 60 * 60 * 1000
+              (now - r.timestamp) < 3 * 60 * 60 * 1000
           );
           if (valid.length === 0) {
             localStorage.removeItem('anystop_spotted_reports');
           } else {
-            localStorage.setItem('anystop_spotted_reports', JSON.stringify(valid));
+            localStorage.setItem('anystop_spotted_reports', JSON.stringify(valid.slice(0, 50)));
           }
-          return valid;
+          return valid.slice(0, 50);
         }
       }
     } catch {
@@ -110,7 +115,8 @@ export const BusFinderPage: React.FC = () => {
       id: `spot-${Date.now()}`,
       timestamp: Date.now()
     };
-    const updated = [report, ...spottedReports];
+    // Cap to 50 reports to avoid localStorage quota exhaustion
+    const updated = [report, ...spottedReports].slice(0, 50);
     setSpottedReports(updated);
     try {
       localStorage.setItem('anystop_spotted_reports', JSON.stringify(updated));
@@ -151,6 +157,7 @@ export const BusFinderPage: React.FC = () => {
   const [openSharedId, setOpenSharedId] = useState<string | null>(null);
 
   const normalizeStopName = (name: string): string => {
+    if (!name || typeof name !== 'string') return '';
     return name
       .toLowerCase()
       .replace(/\s*\([^)]*\)/g, '')
@@ -160,7 +167,7 @@ export const BusFinderPage: React.FC = () => {
   };
 
   const isStopMatch = (target: string, query: string): boolean => {
-    if (!target || !query) return false;
+    if (!target || !query || typeof target !== 'string' || typeof query !== 'string') return false;
     const nTarget = normalizeStopName(target);
     const nQuery = normalizeStopName(query);
     if (!nTarget || !nQuery) return false;
@@ -202,6 +209,17 @@ export const BusFinderPage: React.FC = () => {
       return stopInCorridor && destInCorridor;
     });
   }, [spottedReports, filters.from, filters.to, filters.acFilter, areStopsValid]);
+
+  if (isLoadingAuth) {
+    return (
+      <div className="min-h-screen flex items-center justify-center p-4 bg-[#FAF4ED] dark:bg-[#15122D]">
+        <div className="flex flex-col items-center gap-3">
+          <div className="w-10 h-10 border-3 border-[var(--coral)] border-t-transparent rounded-full animate-spin" />
+          <span className="text-xs font-bold text-[var(--muted)]">Loading Transit Pass...</span>
+        </div>
+      </div>
+    );
+  }
 
   if (!isAuthenticated) {
     return null;

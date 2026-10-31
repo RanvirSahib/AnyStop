@@ -2,16 +2,34 @@ import React, { useEffect, useState } from 'react';
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import { ThemeProvider } from './context/ThemeContext';
+import { ErrorBoundary } from './components/ErrorBoundary';
 import { LandingPage } from './pages/LandingPage';
 import { LoginPage } from './pages/LoginPage';
 import { BusFinderPage } from './pages/BusFinderPage';
 import { ProfilePage } from './pages/ProfilePage';
+import { registerNativeBackButton } from './utils/nativeApp';
 
 const AnimatedRoutes: React.FC = () => {
   const location = useLocation();
   const [displayLocation, setDisplayLocation] = useState(location);
   const [transitionStage, setTransitionStage] = useState<'fade-in' | 'fade-out'>('fade-in');
   const [isNavigating, setIsNavigating] = useState(false);
+
+  // Native Android hardware/gesture back button handling
+  useEffect(() => {
+    const unregister = registerNativeBackButton(() => {
+      // 1. Check if any open modal/dialog has a close button and dismiss it first
+      const openModalCloseBtn = document.querySelector<HTMLButtonElement>(
+        'button[aria-label="Close modal"], button[aria-label="Close calendar"], .custom-calendar-close-btn'
+      );
+      if (openModalCloseBtn) {
+        openModalCloseBtn.click();
+        return true; // handled modal dismissal
+      }
+      return false; // proceed to route history back
+    });
+    return unregister;
+  }, []);
 
   useEffect(() => {
     if (location.pathname !== displayLocation.pathname) {
@@ -66,13 +84,15 @@ const AnimatedRoutes: React.FC = () => {
 
 export const App: React.FC = () => {
   return (
-    <ThemeProvider>
-      <AuthProvider>
-        <BrowserRouter>
-          <AnimatedRoutes />
-        </BrowserRouter>
-      </AuthProvider>
-    </ThemeProvider>
+    <ErrorBoundary>
+      <ThemeProvider>
+        <AuthProvider>
+          <BrowserRouter>
+            <AnimatedRoutes />
+          </BrowserRouter>
+        </AuthProvider>
+      </ThemeProvider>
+    </ErrorBoundary>
   );
 };
 

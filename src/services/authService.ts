@@ -7,8 +7,15 @@ import { UserSession } from '../context/AuthContext';
  * e.g., 9876543210 -> 9876543210@phone.anystop.app, enabling seamless login without SMS gateway cost.
  */
 export const normalizeIdentifier = (raw: string): { email: string; isPhone: boolean; phoneDisplay: string } => {
-  const trimmed = raw.trim();
-  const digitsOnly = trimmed.replace(/\D/g, '');
+  const trimmed = (raw || '').trim();
+  let digitsOnly = trimmed.replace(/\D/g, '');
+
+  // Strip international +91 prefix or national trunk 0 prefix if present
+  if (digitsOnly.length === 12 && digitsOnly.startsWith('91')) {
+    digitsOnly = digitsOnly.slice(2);
+  } else if (digitsOnly.length === 11 && digitsOnly.startsWith('0')) {
+    digitsOnly = digitsOnly.slice(1);
+  }
 
   if (/^[6-9]\d{9}$/.test(digitsOnly)) {
     return {

@@ -28,3 +28,9 @@ pnpm-debug.log*
 .idea/
 .DS_Store
 Thumbs.db
+
+.vercel
+.env*
+
+# Mobile native build
+android/

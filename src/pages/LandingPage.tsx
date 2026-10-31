@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { MapPin, Zap, Landmark, Banknote, Calendar, WifiOff, Users, Sun, Moon } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
@@ -27,6 +27,7 @@ export const LandingPage: React.FC = () => {
   const { darkMode, toggleDarkMode } = useTheme();
   const navRef = useRef<HTMLElement>(null);
   const raceRef = useRef<HTMLElement>(null);
+  const [activeMini, setActiveMini] = useState<number | null>(null);
 
   const handleFindBus = (e?: React.MouseEvent) => {
     if (e) e.preventDefault();
@@ -78,9 +79,95 @@ export const LandingPage: React.FC = () => {
       io.observe(el);
     });
 
+    // 3D Parallax & Magnetic Button interactions from AnyStop reference
+    let raf = 0;
+    const hero = document.getElementById('top');
+    const ph = document.getElementById('phone');
+    const spot = document.getElementById('spot');
+
+    const handlePointerMove = (e: PointerEvent) => {
+      if (!hero || !ph || !spot) return;
+      const r = hero.getBoundingClientRect();
+      const p = ph.getBoundingClientRect();
+      const clamp = (v: number) => Math.max(-1, Math.min(1, v));
+
+      spot.style.setProperty('--sx', `${e.clientX - r.left}px`);
+      spot.style.setProperty('--sy', `${e.clientY - r.top}px`);
+
+      const targetX = clamp(((e.clientX - (p.left + p.width / 2)) / (window.innerWidth / 2)) * 1.6);
+      const targetY = clamp(((e.clientY - (p.top + p.height / 2)) / (window.innerHeight / 2)) * 1.6);
+
+      const loop = () => {
+        currX += (targetX - currX) * 0.12;
+        currY += (targetY - currY) * 0.12;
+        ph.style.setProperty('--ry', `${currX * 16}deg`);
+        ph.style.setProperty('--rx', `${-currY * 16}deg`);
+        ph.style.setProperty('--gx', `${50 + currX * 50}%`);
+        ph.style.setProperty('--gy', `${50 + currY * 50}%`);
+
+        if (Math.abs(targetX - currX) > 0.002 || Math.abs(targetY - currY) > 0.002) {
+          raf = requestAnimationFrame(loop);
+        } else {
+          raf = 0;
+        }
+      };
+
+      if (!raf) {
+        raf = requestAnimationFrame(loop);
+      }
+    };
+
+    let currX = 0;
+    let currY = 0;
+
+    const handlePointerLeave = () => {
+      const loop = () => {
+        currX += (0 - currX) * 0.12;
+        currY += (0 - currY) * 0.12;
+        if (ph) {
+          ph.style.setProperty('--ry', `${currX * 16}deg`);
+          ph.style.setProperty('--rx', `${-currY * 16}deg`);
+        }
+        if (Math.abs(currX) > 0.002 || Math.abs(currY) > 0.002) {
+          raf = requestAnimationFrame(loop);
+        } else {
+          raf = 0;
+        }
+      };
+      if (!raf) {
+        raf = requestAnimationFrame(loop);
+      }
+    };
+
+    const ctaBtns = document.querySelectorAll<HTMLElement>('.stopsense-landing .cta .btn');
+    const onBtnMove = (e: MouseEvent) => {
+      const b = e.currentTarget as HTMLElement;
+      const r = b.getBoundingClientRect();
+      b.style.translate = `${(e.clientX - r.left - r.width / 2) * 0.18}px ${(e.clientY - r.top - r.height / 2) * 0.3}px`;
+    };
+    const onBtnLeave = (e: MouseEvent) => {
+      (e.currentTarget as HTMLElement).style.translate = '';
+    };
+
+    if (window.matchMedia('(hover:hover) and (pointer:fine)').matches && !window.matchMedia('(prefers-reduced-motion:reduce)').matches) {
+      hero?.addEventListener('pointermove', handlePointerMove);
+      hero?.addEventListener('pointerleave', handlePointerLeave);
+      ctaBtns.forEach((b) => {
+        b.addEventListener('pointermove', onBtnMove);
+        b.addEventListener('pointerleave', onBtnLeave);
+      });
+    }
+
     return () => {
       window.removeEventListener('scroll', onScroll);
       io.disconnect();
+      if (raf) cancelAnimationFrame(raf);
+      hero?.removeEventListener('pointermove', handlePointerMove);
+      hero?.removeEventListener('pointerleave', handlePointerLeave);
+      ctaBtns.forEach((b) => {
+        b.removeEventListener('pointermove', onBtnMove);
+        b.removeEventListener('pointerleave', onBtnLeave);
+      });
     };
   }, []);
 
@@ -133,16 +220,18 @@ export const LandingPage: React.FC = () => {
 
       {/* Hero */}
       <header className="hero" id="top">
+        <div className="spot" id="spot" aria-hidden="true" />
         <div className="wrap">
           <div>
             <span className="tag">
+              <i className="td" />
               ANY STOP<b>→</b>ANY BUS
             </span>
             <h1>
               Know your bus <em>before</em> it arrives.
             </h1>
             <p className="lead">
-              Pick two stops. See all buses running between them every day on the same fixed timetable, intermediate stops, and statutory maximum prices including GST.
+              Pick two stops. See which buses run between them, intermediate stops, and statutory maximum prices including GST.
             </p>
             <div className="cta">
               <button type="button" className="btn b1" onClick={handleFindBus}>
@@ -154,9 +243,16 @@ export const LandingPage: React.FC = () => {
             </div>
           </div>
 
-          <div className="phone" aria-hidden="true">
+          <div className="phone" id="phone" aria-hidden="true">
+            <i className="glare" />
+            <span className="fl l" style={{ top: '16%' }}>📍 Kharar</span>
+            <span className="fl r" style={{ top: '46%', animationDelay: '-1.5s' }}>💸 ~₹90</span>
+            <span className="fl l" style={{ bottom: '12%', animationDelay: '-3s' }}>⚡ 3 stops</span>
             <div className="screen">
-              <div className="mini">
+              <div
+                className={`mini ${activeMini === 0 ? 'on' : ''}`}
+                onClick={() => setActiveMini((prev) => (prev === 0 ? null : 0))}
+              >
                 <div className="tr">
                   <div>
                     6:00 AM<small>Chandigarh</small>
@@ -168,11 +264,19 @@ export const LandingPage: React.FC = () => {
                 </div>
                 <span className="chip e">⚡ Express</span>
                 <span className="chip g">Government</span>
-                <span className="chip" style={{ background: '#E8F5E9', color: '#1B5E20', fontWeight: 700 }}>Max ₹130 (incl. GST)</span>
+                <span className="chip" style={{ background: '#E8F5E9', color: '#1B5E20', fontWeight: 700 }}>~₹90</span>
                 <span className="chip" style={{ background: '#E0F2FE', color: '#0369A1', fontWeight: 600 }}>📅 Daily</span>
+                <div className="more">
+                  <div>
+                    <span>3 stops: Kharar → Morinda → Samrala</span>
+                  </div>
+                </div>
               </div>
 
-              <div className="mini">
+              <div
+                className={`mini ${activeMini === 1 ? 'on' : ''}`}
+                onClick={() => setActiveMini((prev) => (prev === 1 ? null : 1))}
+              >
                 <div className="tr">
                   <div>
                     7:15 AM<small>Chandigarh</small>
@@ -183,11 +287,19 @@ export const LandingPage: React.FC = () => {
                   </div>
                 </div>
                 <span className="chip">🐢 All-stop</span>
-                <span className="chip" style={{ background: '#E8F5E9', color: '#1B5E20', fontWeight: 700 }}>Max ₹130 (incl. GST)</span>
+                <span className="chip" style={{ background: '#E8F5E9', color: '#1B5E20', fontWeight: 700 }}>~₹85</span>
                 <span className="chip" style={{ background: '#E0F2FE', color: '#0369A1', fontWeight: 600 }}>📅 Daily</span>
+                <div className="more">
+                  <div>
+                    <span>9 stops: halts at every town on the way</span>
+                  </div>
+                </div>
               </div>
 
-              <div className="mini">
+              <div
+                className={`mini ${activeMini === 2 ? 'on' : ''}`}
+                onClick={() => setActiveMini((prev) => (prev === 2 ? null : 2))}
+              >
                 <div className="tr">
                   <div>
                     9:30 AM<small>Chandigarh</small>
@@ -199,6 +311,11 @@ export const LandingPage: React.FC = () => {
                 </div>
                 <span className="chip">Private</span>
                 <span className="chip" style={{ background: '#E0F2FE', color: '#0369A1', fontWeight: 600 }}>📅 Daily</span>
+                <div className="more">
+                  <div>
+                    <span>AC coach · you can book online</span>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -410,9 +527,9 @@ export const LandingPage: React.FC = () => {
               </a>
             </span>
           </div>
-          <div style={{ display: 'flex', alignItems: 'center' }}>
-            <a onClick={handleFindBus}>Bus finder</a>
-            <a onClick={handleLogin}>Log in</a>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+            <button type="button" style={{ background: 'transparent', border: 'none', cursor: 'pointer', color: 'inherit', font: 'inherit' }} onClick={handleFindBus}>Bus finder</button>
+            <button type="button" style={{ background: 'transparent', border: 'none', cursor: 'pointer', color: 'inherit', font: 'inherit' }} onClick={handleLogin}>Log in</button>
           </div>
         </div>
       </footer>

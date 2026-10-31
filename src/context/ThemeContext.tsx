@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { syncNativeStatusBar, hideNativeSplashScreen, triggerHaptic } from '../utils/nativeApp';
 
 interface ThemeContextType {
   darkMode: boolean;
@@ -26,9 +27,12 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     } catch {
       // ignore
     }
+    syncNativeStatusBar(darkMode);
+    hideNativeSplashScreen();
   }, [darkMode]);
 
   const toggleDarkMode = (e?: React.MouseEvent<HTMLButtonElement>) => {
+    triggerHaptic();
     const nextDark = !darkMode;
 
     // Check for View Transition API support

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { X, Sparkles, Ticket, ArrowRight, CheckCircle2, ShieldCheck, Calendar } from 'lucide-react';
 import { ComputedTrip } from '../types/transit';
 import { formatMinutesToTime, formatJourneyDate } from '../utils/transitEngine';
@@ -22,6 +22,16 @@ export const UpcomingBookingModal: React.FC<UpcomingBookingModalProps> = ({
 }) => {
   const [notified, setNotified] = useState(false);
   const [emailOrPhone, setEmailOrPhone] = useState('');
+
+  // Handle escape key to dismiss modal
+  useEffect(() => {
+    if (!isOpen) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose();
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, onClose]);
 
   if (!isOpen || !trip) return null;
 
@@ -158,6 +168,7 @@ export const UpcomingBookingModal: React.FC<UpcomingBookingModalProps> = ({
                 <input
                   id="notifyInput"
                   type="text"
+                  maxLength={80}
                   placeholder="Enter phone or email"
                   value={emailOrPhone}
                   onChange={(e) => setEmailOrPhone(e.target.value)}

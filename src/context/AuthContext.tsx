@@ -54,7 +54,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [currentUser, setCurrentUser] = useState<UserSession | null>(() => {
     try {
       const saved = localStorage.getItem('anystop_user');
-      return saved ? JSON.parse(saved) : null;
+      if (!saved) return null;
+      const parsed = JSON.parse(saved);
+      if (parsed && typeof parsed === 'object' && typeof parsed.name === 'string') {
+        return parsed;
+      }
+      return null;
     } catch {
       return null;
     }

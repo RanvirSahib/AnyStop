@@ -28,9 +28,9 @@ export const BusCard: React.FC<BusCardProps> = React.memo(({
   const [ownerLabel, ownerClass] = OWNL[ownerCode] || ['Government', 'b-g'];
   const isToday = !trip.journeyDate || trip.journeyDate === getTodayDateString();
 
-  // Stoppage list items
-  const fromName = userFrom.split(' (')[0];
-  const toName = userTo.split(' (')[0];
+  // Stoppage list items with defensive fallbacks
+  const fromName = (userFrom || '').split(' (')[0] || 'Origin';
+  const toName = (userTo || '').split(' (')[0] || 'Destination';
 
   return (
     <article
