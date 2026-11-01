@@ -635,13 +635,15 @@
   min-height: 480px;
 }
 
-.contact-page .done svg {
+.contact-page .done .done-check {
   width: 92px;
   height: 92px;
+  display: block;
+  margin: 0 auto 10px;
 }
 
-.contact-page .done circle,
-.contact-page .done path {
+.contact-page .done .done-check circle,
+.contact-page .done .done-check path {
   fill: none;
   stroke: var(--teal);
   stroke-width: 6;
@@ -651,10 +653,10 @@
   stroke-dashoffset: 300;
 }
 
-.contact-page .card.sent .done circle {
+.contact-page .card.sent .done .done-check circle {
   animation: cp-draw 0.8s 0.7s forwards;
 }
-.contact-page .card.sent .done path {
+.contact-page .card.sent .done .done-check path {
   animation: cp-draw 0.5s 1.3s forwards;
 }
 
@@ -674,7 +676,7 @@
 
 .contact-page .done p {
   color: var(--muted);
-  max-width: 36ch;
+  max-width: 38ch;
   font-size: 15px;
   line-height: 1.5;
 }
@@ -691,7 +693,7 @@
   .contact-page .done {
     padding: 16px;
   }
-  .contact-page .done svg {
+  .contact-page .done .done-check {
     width: 68px;
     height: 68px;
   }
@@ -736,15 +738,53 @@
   border-color: var(--coral);
 }
 
-.contact-page .done a.p {
+.contact-page .done a.p,
+.contact-page .done button.p {
   background: var(--ink);
   color: var(--bg);
   border-color: var(--ink);
 }
-.contact-page .done a.p:hover {
+.contact-page .done a.p:hover,
+.contact-page .done button.p:hover {
   background: var(--coral);
   border-color: var(--coral);
   color: #fff;
+}
+
+.contact-page .extra-mail-action {
+  margin-top: 18px;
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.45;
+  text-align: center;
+}
+
+.contact-page .extra-mail-action a {
+  color: var(--coral);
+  font-weight: 600;
+  text-decoration: underline;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  border: none;
+  background: none;
+  padding: 0;
+  min-height: auto;
+  border-radius: 0;
+}
+
+.contact-page .extra-mail-action a:hover {
+  color: var(--coral2);
+  background: none;
+  border-color: transparent;
+  transform: none;
+}
+
+.contact-page .extra-mail-action a svg {
+  width: 13px !important;
+  height: 13px !important;
+  display: inline-block;
+  vertical-align: middle;
 }
 
 /* ==========================================================================

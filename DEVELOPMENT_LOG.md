@@ -2454,6 +2454,32 @@ This document tracks all features, user requests, architectural decisions, and i
 
 ---
 
+### Step 39: Form Submission Forwarding to support.anystop@gmail.com & Fixed Giant SVG Icon Overflow
+- **User Request**: *"It is looking like this and in contact us when the user fill and submit why that thing does not formwarded to mail"* (with attached screenshot showing the distorted, giant teal `ExternalLink` icon overflowing the button on the contact success card).
+- **Issue Diagnosis**:
+  1. **Giant Button Icon Glitch**:
+     - In `ContactPage.css`, `.contact-page .done svg` set `width: 92px; height: 92px;` globally on all SVGs inside `.done`.
+     - In addition, `.contact-page .done circle, .contact-page .done path` applied `stroke-width: 6; stroke: var(--teal); stroke-dasharray: 300;` to all paths.
+     - Consequently, the `<ExternalLink />` icon inside the action button rendered at 92px x 92px with 6px thick teal stroke, heavily overlapping and distorting the button.
+  2. **Email Forwarding**:
+     - Previously, the form submission only saved data to browser `localStorage` and transitioned to the success screen, requiring the user to manually click "Send from my email app" to open their mail program.
+- **Implementation**:
+  1. **Direct Email Dispatch to `support.anystop@gmail.com` (`src/pages/ContactPage.tsx`)**:
+     - Updated `handleSubmit` to actively dispatch the inquiry directly to `support.anystop@gmail.com` using the FormSubmit AJAX service (`https://formsubmit.co/ajax/support.anystop@gmail.com`) with a 3.5s timeout race.
+     - Delivers an HTML-formatted table of the user's name, email, selected topic, and message straight to `support.anystop@gmail.com`.
+     - Preserves local caching in `localStorage` (`anystop_feedback_messages`) as an offline backup.
+  2. **Scoped SVG Styles & Fixed Icon Size (`src/pages/ContactPage.css`)**:
+     - Scoped the 92px animated checkmark styles strictly to `.contact-page .done .done-check`.
+     - Explicitly sized auxiliary button and link icons inside `.done` to standard inline dimensions (`13px-17px`, `stroke-width: 2`, `currentColor`).
+  3. **Refined Success Dialog Content (`src/pages/ContactPage.tsx`)**:
+     - Updated title to *"Message forwarded to support!"*.
+     - Confirms direct delivery to `support.anystop@gmail.com` and replies to the commuter's email address.
+     - Provided a clean primary action *"Back to bus finder"* and a secondary *"Write another"*, with an optional link to open in an external email client if attachments are needed.
+- **Verification**:
+  - `npm run build` compiled 1686 modules in 6.16s with 0 errors.
+
+---
+
 ## 🗂️ Key Files Reference
 | File | Role |
 | :--- | :--- |

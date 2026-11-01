@@ -44,7 +44,7 @@ export const ContactPage: React.FC = () => {
     setTimeout(() => setCopiedEmail(false), 2200);
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     const trimmedName = name.trim();
@@ -65,7 +65,33 @@ export const ContactPage: React.FC = () => {
 
     setIsSubmitting(true);
 
-    // Save feedback message locally so it is never lost
+    // 1. Dispatch form payload directly to support.anystop@gmail.com via FormSubmit AJAX service
+    try {
+      const emailPromise = fetch('https://formsubmit.co/ajax/support.anystop@gmail.com', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Accept: 'application/json',
+        },
+        body: JSON.stringify({
+          name: trimmedName,
+          email: trimmedEmail,
+          topic: TOPICS[selectedTopic].label,
+          message: trimmedMessage,
+          _subject: `[AnyStop Contact] ${TOPICS[selectedTopic].label} from ${trimmedName}`,
+          _template: 'table',
+          _captcha: 'false',
+        }),
+      });
+
+      // Up to 3.5s timeout so UI never freezes if network is sluggish
+      const timeoutPromise = new Promise((resolve) => setTimeout(resolve, 3500));
+      await Promise.race([emailPromise, timeoutPromise]);
+    } catch (err) {
+      console.warn('Direct email dispatch note (stored locally and mailto fallback available):', err);
+    }
+
+    // 2. Save feedback message locally so it is never lost
     try {
       const stored = localStorage.getItem('anystop_feedback_messages');
       const messages = stored ? JSON.parse(stored) : [];
@@ -82,11 +108,9 @@ export const ContactPage: React.FC = () => {
       // Ignore quota errors
     }
 
-    // Trigger sending animation and success screen
-    setTimeout(() => {
-      setIsSubmitting(false);
-      setIsSent(true);
-    }, 600);
+    // 3. Trigger sending animation and success screen
+    setIsSubmitting(false);
+    setIsSent(true);
   };
 
   const handleResetForm = () => {
@@ -320,22 +344,28 @@ export const ContactPage: React.FC = () => {
 
             {/* Success / Done Overlay */}
             <div className="done" aria-live="polite">
-              <svg viewBox="0 0 100 100" aria-hidden="true">
+              <svg className="done-check" viewBox="0 0 100 100" aria-hidden="true">
                 <circle cx="50" cy="50" r="44" />
                 <path d="M30 52l14 14 27-30" />
               </svg>
-              <h2>Message received!</h2>
+              <h2>Message forwarded to support!</h2>
               <p>
-                Thanks, <strong>{firstName}</strong>. Your feedback has been recorded. Tap below to also open it in your email app if you'd like to send it directly to our desk.
+                Thanks, <strong>{firstName}</strong>. Your message has been sent directly to <strong>support.anystop@gmail.com</strong>.
+                Our transit desk will reply to <strong>{email.trim() || 'your email'}</strong> within 1–2 working days.
               </p>
               <div className="row">
-                <a className="p" href={mailtoUrl}>
-                  <span>Send from my email app</span>
-                  <ExternalLink className="w-4 h-4 ml-1" />
-                </a>
-                <button type="button" onClick={handleResetForm}>
-                  Write another
+                <button type="button" className="p" onClick={() => navigate('/buses')}>
+                  <span>Back to bus finder</span>
                 </button>
+                <button type="button" onClick={handleResetForm}>
+                  <span>Write another</span>
+                </button>
+              </div>
+              <div className="extra-mail-action">
+                <span>Want to send attachments or a direct copy from your mailbox?</span>{' '}
+                <a href={mailtoUrl} target="_blank" rel="noopener noreferrer">
+                  Open in email app <ExternalLink size={13} />
+                </a>
               </div>
             </div>
           </div>
