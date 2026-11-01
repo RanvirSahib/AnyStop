@@ -2413,6 +2413,35 @@ This document tracks all features, user requests, architectural decisions, and i
 
 ---
 
+### Step 37: Transit Doodle Background for Contact Us Page & Global Mobile Responsiveness Hardening
+- **User Request**: *"Add doodles in the background of contact us page like we have in dashnoard and check all the website should have to be repsonsive"*
+- **Implementation**:
+  1. **Transit Doodle Wallpaper on Contact Us (`src/pages/ContactPage.css`)**:
+     - Added `.contact-page::before` fixed layer using `/transit-doodle-light.svg` (light mode) and `/transit-doodle-dark.svg` (dark mode) with `background-size: 500px 500px`, `transform: translateZ(0)`, and `contain: strict`, matching the dashboard wallpaper.
+     - Added `.contact-page .hero::before` subtle transit doodle overlay on the rich hero gradient at 0.18 opacity.
+     - Set `.wrap`, `.hero`, `.grid`, `.faq`, and `footer` to `position: relative; z-index: 2;` so cards, text, and interactive elements sit cleanly on top of the wallpaper.
+  2. **Transit Doodle Wallpaper on Customer Profile (`src/pages/ProfilePage.css`)**:
+     - Added matching `.profile-page::before` and `.profile-page .hero::before` transit doodle wallpaper layers for full brand consistency across light and dark modes.
+  3. **Global Mobile Responsiveness Hardening across All Breakpoints**:
+     - **Contact Us Page (`src/pages/ContactPage.css`)**:
+       - Hero typography: `font-size: clamp(34px, 8.5vw, 68px);` with `word-break: break-word;` and reduced vertical padding on `< 640px`.
+       - Airplane SVG graphic: constrained to `width: min(280px, 75%); right: -10px; opacity: 0.6; pointer-events: none;` on mobile so it never collides with text or creates horizontal scrolling.
+       - Grid & Card padding: adjusted `margin-top: -45px;` and `padding: 20px 14px;` on screens `< 480px`.
+       - Pills & Inputs: refined gap (`6px`) and tap targets (`46px` height, `15px` font size) on `< 480px`.
+       - Success / Done state: full-width column layout for action buttons on screens `< 440px`.
+       - FAQ & Footer: responsive spacing and stacked centered layout on `< 600px`.
+     - **Profile Page (`src/pages/ProfilePage.css`)**:
+       - Stats summary: reduced gap and card padding on `< 480px` (`padding: 10px 6px; font-size: 19px;`).
+       - Segmented tab bar: adjusted button height and font size (`13px`) on `< 480px`.
+       - Saved route cards: added `flex-wrap: wrap;` and full-width route details so "Find buses" and "✕" never clip or overflow on narrow screens.
+     - **Global Layout (`src/index.css`)**:
+       - Added `overflow-x: hidden;` to both `html` and `body` to prevent viewport shifts and horizontal scroll bars during animations.
+- **Verification**:
+  - `npm run build` passed with zero errors (`tsc -b && vite build` completed in 7.21s).
+  - Unpushed local commits remain preserved per user instructions.
+
+---
+
 ## 🗂️ Key Files Reference
 | File | Role |
 | :--- | :--- |

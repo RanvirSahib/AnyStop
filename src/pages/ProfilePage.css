@@ -12,12 +12,29 @@
   --tealbg: #D8F5F0;
   --night: #1F1A3F;
   min-height: 100vh;
-  background: var(--bg);
+  background-color: var(--bg);
   color: var(--ink);
   font: 400 17px/1.55 "Figtree", system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
   padding-bottom: 40px;
+  position: relative;
+  overflow-x: hidden;
   transition: background 0.3s ease, color 0.3s ease;
+}
+
+/* Background transit doodle wallpaper layer (like Dashboard) */
+.profile-page::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  background-image: url('/transit-doodle-light.svg');
+  background-repeat: repeat;
+  background-size: 500px 500px;
+  pointer-events: none;
+  transform: translateZ(0);
+  contain: strict;
+  opacity: 0.92;
 }
 
 [data-theme="dark"] .profile-page,
@@ -32,10 +49,25 @@
   --teal: #4DE0CF;
 }
 
+[data-theme="dark"] .profile-page::before,
+:root[data-theme="dark"] .profile-page::before {
+  background-image: url('/transit-doodle-dark.svg');
+  opacity: 0.85;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .profile-page::before {
+    background-image: url('/transit-doodle-dark.svg');
+    opacity: 0.85;
+  }
+}
+
 .profile-page .wrap {
   max-width: 720px;
   margin: 0 auto;
   padding: 0 18px;
+  position: relative;
+  z-index: 2;
 }
 
 .profile-page .hero {
@@ -44,6 +76,20 @@
   padding: 18px 0 96px;
   position: relative;
   overflow: hidden;
+  z-index: 2;
+}
+
+/* Hero transit doodle wallpaper layer */
+.profile-page .hero::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background-image: url('/transit-doodle-dark.svg');
+  background-repeat: repeat;
+  background-size: 500px 500px;
+  opacity: 0.18;
+  pointer-events: none;
 }
 
 .profile-page .hero .top {
@@ -89,6 +135,13 @@
   animation: ss-rise .7s both;
 }
 
+@media (max-width: 480px) {
+  .profile-page .who {
+    gap: 12px;
+    margin-top: 18px;
+  }
+}
+
 .profile-page .av {
   flex: none;
   width: 92px;
@@ -106,6 +159,14 @@
   box-shadow: 0 0 0 4px rgba(255, 255, 255, .25), 0 14px 30px rgba(0, 0, 0, .35);
   transition: transform .35s cubic-bezier(.3, 1.4, .4, 1);
   cursor: pointer;
+}
+
+@media (max-width: 480px) {
+  .profile-page .av {
+    width: 76px;
+    height: 76px;
+    font-size: 30px;
+  }
 }
 .profile-page .av:hover {
   transform: rotate(-6deg) scale(1.06);
@@ -173,6 +234,13 @@
   animation: ss-rise .7s .15s both;
 }
 
+@media (max-width: 480px) {
+  .profile-page .stats {
+    gap: 6px;
+    margin-top: -46px;
+  }
+}
+
 .profile-page .st {
   background: var(--surface);
   border-radius: 20px;
@@ -180,6 +248,19 @@
   text-align: center;
   box-shadow: 0 14px 34px rgba(31, 26, 63, .2);
   border: 1px solid var(--line);
+}
+
+@media (max-width: 480px) {
+  .profile-page .st {
+    padding: 10px 6px;
+    border-radius: 14px;
+  }
+  .profile-page .st b {
+    font-size: 19px !important;
+  }
+  .profile-page .st span {
+    font-size: 11px !important;
+  }
 }
 
 .profile-page .st b {
@@ -209,6 +290,18 @@
   position: relative;
   margin: 22px 0 18px;
   --i: 0;
+  z-index: 2;
+}
+
+@media (max-width: 480px) {
+  .profile-page .seg {
+    margin: 16px 0 14px;
+  }
+  .profile-page .seg button {
+    font-size: 13px !important;
+    min-height: 40px !important;
+    padding: 0 4px !important;
+  }
 }
 
 .profile-page .seg:before {
@@ -243,6 +336,8 @@
 
 .profile-page .panel {
   display: none;
+  position: relative;
+  z-index: 2;
 }
 .profile-page .panel.on {
   display: block;
@@ -256,6 +351,13 @@
   box-shadow: 0 2px 0 var(--line);
   border: 1px solid var(--line);
   margin-bottom: 14px;
+}
+
+@media (max-width: 480px) {
+  .profile-page .card {
+    padding: 16px 14px;
+    border-radius: 18px;
+  }
 }
 
 .profile-page h2 {
@@ -285,6 +387,24 @@
   transition: transform .3s, opacity .3s, border-color .2s, max-height .35s;
   max-height: 120px;
   overflow: hidden;
+}
+
+@media (max-width: 480px) {
+  .profile-page .route {
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 12px;
+    max-height: 200px;
+  }
+  .profile-page .rt {
+    flex: 1 1 100% !important;
+  }
+  .profile-page .mini {
+    flex: 1;
+    justify-content: center;
+    font-size: 13px !important;
+    min-height: 38px !important;
+  }
 }
 
 .profile-page .route:hover {
