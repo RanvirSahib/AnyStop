@@ -7,6 +7,7 @@ import { LandingPage } from './pages/LandingPage';
 import { LoginPage } from './pages/LoginPage';
 import { BusFinderPage } from './pages/BusFinderPage';
 import { ProfilePage } from './pages/ProfilePage';
+import { ContactPage } from './pages/ContactPage';
 import { registerNativeBackButton } from './utils/nativeApp';
 
 const AnimatedRoutes: React.FC = () => {
@@ -73,6 +74,10 @@ const AnimatedRoutes: React.FC = () => {
           {/* 4. Passenger Profile Page */}
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/account" element={<Navigate to="/profile" replace />} />
+
+          {/* 5. Contact Us Page */}
+          <Route path="/contact" element={<ContactPage />} />
+          <Route path="/contact-us" element={<Navigate to="/contact" replace />} />
 
           {/* Wildcard / Fallback */}
           <Route path="*" element={<Navigate to="/" replace />} />

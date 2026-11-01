@@ -1,0 +1,697 @@
+.contact-page {
+  --bg: #FFF5EC;
+  --surface: #fff;
+  --ink: #231F3D;
+  --muted: #6B6585;
+  --line: #EBDDD0;
+  --field: #FFF9F3;
+  --coral: #FF5A4E;
+  --coral2: #E8433A;
+  --sun: #FFB020;
+  --teal: #0B8F82;
+  --night: #1F1A3F;
+  min-height: 100vh;
+  background: var(--bg);
+  color: var(--ink);
+  font: 400 17px/1.55 "Figtree", system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+  transition: background 0.3s ease, color 0.3s ease;
+}
+
+[data-theme="dark"] .contact-page,
+:root[data-theme="dark"] .contact-page {
+  --bg: #15122B;
+  --surface: #211C40;
+  --ink: #F6F1FF;
+  --muted: #A9A2C8;
+  --line: #342E5A;
+  --field: #1A1535;
+  --teal: #4DE0CF;
+}
+
+.contact-page * {
+  box-sizing: border-box;
+}
+
+.contact-page .wrap {
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 0 18px;
+}
+
+@keyframes cp-rise {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ==========================================================================
+   Hero Section
+   ========================================================================== */
+.contact-page .hero {
+  background: radial-gradient(800px 420px at 85% 100%, rgba(255, 90, 78, 0.5), transparent 60%),
+              linear-gradient(160deg, #1F1A3F, #3B1D63);
+  color: #fff;
+  padding: 18px 0 110px;
+  position: relative;
+  overflow: hidden;
+}
+
+.contact-page .top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  position: relative;
+  z-index: 2;
+}
+
+.contact-page .logo {
+  font-family: "Bricolage Grotesque", sans-serif;
+  font-weight: 800;
+  font-size: 21px;
+  text-decoration: none;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  color: #fff;
+  cursor: pointer;
+}
+
+.contact-page .nl {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.contact-page .nl a,
+.contact-page .nl button {
+  color: #DAD3F2;
+  text-decoration: none;
+  padding: 0 12px;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 500;
+  font-size: 15px;
+  border-radius: 99px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+
+.contact-page .nl a:hover,
+.contact-page .nl button:hover {
+  background: rgba(255, 255, 255, 0.12);
+  color: #fff;
+}
+
+.contact-page .nl .hide {
+  display: none;
+}
+@media (min-width: 640px) {
+  .contact-page .nl .hide {
+    display: flex;
+  }
+}
+
+.contact-page .hero h1 {
+  font-family: "Bricolage Grotesque", Georgia, sans-serif;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1.05;
+  font-size: clamp(40px, 9vw, 70px);
+  margin: 44px 0 12px;
+  position: relative;
+  z-index: 2;
+  animation: cp-rise 0.8s both;
+  color: #fff;
+}
+
+.contact-page .hero h1 em {
+  font-style: normal;
+  color: var(--sun);
+}
+
+.contact-page .hero p {
+  max-width: 42ch;
+  color: #DAD3F2;
+  position: relative;
+  z-index: 2;
+  font-size: 18px;
+  line-height: 1.5;
+  animation: cp-rise 0.8s 0.12s both;
+}
+
+.contact-page .plane {
+  position: absolute;
+  right: -30px;
+  bottom: 14px;
+  width: min(520px, 95%);
+  opacity: 0.95;
+  pointer-events: none;
+}
+
+.contact-page .plane .tr {
+  stroke-dasharray: 6 12;
+  animation: cp-dash 1.2s linear infinite;
+}
+
+@keyframes cp-dash {
+  to {
+    stroke-dashoffset: -36;
+  }
+}
+
+/* ==========================================================================
+   Two-Column Grid Layout
+   ========================================================================== */
+.contact-page .grid {
+  display: grid;
+  gap: 20px;
+  margin-top: -70px;
+  position: relative;
+  padding-bottom: 30px;
+}
+
+@media (min-width: 840px) {
+  .contact-page .grid {
+    grid-template-columns: 0.85fr 1.15fr;
+    align-items: start;
+  }
+}
+
+/* ==========================================================================
+   Left Column: Info Cards
+   ========================================================================== */
+.contact-page .info {
+  display: grid;
+  gap: 12px;
+  animation: cp-rise 0.8s 0.2s both;
+}
+
+.contact-page .ic {
+  background: var(--surface);
+  border-radius: 20px;
+  padding: 18px;
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+  box-shadow: 0 2px 0 var(--line);
+  border: 1px solid var(--line);
+  text-decoration: none;
+  color: var(--ink);
+  transition: transform 0.3s, box-shadow 0.3s, border-color 0.2s;
+  cursor: pointer;
+}
+
+.contact-page .ic:hover {
+  transform: translateY(-4px) rotate(-0.5deg);
+  box-shadow: 0 16px 30px rgba(31, 26, 63, 0.16);
+  border-color: var(--coral);
+}
+
+.contact-page .ic .e {
+  flex: none;
+  width: 48px;
+  height: 48px;
+  border-radius: 15px;
+  display: grid;
+  place-items: center;
+  font-size: 24px;
+  background: rgba(255, 90, 78, 0.14);
+}
+
+.contact-page .ic.t .e {
+  background: rgba(255, 176, 32, 0.2);
+}
+
+.contact-page .ic.g .e {
+  background: rgba(11, 143, 130, 0.16);
+}
+
+.contact-page .ic b {
+  display: block;
+  font-family: "Bricolage Grotesque", sans-serif;
+  font-size: 19px;
+  font-weight: 800;
+  margin-bottom: 2px;
+  color: var(--ink);
+}
+
+.contact-page .ic span {
+  color: var(--muted);
+  font-size: 15px;
+  word-break: break-word;
+  line-height: 1.45;
+}
+
+/* ==========================================================================
+   Right Column: Contact Form Card
+   ========================================================================== */
+.contact-page .card {
+  background: var(--surface);
+  border-radius: 26px;
+  padding: 26px 22px;
+  box-shadow: 0 20px 50px rgba(31, 26, 63, 0.2);
+  border: 1px solid var(--line);
+  position: relative;
+  overflow: hidden;
+  animation: cp-rise 0.8s 0.3s both;
+  transition: min-height 0.4s ease;
+}
+
+.contact-page .card h2 {
+  font-family: "Bricolage Grotesque", sans-serif;
+  font-size: 28px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  margin-bottom: 4px;
+  color: var(--ink);
+}
+
+.contact-page .card .sub {
+  color: var(--muted);
+  font-size: 15px;
+  margin-bottom: 14px;
+}
+
+.contact-page .lbl {
+  font-family: "DM Mono", monospace;
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  color: var(--muted);
+  margin: 16px 0 6px;
+  display: block;
+}
+
+.contact-page .pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.contact-page .pill {
+  border: 2px solid var(--line);
+  background: var(--field);
+  border-radius: 99px;
+  padding: 8px 14px;
+  transition: transform 0.15s, background 0.2s, border-color 0.2s;
+  color: var(--ink);
+  font-size: 14px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.contact-page .pill:hover {
+  border-color: var(--coral);
+}
+.contact-page .pill:active {
+  transform: scale(0.94);
+}
+.contact-page .pill[aria-pressed="true"] {
+  background: var(--ink);
+  border-color: var(--ink);
+  color: var(--bg);
+  font-weight: 700;
+}
+
+.contact-page .two {
+  display: grid;
+  gap: 12px;
+}
+@media (min-width: 560px) {
+  .contact-page .two {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.contact-page .fl {
+  display: block;
+  position: relative;
+}
+
+.contact-page .inp {
+  width: 100%;
+  border: 2px solid var(--line);
+  background: var(--field);
+  border-radius: 14px;
+  padding: 0 14px;
+  height: 50px;
+  font-weight: 500;
+  color: var(--ink);
+  transition: border-color 0.2s, box-shadow 0.2s;
+  font-size: 16px;
+}
+
+.contact-page textarea.inp {
+  height: 130px;
+  padding: 12px 14px;
+  resize: vertical;
+  line-height: 1.5;
+}
+
+.contact-page .inp:focus {
+  outline: 0;
+  border-color: var(--coral);
+  box-shadow: 0 0 0 4px rgba(255, 90, 78, 0.18);
+}
+
+.contact-page .fl.bad .inp {
+  border-color: var(--coral2);
+  animation: cp-shake 0.4s;
+}
+
+@keyframes cp-shake {
+  25% { transform: translateX(-7px); }
+  50% { transform: translateX(7px); }
+  75% { transform: translateX(-4px); }
+}
+
+.contact-page .msg {
+  display: none;
+  color: var(--coral2);
+  font-weight: 700;
+  font-size: 13px;
+  margin-top: 4px;
+}
+
+.contact-page .fl.bad .msg {
+  display: block;
+}
+
+.contact-page .cnt {
+  text-align: right;
+  font-size: 13px;
+  color: var(--muted);
+  margin-top: 4px;
+}
+
+.contact-page .send {
+  width: 100%;
+  margin-top: 16px;
+  min-height: 54px;
+  border: 0;
+  border-radius: 16px;
+  background: var(--coral);
+  color: #fff;
+  font-weight: 700;
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  box-shadow: 0 12px 28px rgba(255, 90, 78, 0.4);
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+  transition: transform 0.15s, background 0.2s;
+}
+
+.contact-page .send:hover {
+  background: var(--coral2);
+  transform: translateY(-1px);
+}
+.contact-page .send:active {
+  transform: scale(0.97);
+}
+
+.contact-page .send svg {
+  width: 22px;
+  height: 22px;
+  transition: transform 0.35s;
+}
+
+.contact-page .send:hover svg {
+  transform: translate(4px, -3px) rotate(-8deg);
+}
+
+.contact-page .send:after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(100deg, transparent 30%, rgba(255, 255, 255, 0.4) 50%, transparent 70%);
+  transform: translateX(-130%);
+  animation: cp-shine 3.6s 1.2s infinite;
+}
+
+@keyframes cp-shine {
+  40%, 100% { transform: translateX(130%); }
+}
+
+.contact-page .form {
+  transition: opacity 0.4s, transform 0.5s;
+}
+
+.contact-page .card.sent .form {
+  opacity: 0;
+  transform: translateY(-30px) scale(0.97);
+  pointer-events: none;
+}
+
+.contact-page .card.sent .send svg {
+  animation: cp-fly 0.8s forwards;
+}
+
+@keyframes cp-fly {
+  to {
+    transform: translate(260px, -120px) rotate(-25deg);
+    opacity: 0;
+  }
+}
+
+/* ==========================================================================
+   Success / Done Screen
+   ========================================================================== */
+.contact-page .done {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 24px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.5s 0.5s;
+}
+
+.contact-page .card.sent .done {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.contact-page .card.sent {
+  min-height: 480px;
+}
+
+.contact-page .done svg {
+  width: 92px;
+  height: 92px;
+}
+
+.contact-page .done circle,
+.contact-page .done path {
+  fill: none;
+  stroke: var(--teal);
+  stroke-width: 6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 300;
+  stroke-dashoffset: 300;
+}
+
+.contact-page .card.sent .done circle {
+  animation: cp-draw 0.8s 0.7s forwards;
+}
+.contact-page .card.sent .done path {
+  animation: cp-draw 0.5s 1.3s forwards;
+}
+
+@keyframes cp-draw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+.contact-page .done h2 {
+  font-family: "Bricolage Grotesque", sans-serif;
+  font-size: 26px;
+  font-weight: 800;
+  margin: 14px 0 6px;
+  color: var(--ink);
+}
+
+.contact-page .done p {
+  color: var(--muted);
+  max-width: 36ch;
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+.contact-page .done .row {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+.contact-page .done a,
+.contact-page .done button {
+  border-radius: 99px;
+  min-height: 46px;
+  padding: 0 20px;
+  font-weight: 700;
+  font-size: 15px;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: 2px solid var(--line);
+  background: var(--surface);
+  color: var(--ink);
+  cursor: pointer;
+  transition: transform 0.15s, background 0.2s, border-color 0.2s;
+}
+
+.contact-page .done a:hover,
+.contact-page .done button:hover {
+  transform: translateY(-1px);
+  background: var(--bg);
+  border-color: var(--coral);
+}
+
+.contact-page .done a.p {
+  background: var(--ink);
+  color: var(--bg);
+  border-color: var(--ink);
+}
+.contact-page .done a.p:hover {
+  background: var(--coral);
+  border-color: var(--coral);
+  color: #fff;
+}
+
+/* ==========================================================================
+   FAQ Section
+   ========================================================================== */
+.contact-page .faq {
+  max-width: 760px;
+  margin: 20px auto 50px;
+}
+
+.contact-page .faq h2 {
+  font-family: "Bricolage Grotesque", sans-serif;
+  font-size: 30px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  margin-bottom: 14px;
+  color: var(--ink);
+}
+
+.contact-page details {
+  background: var(--surface);
+  border-radius: 18px;
+  margin-bottom: 10px;
+  padding: 0 20px;
+  box-shadow: 0 2px 0 var(--line);
+  border: 1px solid var(--line);
+  transition: box-shadow 0.2s;
+}
+
+.contact-page summary {
+  list-style: none;
+  cursor: pointer;
+  min-height: 54px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.contact-page summary::-webkit-details-marker {
+  display: none;
+}
+
+.contact-page summary:after {
+  content: "+";
+  font-size: 28px;
+  color: var(--coral);
+  transition: transform 0.3s;
+}
+
+.contact-page details[open] summary:after {
+  transform: rotate(45deg);
+}
+
+.contact-page details p {
+  color: var(--muted);
+  padding-bottom: 16px;
+  line-height: 1.5;
+  animation: cp-rise 0.4s both;
+}
+
+/* ==========================================================================
+   Footer
+   ========================================================================== */
+.contact-page footer {
+  background: var(--night);
+  color: #BDB5DD;
+  padding: 26px 0;
+  font-size: 15px;
+}
+
+.contact-page footer .wrap {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.contact-page footer a,
+.contact-page footer button {
+  color: inherit;
+  margin-left: 14px;
+  text-decoration: none;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font: inherit;
+  transition: color 0.2s;
+}
+
+.contact-page footer a:hover,
+.contact-page footer button:hover {
+  color: #fff;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .contact-page *,
+  .contact-page *:before,
+  .contact-page *:after {
+    animation: none !important;
+    transition-duration: 0.01ms !important;
+    transition-delay: 0s !important;
+  }
+  .contact-page .done circle,
+  .contact-page .done path {
+    stroke-dashoffset: 0;
+  }
+}
+

@@ -2375,6 +2375,31 @@ This document tracks all features, user requests, architectural decisions, and i
 
 ---
 
+### Step 35: Contact Us Page Implementation (`Contact us.html`)
+- **User Request**: *"Contact us.html. Take this as a reference page for the contact us and make the contact us page for the website"*
+- **Implementation**:
+  1. **Scoped Stylesheet ([`src/pages/ContactPage.css`](file:///c:/AnyStop/src/pages/ContactPage.css))**:
+     - Light/Dark theme support with `--bg`, `--surface`, `--ink`, `--muted`, `--coral`, `--teal`, `--sun`.
+     - Animated curved flight path with flying golden paper plane (`animateMotion`, `stroke-dashoffset`).
+     - Shake animation (`cp-shake`) on input errors and flying paper plane transition (`cp-fly`) on submission.
+     - SVG circular progress and checkmark draw animation (`cp-draw`) on the `.done` success state.
+  2. **Dedicated React Route Component ([`src/pages/ContactPage.tsx`](file:///c:/AnyStop/src/pages/ContactPage.tsx))**:
+     - Hero header with responsive navigation, AnyStop logo, theme toggle, and headline *"Got a bus tip? Tell us."*
+     - Info cards column: One-tap copy `support@anystop.in`, reply time expectation (1–2 working days), and wrong timing reporting tips.
+     - Interactive Topic selector pills: `Wrong timing`, `Add a stop or route`, `Suggestion`, `Partnership`, `Something else`.
+     - Prepopulates logged-in user name and email.
+     - Live character countdown (600 max) on the message field.
+     - Robust field validation (name >= 2 chars, valid email regex, message >= 10 chars).
+     - Persists feedback to `anystop_feedback_messages` in localStorage and provides prefilled `mailto:` email fallback link.
+     - Expandable FAQ section answering common rider questions.
+  3. **Router & Site Integration**:
+     - Added `/contact` route and `/contact-us` alias in [`src/App.tsx`](file:///c:/AnyStop/src/App.tsx).
+     - Linked Contact in the navbar and footer of [`src/pages/LandingPage.tsx`](file:///c:/AnyStop/src/pages/LandingPage.tsx).
+- **Verification**:
+  - `npm run build` compiled 1686 modules in 6.94s with 0 errors.
+
+---
+
 ## 🗂️ Key Files Reference
 | File | Role |
 | :--- | :--- |
@@ -2387,6 +2412,10 @@ This document tracks all features, user requests, architectural decisions, and i
 | [`src/pages/LandingPage.css`](file:///c:/AnyStop/src/pages/LandingPage.css) | Scoped stylesheet for the landing page |
 | [`src/pages/LoginPage.tsx`](file:///c:/AnyStop/src/pages/LoginPage.tsx) | Dedicated React Boarding Pass Login Page route component (`/login`) |
 | [`src/pages/BusFinderPage.tsx`](file:///c:/AnyStop/src/pages/BusFinderPage.tsx) | Dedicated React Punjab Bus Finder Page route component (`/buses`) |
+| [`src/pages/ProfilePage.tsx`](file:///c:/AnyStop/src/pages/ProfilePage.tsx) | Dedicated React Customer Profile Page route component (`/profile`) |
+| [`src/pages/ProfilePage.css`](file:///c:/AnyStop/src/pages/ProfilePage.css) | Scoped stylesheet for the 3-tab customer profile page |
+| [`src/pages/ContactPage.tsx`](file:///c:/AnyStop/src/pages/ContactPage.tsx) | Dedicated React Contact Us Page route component (`/contact`) |
+| [`src/pages/ContactPage.css`](file:///c:/AnyStop/src/pages/ContactPage.css) | Scoped stylesheet for the contact page with animated plane and interactive form |
 | [`src/context/AuthContext.tsx`](file:///c:/AnyStop/src/context/AuthContext.tsx) | Shared authentication session context with localStorage persistence |
 | [`src/context/ThemeContext.tsx`](file:///c:/AnyStop/src/context/ThemeContext.tsx) | Shared dark/light theme context with circular View Transitions |
 | [`src/App.tsx`](file:///c:/AnyStop/src/App.tsx) | React Router application entrypoint configuring routes for all three pages |

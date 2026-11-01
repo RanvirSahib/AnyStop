@@ -185,6 +185,14 @@ export const LandingPage: React.FC = () => {
             <a href="#faq">FAQ</a>
             <button
               type="button"
+              onClick={() => navigate('/contact')}
+              style={{ background: 'none', border: 'none', color: '#DAD3F2', padding: '10px 12px', fontWeight: 500, cursor: 'pointer', font: 'inherit' }}
+              className="hidden md:block hover:text-white"
+            >
+              Contact
+            </button>
+            <button
+              type="button"
               onClick={(e) => toggleDarkMode(e)}
               className="landing-theme-toggle-btn theme-toggle-btn"
               title={darkMode ? "Switch to Day theme" : "Switch to Night theme"}
@@ -529,6 +537,7 @@ export const LandingPage: React.FC = () => {
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
             <button type="button" style={{ background: 'transparent', border: 'none', cursor: 'pointer', color: 'inherit', font: 'inherit' }} onClick={handleFindBus}>Bus finder</button>
+            <button type="button" style={{ background: 'transparent', border: 'none', cursor: 'pointer', color: 'inherit', font: 'inherit' }} onClick={() => navigate('/contact')}>Contact us</button>
             <button type="button" style={{ background: 'transparent', border: 'none', cursor: 'pointer', color: 'inherit', font: 'inherit' }} onClick={handleLogin}>Log in</button>
           </div>
         </div>
