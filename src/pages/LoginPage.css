@@ -813,9 +813,26 @@
 }
 
 .stopsense-login .inp.otp-inp input {
+  font-family: "Figtree", system-ui, -apple-system, sans-serif;
+  font-weight: 500;
+  letter-spacing: normal;
+  font-size: 14px;
+}
+
+.stopsense-login .inp.otp-inp input:not(:placeholder-shown) {
   font-family: "DM Mono", monospace;
   font-weight: 700;
-  letter-spacing: 0.12em;
+  letter-spacing: 0.2em;
+  font-size: 15px;
+}
+
+.stopsense-login .inp.otp-inp input::placeholder {
+  font-family: "Figtree", system-ui, -apple-system, sans-serif;
+  font-weight: 500;
+  letter-spacing: normal;
+  font-size: 13.5px;
+  color: var(--muted);
+  opacity: 0.75;
 }
 
 .stopsense-login .otp-action-btn {

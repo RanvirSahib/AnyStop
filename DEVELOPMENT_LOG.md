@@ -2400,6 +2400,19 @@ This document tracks all features, user requests, architectural decisions, and i
 
 ---
 
+### Step 36: OTP Input Placeholder Font & Typography Refinement
+- **User Request**: *"Change the font styles of this"* (attached screenshot showing the monospace blocky `Click 'Send OTP'` placeholder in the login OTP field).
+- **Issue Diagnosis**:
+  - `.stopsense-login .inp.otp-inp input` previously forced `font-family: "DM Mono", monospace; font-weight: 700; letter-spacing: 0.12em;` globally on the entire input.
+  - This caused unentered placeholder text (`Click 'Send OTP'` / `Enter 6-digit OTP`) to inherit the typewriter monospace font with wide, blocky spacing.
+- **Implementation**:
+  - In [`src/pages/LoginPage.css`](file:///c:/AnyStop/src/pages/LoginPage.css), updated `.stopsense-login .inp.otp-inp input` and its `::placeholder` to use the sleek application sans-serif typography (`"Figtree", system-ui, -apple-system, sans-serif; font-weight: 500; letter-spacing: normal; font-size: 13.5px; opacity: 0.75;`).
+  - Added `:not(:placeholder-shown)` selector so that only when the user actually enters their 6-digit security pin does the input switch to cleanly spaced numeric digits (`font-family: "DM Mono", monospace; font-weight: 700; letter-spacing: 0.2em; font-size: 15px;`).
+- **Verification**:
+  - `npm run build` compiled 1686 modules in 8.71s with 0 errors.
+
+---
+
 ## 🗂️ Key Files Reference
 | File | Role |
 | :--- | :--- |
