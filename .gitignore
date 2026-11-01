@@ -34,3 +34,7 @@ Thumbs.db
 
 # Mobile native build
 android/
+
+# Mobile build artifacts
+*.apk
+AnyStop.apk
