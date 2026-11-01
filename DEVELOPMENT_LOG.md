@@ -2542,6 +2542,22 @@ This document tracks all features, user requests, architectural decisions, and i
 
 ---
 
+### Step 44: Integration of Official AnyStop Branding & App Icon Suite
+- **User Request**: *"Add the logos of anystop in app"*
+- **Implementation**:
+  - **Android App Launcher Icon & Metadata**:
+    - Replaced generic Flutter launcher placeholders with high-resolution AnyStop adaptive launcher icons (`ic_launcher.png`, `ic_launcher_round.png`, `ic_launcher_foreground.png`) across all 5 mipmap densities (`mdpi`, `hdpi`, `xhdpi`, `xxhdpi`, `xxxhdpi`).
+    - Synchronized high-density AnyStop splash screen drawables in `res/drawable*`.
+    - Updated [`mobile_flutter/android/app/src/main/AndroidManifest.xml`](file:///c:/AnyStop/mobile_flutter/android/app/src/main/AndroidManifest.xml) with `android:label="AnyStop"`, `android:icon="@mipmap/ic_launcher"`, and `android:roundIcon="@mipmap/ic_launcher_round"`.
+  - **In-App Vector Logo & Header Branding**:
+    - Extracted the official AnyStop location pin + bus silhouette + radar wave emblem into [`mobile_flutter/assets/anystop-emblem.svg`](file:///c:/AnyStop/mobile_flutter/assets/anystop-emblem.svg).
+    - Upgraded [`mobile_flutter/lib/ui/widgets/anystop_logo.dart`](file:///c:/AnyStop/mobile_flutter/lib/ui/widgets/anystop_logo.dart) to render the official vector emblem via `SvgPicture` alongside the Bricolage Grotesque typography (`Any` in Navy, `Stop` in Coral) and `"PUNJAB HIGHWAY TRANSIT"` gold subtitle.
+- **Verification**:
+  - `flutter analyze` passed with 0 issues.
+  - `flutter test` passed 5/5 unit & widget test suites with 0 errors.
+
+---
+
 ## 🗂️ Key Files Reference
 | File | Role |
 | :--- | :--- |
