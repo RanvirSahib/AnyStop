@@ -2480,6 +2480,20 @@ This document tracks all features, user requests, architectural decisions, and i
 
 ---
 
+### Step 40: Removed External Mail Link from Contact Success Card & Pushed to GitHub
+- **User Request**: *"Delete tjos amd push to github"* (attached screenshot showing the bottom prompt *"Want to send attachments or a direct copy from your mailbox? Open in email app"*).
+- **Implementation**:
+  - In [`src/pages/ContactPage.tsx`](file:///c:/AnyStop/src/pages/ContactPage.tsx):
+    - Removed the `.extra-mail-action` section from the success overlay card, keeping the interface minimal and focused on "Back to bus finder" and "Write another".
+    - Removed unused `ExternalLink` icon import and unused `mailtoUrl` / `mailtoSubject` / `mailtoBody` references.
+  - In [`src/pages/ContactPage.css`](file:///c:/AnyStop/src/pages/ContactPage.css):
+    - Removed `.contact-page .extra-mail-action` styles.
+- **Verification**:
+  - `npm run build` compiled 1686 modules in 6.35s with 0 errors.
+  - Pushed all accumulated commits to GitHub (`origin/main`).
+
+---
+
 ## 🗂️ Key Files Reference
 | File | Role |
 | :--- | :--- |

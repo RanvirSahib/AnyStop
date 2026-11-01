@@ -751,42 +751,6 @@
   color: #fff;
 }
 
-.contact-page .extra-mail-action {
-  margin-top: 18px;
-  font-size: 13px;
-  color: var(--muted);
-  line-height: 1.45;
-  text-align: center;
-}
-
-.contact-page .extra-mail-action a {
-  color: var(--coral);
-  font-weight: 600;
-  text-decoration: underline;
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  border: none;
-  background: none;
-  padding: 0;
-  min-height: auto;
-  border-radius: 0;
-}
-
-.contact-page .extra-mail-action a:hover {
-  color: var(--coral2);
-  background: none;
-  border-color: transparent;
-  transform: none;
-}
-
-.contact-page .extra-mail-action a svg {
-  width: 13px !important;
-  height: 13px !important;
-  display: inline-block;
-  vertical-align: middle;
-}
-
 /* ==========================================================================
    FAQ Section
    ========================================================================== */

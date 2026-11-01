@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Sun, Moon, ExternalLink } from 'lucide-react';
+import { Sun, Moon } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 import { AnyStopLogo } from '../components/AnyStopLogo';
@@ -120,10 +120,6 @@ export const ContactPage: React.FC = () => {
     setEmailError(false);
     setMessageError(false);
   };
-
-  const mailtoSubject = `[AnyStop] ${TOPICS[selectedTopic].label}`;
-  const mailtoBody = `${message.trim()}\n\n— ${name.trim()} (${email.trim()})`;
-  const mailtoUrl = `mailto:support.anystop@gmail.com?subject=${encodeURIComponent(mailtoSubject)}&body=${encodeURIComponent(mailtoBody)}`;
 
   const firstName = name.trim().split(/\s+/)[0] || 'Traveller';
 
@@ -360,12 +356,6 @@ export const ContactPage: React.FC = () => {
                 <button type="button" onClick={handleResetForm}>
                   <span>Write another</span>
                 </button>
-              </div>
-              <div className="extra-mail-action">
-                <span>Want to send attachments or a direct copy from your mailbox?</span>{' '}
-                <a href={mailtoUrl} target="_blank" rel="noopener noreferrer">
-                  Open in email app <ExternalLink size={13} />
-                </a>
               </div>
             </div>
           </div>
