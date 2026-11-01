@@ -2494,6 +2494,39 @@ This document tracks all features, user requests, architectural decisions, and i
 
 ---
 
+### Step 41: Mobile View Margins, Horizontal Overflow & Text Wrapping Fix
+- **User Request**: *"Check the margins for the mobile view and fix that and verify the mobile yourself"* (attached two mobile screenshots showing right-side clipping, horizontal scrolling, and misaligned margins).
+- **Issue Diagnosis & Root Cause Analysis**:
+  1. **Global Class Collision (`.t`) Causing Text Overflow**:
+     - In [`src/index.css`](file:///c:/AnyStop/src/index.css), a global selector `.t { white-space: nowrap; }` was defined for landing tracks.
+     - In [`src/pages/ContactPage.tsx`](file:///c:/AnyStop/src/pages/ContactPage.tsx), the "Reply time" card had `<div className="ic t">`, which unintentionally inherited `white-space: nowrap;`.
+     - This prevented the sentence *"We aim to review and reply within 1–2 working days."* from wrapping onto a second line, forcing the text to stretch to **423.4px** wide on a **386px** viewport and pushing the entire page into horizontal overflow.
+  2. **Subpixel Bleed on Paper Plane SVG**:
+     - `.contact-page .plane` had `right: -20px` (and `right: -10px` on mobile), bleeding outside the screen boundaries.
+  3. **Unconstrained Mobile Grid Tracks**:
+     - `.contact-page .grid` lacked an explicit `grid-template-columns: 100%; min-width: 0;` on mobile viewports below 840px, causing flex and grid children (`.ic`, `.card`, `.info`) to size based on `auto` (max-content).
+  4. **Success State Action Buttons Stacking**:
+     - On narrow mobile screens (< 480px), side-by-side action buttons in `.done .row` squeezed against margins and caused wobble.
+- **Implementation**:
+  1. **Scoped CSS Classes & Forced Normal Whitespace (`src/pages/ContactPage.tsx` & `src/pages/ContactPage.css`)**:
+     - Renamed `.ic.t` to `.ic.ic-timer` and `.ic.g` to `.ic.ic-bus`, eliminating the global `.t` class collision.
+     - Added `.contact-page .ic span { display: block; width: 100%; max-width: 100%; white-space: normal; word-break: break-word; overflow-wrap: anywhere; line-height: 1.45; }` so text wraps cleanly to the next line.
+  2. **Contained Mobile Viewport & Margins (`src/pages/ContactPage.css`)**:
+     - Added universal box-sizing: `.contact-page, .contact-page *, .contact-page *::before, .contact-page *::after { box-sizing: border-box; }`.
+     - Added `width: 100%; max-width: 100%; contain: paint;` to `.hero` and `.card`.
+     - Constrained the animated paper plane SVG on mobile to `right: 0; width: min(220px, 60%); opacity: 0.45; overflow: hidden;`.
+     - Sized mobile `.wrap` padding to `0 16px` on `< 640px` and `0 12px` on `< 380px`.
+     - Sized mobile `.card` padding to `18px 14px` and `.ic` padding to `14px 12px`.
+     - Styled `.done .row` buttons into a vertically stacked, full-width column (`max-width: 320px; width: 100%;`) on mobile with `overflow-wrap: anywhere; word-break: break-word;` on email strings.
+- **Verification**:
+  - Rebuilt production bundle via `npm run build` (`tsc -b && vite build` completed in 9.32s with 0 errors).
+  - Executed automated Chrome DevTools Protocol verification script testing viewports at **360x800**, **375x812**, and **386x844** (user's device dimension):
+    - `overflowingElementsCount: 0` (zero overflowing elements across all viewports).
+    - `hasHorizontalOverflow: false` (`document.documentElement.scrollWidth === clientWidth`).
+    - Captured and visually inspected screenshots of the hero, info cards, contact form, validation states, success dialog, FAQ accordion, and footer, confirming 100% symmetric margins and zero horizontal scroll or clipping.
+
+---
+
 ## 🗂️ Key Files Reference
 | File | Role |
 | :--- | :--- |

@@ -218,23 +218,23 @@ export const ContactPage: React.FC = () => {
               onClick={handleCopyEmail}
               title="Click to copy email address"
             >
-              <span className="e">✉️</span>
+              <span className="ic-icon">✉️</span>
               <div>
                 <b>Email us</b>
                 <span>{copiedEmail ? 'Copied to clipboard! ✓' : 'support.anystop@gmail.com'}</span>
               </div>
             </a>
 
-            <div className="ic t">
-              <span className="e">⏱</span>
+            <div className="ic ic-timer">
+              <span className="ic-icon">⏱</span>
               <div>
                 <b>Reply time</b>
                 <span>We aim to review and reply within 1–2 working days.</span>
               </div>
             </div>
 
-            <div className="ic g">
-              <span className="e">🚌</span>
+            <div className="ic ic-bus">
+              <span className="ic-icon">🚌</span>
               <div>
                 <b>Reporting a wrong timing?</b>
                 <span>Tell us the two stops, the bus operator (PRTC/Punbus/private), and the actual departure time you saw. That’s all we need.</span>
