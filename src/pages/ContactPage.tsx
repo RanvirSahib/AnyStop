@@ -39,7 +39,7 @@ export const ContactPage: React.FC = () => {
 
   const handleCopyEmail = (e: React.MouseEvent) => {
     e.preventDefault();
-    navigator.clipboard.writeText('support@anystop.in');
+    navigator.clipboard.writeText('support.anystop@gmail.com');
     setCopiedEmail(true);
     setTimeout(() => setCopiedEmail(false), 2200);
   };
@@ -99,7 +99,7 @@ export const ContactPage: React.FC = () => {
 
   const mailtoSubject = `[AnyStop] ${TOPICS[selectedTopic].label}`;
   const mailtoBody = `${message.trim()}\n\n— ${name.trim()} (${email.trim()})`;
-  const mailtoUrl = `mailto:support@anystop.in?subject=${encodeURIComponent(mailtoSubject)}&body=${encodeURIComponent(mailtoBody)}`;
+  const mailtoUrl = `mailto:support.anystop@gmail.com?subject=${encodeURIComponent(mailtoSubject)}&body=${encodeURIComponent(mailtoBody)}`;
 
   const firstName = name.trim().split(/\s+/)[0] || 'Traveller';
 
@@ -194,14 +194,14 @@ export const ContactPage: React.FC = () => {
           <div className="info">
             <a
               className="ic"
-              href="mailto:support@anystop.in"
+              href="mailto:support.anystop@gmail.com"
               onClick={handleCopyEmail}
               title="Click to copy email address"
             >
               <span className="e">✉️</span>
               <div>
                 <b>Email us</b>
-                <span>{copiedEmail ? 'Copied to clipboard! ✓' : 'support@anystop.in'}</span>
+                <span>{copiedEmail ? 'Copied to clipboard! ✓' : 'support.anystop@gmail.com'}</span>
               </div>
             </a>
 

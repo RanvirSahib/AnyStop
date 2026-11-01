@@ -2442,6 +2442,18 @@ This document tracks all features, user requests, architectural decisions, and i
 
 ---
 
+### Step 38: Support Email Address Updated to support.anystop@gmail.com
+- **User Request**: *"put the email id as support.anystop@gmail.com"*
+- **Implementation**:
+  - In [`src/pages/ContactPage.tsx`](file:///c:/AnyStop/src/pages/ContactPage.tsx):
+    - Updated clipboard copy action to copy `support.anystop@gmail.com`.
+    - Updated `mailto:` fallback link in `mailtoUrl` to `mailto:support.anystop@gmail.com`.
+    - Updated the email card display link and text to `support.anystop@gmail.com`.
+- **Verification**:
+  - `npm run build` compiled 1686 modules in 6.35s with 0 errors.
+
+---
+
 ## 🗂️ Key Files Reference
 | File | Role |
 | :--- | :--- |
