@@ -1,9 +1,9 @@
-import { Radio, PhoneCall, Sun, Moon } from 'lucide-react';
+import { Radio, PhoneCall } from 'lucide-react';
 import { AnyStopLogo } from './AnyStopLogo';
 
 interface HeaderProps {
-  darkMode: boolean;
-  onToggleDarkMode: (e: React.MouseEvent<HTMLButtonElement>) => void;
+  darkMode?: boolean;
+  onToggleDarkMode?: (e: React.MouseEvent<HTMLButtonElement>) => void;
   onOpenInquiries: () => void;
   onOpenSpottedFeed: () => void;
   spottedCount: number;
@@ -15,8 +15,6 @@ interface HeaderProps {
 }
 
 export const Header: React.FC<HeaderProps> = ({
-  darkMode,
-  onToggleDarkMode,
   onOpenInquiries,
   onOpenSpottedFeed,
   spottedCount,
@@ -128,27 +126,6 @@ export const Header: React.FC<HeaderProps> = ({
                 </span>
               </button>
             )}
-
-            {/* Theme toggle */}
-            <button
-              onClick={onToggleDarkMode}
-              className="tbtn shrink-0 theme-toggle-btn"
-              id="theme"
-              aria-label="Switch light and dark theme"
-              title={darkMode ? "Switch to Day theme" : "Switch to Night theme"}
-            >
-              <span className="hidden sm:inline text-xs font-semibold">Theme</span>
-              <span
-                key={darkMode ? 'dark' : 'light'}
-                className="theme-icon-container"
-              >
-                {darkMode ? (
-                  <Moon className="w-3.5 h-3.5 text-indigo-200 fill-indigo-200/50 theme-icon" />
-                ) : (
-                  <Sun className="w-3.5 h-3.5 text-amber-300 fill-amber-300/60 theme-icon" />
-                )}
-              </span>
-            </button>
           </div>
         </div>
 

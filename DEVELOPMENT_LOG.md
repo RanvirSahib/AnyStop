@@ -2527,6 +2527,21 @@ This document tracks all features, user requests, architectural decisions, and i
 
 ---
 
+### Step 43: Removal of Theme Toggle Option Across Mobile and Web
+- **User Request**: *"Delete the themes option' in a app"*
+- **Implementation**:
+  - **Flutter Mobile App**:
+    - In [`mobile_flutter/lib/ui/features/bus_finder/bus_finder_screen.dart`](file:///c:/AnyStop/mobile_flutter/lib/ui/features/bus_finder/bus_finder_screen.dart), removed the Theme Toggle `IconButton` from the top navigation bar.
+    - In [`mobile_flutter/lib/main.dart`](file:///c:/AnyStop/mobile_flutter/lib/main.dart), locked the app to `themeMode: ThemeMode.light` with `AnyStopTheme.lightTheme` for a clean, cohesive mobile experience.
+  - **Web Application**:
+    - In [`src/components/Header.tsx`](file:///c:/AnyStop/src/components/Header.tsx), removed the `#theme` toggle button and unused Lucide icon imports (`Sun`, `Moon`).
+    - Cleaned up unused props in `Header.tsx` to ensure strict TypeScript compliance.
+- **Verification**:
+  - `npm run build` compiled 1686 modules in 6.70s with 0 errors.
+  - `flutter test` passed all 5 test suites (transit dataset, routing engine, fares, and app smoke test) with 0 errors.
+
+---
+
 ## 🗂️ Key Files Reference
 | File | Role |
 | :--- | :--- |
