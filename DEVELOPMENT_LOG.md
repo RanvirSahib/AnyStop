@@ -2558,6 +2558,28 @@ This document tracks all features, user requests, architectural decisions, and i
 
 ---
 
+### Step 45: Animated Map-Pin Splash & Launch Screen Integration
+- **User Request**: *"there is some files for the when the app is starting then it will be shown as a animation so that the app looks attractive you can check these in the front app folder and add that in the app"*
+- **Implementation**:
+  - Found provided animation assets and source in [`front app/`](file:///c:/AnyStop/front%20app/):
+    - `logo.png`
+    - `splash_screen.dart`
+  - Bundled `logo.png` into [`mobile_flutter/assets/images/logo.png`](file:///c:/AnyStop/mobile_flutter/assets/images/logo.png) and updated `pubspec.yaml` with `- assets/images/`.
+  - Implemented [`mobile_flutter/lib/ui/features/splash/splash_screen.dart`](file:///c:/AnyStop/mobile_flutter/lib/ui/features/splash/splash_screen.dart):
+    - Map-pin logo drop-in with bounce and pop physics (`Curves.bounceOut`, `Curves.easeOutBack`).
+    - Expanding radial glow and 3 pulsing orange signal radar rings via `_RingsPainter`.
+    - Animated yellow dashed highway road drawing underneath via `_RoadPainter`.
+    - Sequential letter-by-letter reveal for `"AnyStop"` using `GoogleFonts.bricolageGrotesque`.
+    - `"ANY STOP · ANY BUS"` subtitle fade-in using `GoogleFonts.figtree`.
+    - Accessible reduce-motion handling via `MediaQuery.disableAnimations`.
+    - Smooth 600ms `FadeTransition` page replacement into `BusFinderScreen()`.
+  - Configured `home: const SplashScreen(next: BusFinderScreen())` in [`mobile_flutter/lib/main.dart`](file:///c:/AnyStop/mobile_flutter/lib/main.dart).
+- **Verification**:
+  - `flutter analyze` completed with **0 issues**.
+  - `flutter test` verified with **5/5 tests passing** (unit tests + full splash animation and page replacement test).
+
+---
+
 ## 🗂️ Key Files Reference
 | File | Role |
 | :--- | :--- |
